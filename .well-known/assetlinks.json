@@ -1,0 +1,13 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "BURAYA_PACKAGE_ID_YAZ",
+      "sha256_cert_fingerprints": [
+        "BURAYA_PLAY_CONSOLE_SHA256_PARMAK_IZI_1",
+        "BURAYA_PWABUILDER_KEYSTORE_SHA256_PARMAK_IZI_2"
+      ]
+    }
+  }
+]

@@ -1,0 +1,21 @@
+{
+  "id": "./",
+  "name": "Kidomind • Aksu Studio",
+  "short_name": "Kidomind",
+  "description": "Çocuklar ve gençler için matematik, İngilizce, bilgi yarışması ve beyin oyunları. Reklamsız, çevrimdışı çalışır.",
+  "lang": "tr",
+  "dir": "ltr",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0d1022",
+  "theme_color": "#5b5bf0",
+  "categories": ["education", "kids", "games"],
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/maskable-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
