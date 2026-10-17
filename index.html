@@ -130,7 +130,7 @@ background:radial-gradient(circle at 30% 20%,#8b7bff 0,#5b5bf0 45%,#2f2fb8 100%)
 #splash .st{letter-spacing:.35em;font-size:15px;font-weight:700;opacity:0;animation:spIn .8s .2s forwards;text-transform:uppercase}
 #splash .st small{display:block;letter-spacing:.2em;font-size:11px;opacity:.75;margin-top:6px;font-weight:600}
 #splash .lg{font-size:min(19vw,92px);font-weight:900;line-height:1;margin:22px 0 10px;opacity:0;animation:spPop .9s 1.1s cubic-bezier(.2,1.6,.4,1) forwards;text-shadow:0 6px 24px #0004}
-#splash .lg b{color:#ffd23f}
+#splash .lg b{color:#ffb800}
 #splash .tg{font-size:16px;opacity:0;animation:spIn .8s 1.8s forwards;letter-spacing:.08em}
 #splash .go{margin-top:44px;min-width:210px;min-height:60px;border-radius:30px;background:#fff;color:#4a46d8;font-size:22px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 8px 0 #c9cbff,0 14px 30px #0005;border:0;opacity:0;animation:spIn .6s 2.4s forwards,spPulse 1.6s 3s infinite}
 #splash .go:active{transform:translateY(4px);box-shadow:0 4px 0 #c9cbff}
@@ -1184,14 +1184,76 @@ html:root:root:root body #app .kdpf-sw{color:#fff!important;-webkit-text-fill-co
 .kdl-pad .ph{visibility:hidden}
 @media(prefers-reduced-motion:reduce){.kdl-dots.bad{animation:none}}
 </style>
+<style id="kidomind-splash-v2">
+/* Kidomind açılış ekranı v3 – tipografi odaklı */
+@property --s{syntax:"<length>";inherits:false;initial-value:0em}
+@property --ang{syntax:"<angle>";inherits:false;initial-value:0deg}
+#splash.kd2{font-family:ui-rounded,"SF Pro Rounded","Nunito","Baloo 2",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+#splash.kd2 .fl{opacity:.1;font-weight:900}
+/* akan renk lekeleri */
+#splash.kd2 .sp-blob{position:absolute;width:min(95vw,520px);aspect-ratio:1;border-radius:50%;filter:blur(64px);opacity:0;pointer-events:none;mix-blend-mode:screen;animation:spBlobIn 1.6s .1s forwards}
+#splash.kd2 .b1{left:-25%;top:4%;background:#7c5cff;animation-name:spBlobIn,spDrift1;animation-duration:1.6s,14s;animation-delay:.1s,0s;animation-iteration-count:1,infinite;animation-fill-mode:forwards,none;animation-timing-function:ease,ease-in-out}
+#splash.kd2 .b2{right:-30%;top:30%;background:#22d3ee;animation-name:spBlobIn,spDrift2;animation-duration:1.6s,17s;animation-delay:.3s,0s;animation-iteration-count:1,infinite;animation-fill-mode:forwards,none;animation-timing-function:ease,ease-in-out}
+#splash.kd2 .b3{left:5%;bottom:-24%;background:#f472b6;animation-name:spBlobIn,spDrift3;animation-duration:1.6s,19s;animation-delay:.5s,0s;animation-iteration-count:1,infinite;animation-fill-mode:forwards,none;animation-timing-function:ease,ease-in-out}
+@keyframes spBlobIn{to{opacity:.42}}
+@keyframes spDrift1{50%{translate:28% 18%}}
+@keyframes spDrift2{50%{translate:-30% -14%}}
+@keyframes spDrift3{50%{translate:22% -26%}}
+#splash.kd2 .sp-top{position:relative;font-size:12px;font-weight:800;letter-spacing:.42em;text-transform:uppercase;color:#fff;opacity:0;animation:spIn .9s .2s forwards;margin-bottom:clamp(18px,4vh,36px)}
+#splash.kd2 .sp-top small{font-size:10px;letter-spacing:.3em;opacity:.65;font-weight:700;margin-left:.5em}
+/* YAZI */
+#splash.kd2 .sp-logo{position:relative;margin:0;font-size:min(17.4vw,104px);font-weight:900;line-height:1.05;letter-spacing:-.05em;white-space:nowrap;}
+#splash.kd2 .sp-w{position:relative;display:inline-block}
+#splash.kd2 .l{position:relative;display:inline-block;opacity:0;color:#2f8bff;-webkit-text-fill-color:#2f8bff;
+ text-shadow:0 0 .35em rgba(47,139,255,.35);
+ animation:spLet 1s calc(.9s + var(--i)*.075s) cubic-bezier(.16,1.2,.3,1) forwards}
+#splash.kd2 .l:nth-child(n+5){color:#ffb800;-webkit-text-fill-color:#ffb800;text-shadow:0 0 .35em rgba(255,184,0,.35)}
+@keyframes spLet{0%{opacity:0;transform:translateY(.55em) scale(.86);filter:blur(16px)}60%{filter:blur(0)}100%{opacity:1;transform:none;filter:none}}
+@keyframes spWave{50%{translate:0 -.045em}}
+/* i noktaları */
+#splash.kd2 .l.dt:after{content:"";position:absolute;left:50%;top:.075em;width:.17em;height:.17em;margin-left:-.085em;border-radius:50%;
+ background:var(--dc);box-shadow:0 0 .35em var(--dc),0 0 .8em var(--dc);
+ transform:scale(0);animation:spDot .7s calc(1.9s + var(--i)*.1s) cubic-bezier(.2,2,.4,1) forwards}
+@keyframes spDot{from{transform:translateY(-1.4em) scale(0)}to{transform:none}}
+@keyframes spGlow{50%{box-shadow:0 0 .55em var(--dc),0 0 1.3em var(--dc);scale:1.18}}
+/* çizgi + slogan */
+#splash.kd2 .sp-line{height:3px;width:0;margin-top:clamp(12px,2.4vh,20px);border-radius:3px;background:linear-gradient(90deg,transparent,#2f8bff,#ffb800,transparent);animation:spLine 1.1s 1.9s cubic-bezier(.2,.8,.2,1) forwards}
+@keyframes spLine{to{width:min(58vw,230px)}}
+#splash.kd2 .sp-tg{display:flex;align-items:center;gap:12px;margin-top:clamp(14px,2.6vh,22px);font-size:13px;font-weight:800;letter-spacing:.3em;text-transform:uppercase;color:#fff}
+#splash.kd2 .sp-tg span{opacity:0;animation:spIn .7s calc(2.2s + var(--k,0)*.2s) forwards}
+#splash.kd2 .sp-tg span:nth-of-type(2){--k:1}#splash.kd2 .sp-tg span:nth-of-type(3){--k:2}
+#splash.kd2 .sp-tg em{width:5px;height:5px;border-radius:50%;background:#ffb800;opacity:0;animation:spIn .5s 2.4s forwards}
+/* buton */
+#splash.kd2 .sp-go{position:relative;margin-top:clamp(30px,6vh,54px);min-width:190px;height:60px;padding:0 30px;border:0;border-radius:30px;cursor:pointer;color:#fff;font:inherit;font-size:20px;font-weight:900;letter-spacing:.02em;
+ display:flex;align-items:center;justify-content:center;gap:12px;
+ background:linear-gradient(135deg,rgba(255,255,255,.2),rgba(255,255,255,.07));backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+ box-shadow:0 14px 40px rgba(10,6,70,.35),inset 0 1px 0 rgba(255,255,255,.4);opacity:0;animation:spIn .7s 2.9s forwards;-webkit-tap-highlight-color:transparent}
+#splash.kd2 .sp-go:before{content:"";position:absolute;inset:0;border-radius:inherit;padding:1.6px;pointer-events:none;
+ background:conic-gradient(from var(--ang),rgba(255,255,255,.05) 0,#fff 14%,#67e8f9 28%,#f9a8d4 42%,rgba(255,255,255,.05) 58%);
+ -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0);animation:spAng 3.2s linear infinite}
+@keyframes spAng{to{--ang:360deg}}
+#splash.kd2 .sp-go b{font-weight:900}
+@keyframes spNudge{50%{translate:5px 0}}
+@keyframes spBreath{50%{transform:scale(1.045)}}
+#splash.kd2 .sp-go:active{transform:scale(.95);animation:none;opacity:1}
+#splash.kd2 .sp-foot{position:absolute;left:0;right:0;bottom:calc(env(safe-area-inset-bottom,0px) + 18px);font-size:10.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#fff;opacity:0;animation:spFoot .8s 3.4s forwards}
+@keyframes spFoot{to{opacity:.5}}
+@media(max-height:520px){#splash.kd2 .sp-foot{display:none}}
+
+#splash.kd2{cursor:default}
+/* v4: sabit, koyu zemin */
+#splash#splash.kd2{background:radial-gradient(ellipse 90% 55% at 50% 28%,#18206e 0,transparent 72%),radial-gradient(ellipse 70% 45% at 90% 95%,#2b0d5e 0,transparent 70%),linear-gradient(180deg,#060920 0,#0a0f36 55%,#100a2e 100%)!important}
+#splash#splash.kd2:before{border:1px solid rgba(120,140,255,.10)!important;box-shadow:0 0 0 28px rgba(120,140,255,.025),0 0 0 70px rgba(120,140,255,.018)!important}
+#splash.kd2 .sp-blob{display:none!important}
+#splash.kd2 .fl{opacity:.07;color:#8fa2ff}
+#splash.kd2 .l{text-shadow:none}
+#splash.kd2 .l.dt:after{box-shadow:0 0 .3em var(--dc)}
+#splash.kd2 .sp-go{background:linear-gradient(135deg,rgba(255,255,255,.12),rgba(255,255,255,.04));box-shadow:0 10px 30px rgba(0,0,0,.45)}
+</style>
 </head>
 <body>
 <main id="app"></main>
-<div id="splash" role="dialog" aria-label="Kidomind açılış ekranı"><div id="spf"></div>
-<div class="st">Aksu Studio<small>sunar</small></div>
-<div class="lg">Kido<b>mind</b></div>
-<div class="tg">Oyna • Öğren • Büyü</div>
-<button class="go" id="spgo" type="button">▶ Başla</button></div>
+<div id="splash" class="kd2" role="dialog" aria-label="Kidomind açılış ekranı"><div id="spf"></div><div class="sp-blob b1"></div><div class="sp-blob b2"></div><div class="sp-blob b3"></div><div class="sp-top">Aksu Studio <small>sunar</small></div><h1 class="sp-logo" aria-label="Kidomind"><span aria-hidden="true" class="sp-w"><span class="l" style="--i:0">K</span><span class="l dt" style="--i:1;--dc:#2f8bff">ı</span><span class="l" style="--i:2">d</span><span class="l" style="--i:3">o</span><span class="l" style="--i:4">m</span><span class="l dt" style="--i:5;--dc:#ffb800">ı</span><span class="l" style="--i:6">n</span><span class="l" style="--i:7">d</span></span></h1><div class="sp-line"></div><div class="sp-tg"><span>Oyna</span><em></em><span>Öğren</span><em></em><span>Büyü</span></div><button class="sp-go" id="spgo" type="button"><b>Başla</b><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button><div class="sp-foot">Kido ile öğren</div></div>
 
 <script>
 window.KCB=(()=>{
@@ -1539,7 +1601,7 @@ function gFruit(){
  for(let i=0;i<7;i++){const bx=14+i*54+(i*37)%15;b.fillStyle="rgba(8,36,24,.38)";b.fillRect(bx,0,11,H);b.fillStyle="rgba(120,200,140,.12)";b.fillRect(bx+2,0,2,H);
   for(let y=40+(i*23)%40;y<H;y+=78){b.fillStyle="rgba(8,36,24,.55)";b.fillRect(bx-2,y,15,4)}}
  q=b.createRadialGradient(W/2,H/2,H*.3,W/2,H/2,H*.75);q.addColorStop(0,"rgba(0,0,0,0)");q.addColorStop(1,"rgba(0,0,0,.5)");b.fillStyle=q;b.fillRect(0,0,W,H);
- const F=["🍉","🍎","🍊","🍌","🍇","🍓","🍍","🥝","🍋"],FC={"🍉":"#ff4d6d","🍎":"#e5383b","🍊":"#ff9f1c","🍌":"#ffe66d","🍇":"#9d4edd","🍓":"#ff4d6d","🍍":"#ffd23f","🥝":"#8ac926","🍋":"#f9f871"};
+ const F=["🍉","🍎","🍊","🍌","🍇","🍓","🍍","🥝","🍋"],FC={"🍉":"#ff4d6d","🍎":"#e5383b","🍊":"#ff9f1c","🍌":"#ffe66d","🍇":"#9d4edd","🍓":"#ff4d6d","🍍":"#ffb800","🥝":"#8ac926","🍋":"#f9f871"};
  const FONT="px 'Apple Color Emoji','Segoe UI Emoji','Noto Color Emoji',serif";
  let fr=[],pc=[],pa=[],st=[],pp=[],tr=[],qq=[],sc=0,hp=3,fm=0,wt=50,ice=0,shake=0,flash=0,flashC="#fff",mf=0,over=0,overT=0,paused=0,newRec=0,comboN=0,comboT=0,dn=0,last=null,boomAt=null;
  const upd=()=>{const e=document.getElementById("fs");if(e)e.textContent="Skor: "+sc+" • Rekor: "+Math.max(best,sc)};
@@ -6736,7 +6798,7 @@ document.addEventListener("click",e=>{if(e.target.closest&&e.target.closest("#sp
 
 /* Konfeti */
 let _cfT=0;
-function confetti(){if(Date.now()-_cfT<1200)return;_cfT=Date.now();const c=document.createElement("canvas");c.style.cssText="position:fixed;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:99999";c.width=innerWidth;c.height=innerHeight;document.body.appendChild(c);const x=c.getContext("2d"),P=[...Array(90)].map(()=>({x:c.width/2,y:c.height*.4,vx:(Math.random()-.5)*14,vy:-Math.random()*14-4,r:4+Math.random()*5,c:"hsl("+Math.random()*360+",90%,60%)",a:Math.random()*6}));let f=0;(function L(){x.clearRect(0,0,c.width,c.height);P.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.45;p.a+=.2;x.save();x.translate(p.x,p.y);x.rotate(p.a);x.fillStyle=p.c;x.fillRect(-p.r,-p.r/2,p.r*2,p.r);x.restore()});if(++f<110)requestAnimationFrame(L);else c.remove()})()}
+var _kdT0=Date.now();function confetti(){if(document.getElementById("splash")||Date.now()-_kdT0<3500)return;if(Date.now()-_cfT<1200)return;_cfT=Date.now();const c=document.createElement("canvas");c.style.cssText="position:fixed;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:99999";c.width=innerWidth;c.height=innerHeight;document.body.appendChild(c);const x=c.getContext("2d"),P=[...Array(90)].map(()=>({x:c.width/2,y:c.height*.4,vx:(Math.random()-.5)*14,vy:-Math.random()*14-4,r:4+Math.random()*5,c:"hsl("+Math.random()*360+",90%,60%)",a:Math.random()*6}));let f=0;(function L(){x.clearRect(0,0,c.width,c.height);P.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.45;p.a+=.2;x.save();x.translate(p.x,p.y);x.rotate(p.a);x.fillStyle=p.c;x.fillRect(-p.r,-p.r/2,p.r*2,p.r);x.restore()});if(++f<110)requestAnimationFrame(L);else c.remove()})()}
 const _toT=toast;toast=function(m){_toT(m);if(/^(🏅|🎯 Hedef|🏆 Yeni|🎉|⭐ Seviye|🃏)/.test(m))confetti()};
 
 /* Koleksiyon albümü */
@@ -12286,15 +12348,15 @@ if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catc
 (function(){try{var sp=document.getElementById("splash");if(!sp)return;
 var seen=false;try{seen=sessionStorage.getItem("kd-splash")==="1"}catch(e){}
 if(seen){sp.remove();return}
-var f=document.getElementById("spf"),sy=["+","−","×","÷","★","?","=","♥"];
-for(var i=0;i<14;i++){var e=document.createElement("span");e.className="fl";e.textContent=sy[i%sy.length];
+var f=document.getElementById("spf"),sy=["+","−","×","÷","★","?","=","♥","✦","π","A","Z"];
+for(var i=0;i<18;i++){var e=document.createElement("span");e.className="fl";e.textContent=sy[i%sy.length];
 e.style.cssText="left:"+(Math.random()*92)+"%;font-size:"+(28+Math.random()*44)+"px;animation-duration:"+(9+Math.random()*10)+"s;animation-delay:-"+(Math.random()*14)+"s";f.appendChild(e)}
+function kdm(){try{var w=document.querySelector("#splash .sp-w");if(!w)return;var L=w.querySelectorAll(".l");if(!L.length)return;var fs=parseFloat(getComputedStyle(L[0]).fontSize)||64;for(var j=0;j<L.length;j++)L[j].style.setProperty("--x",(L[j].offsetLeft/fs).toFixed(3)+"em")}catch(e){}}kdm();requestAnimationFrame(kdm);window.addEventListener("resize",kdm);if(document.fonts&&document.fonts.ready)document.fonts.ready.then(kdm);
 var t0=Date.now(),done=false;
 function close(){if(done||Date.now()-t0<700)return;done=true;try{sessionStorage.setItem("kd-splash","1")}catch(e){}
 try{if(navigator.vibrate)navigator.vibrate(15)}catch(e){}
 sp.classList.add("out");setTimeout(function(){sp.remove()},500)}
-sp.addEventListener("click",close);sp.addEventListener("touchend",function(ev){ev.preventDefault();close()},{passive:false});
-document.addEventListener("keydown",function(ev){if(!done&&(ev.key==="Enter"||ev.key===" "))close()});
+var go=document.getElementById("spgo");if(go){go.addEventListener("click",close);go.addEventListener("touchend",function(ev){ev.preventDefault();close()},{passive:false})}
 }catch(e){console.warn("splash:",e)}})();
 
 /* ===== KİDOMİND v6 KABUK: alt menü + Bugün + kategoriler ===== */
