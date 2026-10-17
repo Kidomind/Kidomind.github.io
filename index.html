@@ -171,7 +171,7 @@ body.kd-home #kdnav{display:flex}body.kd-home #app{padding-bottom:96px}
 .dailybox{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:10px 0 14px;padding:13px 14px;border:1px solid color-mix(in srgb,var(--ok) 35%,var(--bd));border-radius:16px;background:linear-gradient(135deg,color-mix(in srgb,var(--ok) 12%,var(--card)),var(--card));box-shadow:0 8px 24px #00000012}.dailybox b{display:block;font-size:14px}.dailybox small{display:block;color:var(--mu);font-size:11px;margin-top:3px}.dailybox .btn{min-width:108px;font-weight:800}.legendgrid{position:relative}.legendgrid .card{border-color:#f59e0b66;background:linear-gradient(145deg,var(--card),#f59e0b12);box-shadow:0 10px 28px #f59e0b12;position:relative;overflow:hidden}.legendgrid .card:before{content:"";position:absolute;inset:-60% -30%;background:linear-gradient(105deg,transparent 35%,#ffffff22 48%,transparent 60%);transform:translateX(-70%) rotate(8deg);transition:transform .7s ease;pointer-events:none}.legendgrid .card:hover:before{transform:translateX(70%) rotate(8deg)}.legendtag{display:inline-flex;align-items:center;gap:5px;font-size:9px;font-weight:900;letter-spacing:.5px;padding:4px 7px;border-radius:999px;background:#f59e0b18;color:#f59e0b;border:1px solid #f59e0b44;margin-top:5px}.legenddesc{display:block;color:var(--mu);font-size:10px;line-height:1.35;margin-top:4px}.legendcount{margin:8px 0 4px;padding:10px 12px;border:1px solid #f59e0b44;border-radius:14px;background:linear-gradient(135deg,#f59e0b12,var(--card));font-size:11px}.legendcount b{color:#f59e0b}.legendbar{height:6px;background:#f59e0b18;border-radius:999px;overflow:hidden;margin-top:7px}.legendbar i{display:block;height:100%;background:linear-gradient(90deg,#f59e0b,#fde68a);border-radius:999px}
 .kdboxes{display:grid;grid-template-columns:1fr;gap:12px;margin:10px 0 16px}.kdbox{position:relative;overflow:hidden;text-align:left;border:1px solid var(--bd);border-radius:22px;padding:16px;background:linear-gradient(145deg,var(--card),color-mix(in srgb,var(--bc) 13%,var(--card)));color:var(--tx);font:inherit;cursor:pointer;box-shadow:0 12px 26px -17px var(--bc)}.kdbox:active{transform:scale(.985)}.kdbox:disabled{opacity:.55;cursor:default}.kdbox .kbtop{display:flex;align-items:center;gap:12px}.kdbox .kbicon{width:62px;height:62px;flex:none;display:grid;place-items:center;border-radius:18px;background:var(--bc);color:#fff;font-size:34px;box-shadow:0 7px 16px -8px var(--bc)}.kdbox b{font-size:17px}.kdbox small{display:block;color:var(--mu);font-weight:700;margin-top:3px}.kdbox .kbcost{margin-left:auto;white-space:nowrap;background:color-mix(in srgb,var(--bc) 12%,var(--card));border:1px solid color-mix(in srgb,var(--bc) 28%,var(--bd));padding:7px 9px;border-radius:12px;font-weight:900}.kdbox .kbbadge{position:absolute;right:-28px;top:10px;transform:rotate(35deg);background:var(--bc);color:#fff;padding:3px 32px;font-size:9px;font-weight:900}.kdreward{margin:10px 0 14px;padding:16px;border-radius:20px;text-align:center;background:linear-gradient(135deg,#5b5bf0,#ec4899);color:#fff;animation:pp .3s}.kdreward .rgi{font-size:48px}.kdreward b{display:block;font-size:18px;margin-top:3px}.kdreward small{display:block;opacity:.9;margin-top:4px}
 .kdbal b{font-size:30px}.kdbal small{opacity:.9;display:block}
-@media(prefers-color-scheme:dark){}
+
 
 /* Kidomind Özel Hikâye UI */
 .kdstory-feature{width:100%;display:flex;align-items:center;gap:12px;margin:0 0 14px;padding:14px;border:0;border-radius:24px;text-align:left;color:#fff;background:linear-gradient(135deg,#5b5bf0 0%,#7c3aed 52%,#ec4899 100%);box-shadow:0 14px 30px -16px #5b5bf0;cursor:pointer;font-family:inherit}
@@ -1209,13 +1209,13 @@ html:root:root:root body #app .kdpf-sw{color:#fff!important;-webkit-text-fill-co
  animation:spLet 1s calc(.9s + var(--i)*.075s) cubic-bezier(.16,1.2,.3,1) forwards}
 #splash.kd2 .l:nth-child(n+5){color:#ffb800;-webkit-text-fill-color:#ffb800;text-shadow:0 0 .35em rgba(255,184,0,.35)}
 @keyframes spLet{0%{opacity:0;transform:translateY(.55em) scale(.86);filter:blur(16px)}60%{filter:blur(0)}100%{opacity:1;transform:none;filter:none}}
-@keyframes spWave{50%{translate:0 -.045em}}
+
 /* i noktaları */
 #splash.kd2 .l.dt:after{content:"";position:absolute;left:50%;top:.075em;width:.17em;height:.17em;margin-left:-.085em;border-radius:50%;
  background:var(--dc);box-shadow:0 0 .35em var(--dc),0 0 .8em var(--dc);
  transform:scale(0);animation:spDot .7s calc(1.9s + var(--i)*.1s) cubic-bezier(.2,2,.4,1) forwards}
 @keyframes spDot{from{transform:translateY(-1.4em) scale(0)}to{transform:none}}
-@keyframes spGlow{50%{box-shadow:0 0 .55em var(--dc),0 0 1.3em var(--dc);scale:1.18}}
+
 /* çizgi + slogan */
 #splash.kd2 .sp-line{height:3px;width:0;margin-top:clamp(12px,2.4vh,20px);border-radius:3px;background:linear-gradient(90deg,transparent,#2f8bff,#ffb800,transparent);animation:spLine 1.1s 1.9s cubic-bezier(.2,.8,.2,1) forwards}
 @keyframes spLine{to{width:min(58vw,230px)}}
@@ -1233,8 +1233,8 @@ html:root:root:root body #app .kdpf-sw{color:#fff!important;-webkit-text-fill-co
  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0);animation:spAng 3.2s linear infinite}
 @keyframes spAng{to{--ang:360deg}}
 #splash.kd2 .sp-go b{font-weight:900}
-@keyframes spNudge{50%{translate:5px 0}}
-@keyframes spBreath{50%{transform:scale(1.045)}}
+
+
 #splash.kd2 .sp-go:active{transform:scale(.95);animation:none;opacity:1}
 #splash.kd2 .sp-foot{position:absolute;left:0;right:0;bottom:calc(env(safe-area-inset-bottom,0px) + 18px);font-size:10.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#fff;opacity:0;animation:spFoot .8s 3.4s forwards}
 @keyframes spFoot{to{opacity:.5}}
@@ -7230,7 +7230,7 @@ function zpCss(){
  .qzo.ok::before,.qzo.no::before{color:#fff;background:#ffffff40}
  .zp-f{font-size:11px;font-weight:800;color:var(--c);margin-top:6px}
  .zp-clk{width:50px;height:50px;border-radius:50%;background:#fff;border:3px solid var(--c);display:flex;align-items:center;justify-content:center;margin-bottom:8px;box-shadow:0 5px 12px color-mix(in srgb,var(--c) 30%,transparent)}`;document.head.appendChild(st)}
-const zpStar=k=>((meta.stars||{})[k+"_1"])||0,zpTag=k=>zpStar(k)?`<span class="okz-d">${"⭐".repeat(zpStar(k))} en iyi</span>`:`<span class="okz-d z">Henüz denemedin</span>`;
+const zpStar=k=>((meta.stars||{})[k+"_1"])||0,zpTag=k=>zpStar(k)?`<span class="okz-d">${"⭐".repeat(zpStar(k))} en iyi</span>`:``;
 const ZPB=()=>{const f=()=>gClock();f.zp=1;return f};
 const zOpt=(c,pool)=>{const s=new Set([c]);let g=0;while(s.size<4&&g++<300)s.add(pool[R(0,pool.length-1)]);const o=sh([...s]);return{o,a:o.indexOf(c)}};
 const zMenu=(T,sub,cards,fn)=>{BKF=ZPB();zpCss();
@@ -7834,6 +7834,7 @@ function musTick(c,t,v){
  g.gain.value=v*4;s.connect(h);h.connect(g);g.connect(musGain);s.start(t)}
 function musSched(){
  const c=soundManager.ctx;if(!c||!musOn)return;
+ if(window.kmStyle&&window.kmStyle()!=='nese'){const r=window.kmSched(c,musGain,musIdx,musBase);musIdx=r[0];musBase=r[1];return}
  while(true){const e=MUS_EV[musIdx],t=musBase+e[0]*MUS_B;if(t>=c.currentTime+.5)break;
   if(t>=c.currentTime-.05){
    if(e[1]==="m")musPluck(c,e[2],t,e[4],e[3]*MUS_B,e[3]>1?1.6:1.1);
@@ -8572,7 +8573,7 @@ const OKZ=[["#6366f1","#a5b4fc"],["#16a34a","#86efac"],["#ea580c","#fdba74"],["#
 const okzC=i=>{const c=OKZ[i%OKZ.length];return `--c:${c[0]};--c2:${c[1]}`};
 const okzN=k=>(((meta.st||{})[k])||{}).c||0;
 const okzHead=(t,sub,grad,bg,chips)=>`<div class="okz-h" data-bg="${bg}" style="background:${grad}"><h1>${t}</h1><p>${sub}</p><div class="okz-bar">${chips.map(c=>`<span>${c}</span>`).join("")}</div></div>`;
-const okzDone=n=>n?`<span class="okz-d">✅ ${n} doğru</span>`:`<span class="okz-d z">Henüz denemedin</span>`;
+const okzDone=n=>n?`<span class="okz-d">✅ ${n} doğru</span>`:``;
 window.okzCss=okzCss;window.okzHead=okzHead;window.okzC=okzC;window.OKZ=OKZ;
 const BG={m:"linear-gradient(135deg,#fde68a,#fbcfe8)",t:"linear-gradient(135deg,#bae6fd,#bbf7d0)"};
 function dMenu(id,e,title,sub,L,g,fn){BKF=hub;gp();okzCss();
@@ -16048,8 +16049,9 @@ setInterval(notice,60000);setTimeout(notice,2500);
 
 
 <style>
-#kidoVoiceSection{margin:14px 0;padding:14px;border:1px solid var(--bd,#ddd);border-radius:14px;background:var(--card,#fff);color:var(--text,#222)}
-#kidoVoiceSection label{display:block;font-weight:600;margin:8px 0 4px}#kidoVoiceSection select,#kidoVoiceSection button{width:100%;padding:9px;border-radius:9px;border:1px solid #9998;background:var(--bg,#fff);color:inherit;font:inherit}#kidoVoiceSection p{font-size:12px;line-height:1.45;opacity:.8;margin:8px 0}
+#kidoVoiceSection{margin:14px 0;padding:14px;border:1px solid var(--bd,#ddd);border-radius:14px;background:var(--card,#fff);color:var(--tx,#222)}
+#kidoVoiceSection label{display:block;font-weight:600;margin:8px 0 4px;color:var(--tx,#222)}#kidoVoiceSection select,#kidoVoiceSection button{width:100%;padding:9px;border-radius:9px;border:1px solid #9998;background:var(--bg,#fff);color:var(--tx,#222);-webkit-text-fill-color:var(--tx,#222);opacity:1;font:inherit}#kidoVoiceSection select option{background:var(--card,#fff);color:var(--tx,#222)}#kidoVoiceSection p{color:var(--mu,#555)}#kidoVoiceSection button{background:var(--pr,#5b5bf0);color:#fff;-webkit-text-fill-color:#fff;font-weight:700}
+#app #kidoVoiceSection label{color:var(--tx,#222)!important;opacity:1!important}#app #kidoVoiceSection select{background:var(--bg,#fff)!important;color:var(--tx,#222)!important;-webkit-text-fill-color:var(--tx,#222)!important;opacity:1!important;border:1px solid var(--bd,#9998)!important}#app #kidoVoiceSection button{background:var(--pr,#5b5bf0)!important;color:#fff!important;-webkit-text-fill-color:#fff!important;opacity:1!important}#app #kidoVoiceSection p{color:var(--mu,#555)!important}#kidoVoiceSection p{font-size:12px;line-height:1.45;opacity:.8;margin:8px 0}
 </style>
 <script>
 (()=>{
@@ -16217,6 +16219,108 @@ setInterval(notice,60000);setTimeout(notice,2500);
   }
   if(typeof PPX!=='undefined')PPX.push(mount);
   document.addEventListener('DOMContentLoaded',mount);
+})();
+</script>
+<script id="kidomind-music-styles">
+/* Ebeveyn paneli: uygulama müziği seçimi (Web Audio, dosya yok) */
+(function(){
+ const KEY='kido_music_style';
+ const N={C:0,'C#':1,D:2,'D#':3,E:4,F:5,'F#':6,G:7,'G#':8,A:9,'A#':10,B:11};
+ const hz=n=>{const m=n.match(/^([A-G]#?)(\d)$/);return 440*Math.pow(2,((N[m[1]]+12*(+m[2]+1))-69)/12)};
+ const seq=str=>{const out=[];let t=0;str.split(' ').forEach(k=>{const p=k.split(':'),du=+p[1];if(p[0]!=='-')out.push([t,hz(p[0]),du]);t+=du});return {out,len:t}};
+ let mem=null;
+ const get=()=>{if(mem)return mem;try{return localStorage.getItem(KEY)||'nese'}catch(e){return 'nese'}};
+ const put=v=>{mem=v;try{localStorage.setItem(KEY,v);return localStorage.getItem(KEY)===v}catch(e){return false}};
+ const S=[
+ {id:'nese',e:'🥁',n:'Neşe Ode\u2019si (marimba)',d:'Şu anki ana sayfa müziği.'},
+ {id:'lofi',e:'☕',n:'Lo-fi Sakin',d:'Yumuşak piyano akorları, tok davul.',bpm:76,build(){
+  const ch=[['C3','E3','G3','B3'],['A2','C3','E3','G3'],['D3','F3','A3','C4'],['G2','B2','D3','F3']],e=[];
+  const m=seq('E5:1 G5:.5 E5:.5 D5:1 -:1 C5:1 E5:.5 D5:.5 C5:1 -:1 D5:1 F5:.5 E5:.5 D5:1 C5:1 B4:2 -:2').out;
+  for(let b=0;b<4;b++){ch[b].forEach((n,i)=>e.push([b*4+i*.06,0,0,hz(n),4,{type:'triangle',v:.07,len:.9}]));
+   e.push([b*4,'k']);e.push([b*4+2.5,'k']);e.push([b*4+1,'h']);e.push([b*4+3,'h']);
+   for(let q=0;q<8;q++)e.push([b*4+q*.5+(q%2?.1:0),'t'])}
+  m.forEach(x=>e.push([x[0],0,0,x[1],x[2],{type:'sine',v:.1,len:1.3}]));
+  return {e,len:16}}},
+ {id:'chip',e:'🕹️',n:'8-bit Oyun (Türk Marşı)',d:'Mozart ezgisi, eski konsol sesiyle. Enerjik.',bpm:140,build(){
+  const m=seq('B4:.25 A4:.25 G#4:.25 A4:.25 C5:1 D5:.25 C5:.25 B4:.25 C5:.25 E5:1 F5:.25 E5:.25 D#5:.25 E5:.25 B5:.25 A5:.25 G#5:.25 A5:.25 B5:.25 A5:.25 G#5:.25 A5:.25 C6:1.5 A5:.5'),e=[];
+  m.out.forEach(x=>e.push([x[0],0,0,x[1],x[2],{type:'square',v:.06,len:.85,dry:1}]));
+  const len=Math.ceil(m.len/2)*2;
+  for(let b=0;b<len;b++){e.push([b,0,0,hz(b%2?'E3':'A2'),.5,{type:'triangle',v:.12,len:.9,dry:1}]);e.push([b,b%2?'h':'k'])}
+  return {e,len}}},
+ {id:'kutu',e:'🎁',n:'Müzik Kutusu',d:'Çıngıraklı küçük notalar, sakin ve sevimli.',bpm:92,build(){
+  const m=seq('C5:.5 E5:.5 G5:.5 E5:.5 C5:.5 E5:.5 G5:1 A5:.5 G5:.5 F5:.5 E5:.5 D5:.5 F5:.5 E5:1 G5:.5 E5:.5 C5:.5 E5:.5 D5:.5 F5:.5 D5:.5 B4:.5 C5:2'),e=[];
+  m.out.forEach(x=>{e.push([x[0],0,0,x[1],x[2],{type:'sine',v:.1,len:2}]);e.push([x[0],0,0,x[1]*3,x[2],{type:'sine',v:.025,len:.8}])});
+  return {e,len:Math.ceil(m.len/4)*4}}},
+ {id:'macera',e:'🗺️',n:'Macera',d:'Hızlı tempo, kahramanlık havası.',bpm:128,build(){
+  const m=seq('A4:.5 C5:.5 E5:1 D5:.5 C5:.5 D5:1 E5:.5 G5:.5 A5:1 G5:.5 E5:.5 D5:1 C5:.5 D5:.5 E5:1 A4:.5 C5:.5 D5:2 E5:.5 D5:.5 C5:.5 B4:.5 A4:2 -:2'),e=[];
+  m.out.forEach(x=>{e.push([x[0],0,0,x[1],x[2],{type:'sawtooth',v:.035,len:.8}]);e.push([x[0],0,0,x[1]/2,x[2],{type:'triangle',v:.05,len:.8}])});
+  const r=['A2','F2','C3','G2'];
+  for(let b=0;b<m.len;b+=.5){e.push([b,0,0,hz(r[Math.floor(b/4)%4]),.4,{type:'triangle',v:.1,len:.9,dry:1}]);e.push([b,b%1===0?'k':'h'])}
+  return {e,len:Math.ceil(m.len/4)*4}}},
+ {id:'uyku',e:'🌙',n:'Uyku Vakti',d:'Çok yavaş ve yumuşak sesler. Gece için ideal.',bpm:56,build(){
+  const ch=[['A3','C4','E4'],['F3','A3','C4'],['C3','E3','G3'],['G3','B3','D4']],e=[];
+  for(let b=0;b<4;b++){ch[b].concat(ch[b][1]).forEach((n,i)=>e.push([b*4+i,0,0,hz(n),4,{type:'sine',v:.09,len:1.6,a:.2}]));
+   e.push([b*4,0,0,hz(ch[b][0])/2,4,{type:'sine',v:.08,len:1.7,a:.4}])}
+  [[2,'E5'],[6,'C5'],[10,'G5'],[14,'D5']].forEach(x=>e.push([x[0],0,0,hz(x[1]),3,{type:'sine',v:.05,len:1.5}]));
+  return {e,len:16}}}
+ ];
+ const cache={};
+ function build(id){if(cache[id])return cache[id];const s=S.find(x=>x.id===id);if(!s||!s.build)return null;const b=s.build();b.e.sort((x,y)=>x[0]-y[0]);return cache[id]={bpm:s.bpm,e:b.e,len:b.len}}
+ function dly(c,dest){if(dest._kd)return dest._kd;const di=c.createGain(),dl=c.createDelay(1),fb=c.createGain(),w=c.createGain();
+  dl.delayTime.value=.28;fb.gain.value=.3;w.gain.value=.35;di.connect(dl);dl.connect(fb);fb.connect(dl);dl.connect(w);w.connect(dest);return dest._kd=di}
+ function osc(c,dest,f,t,d,o){const s=c.createOscillator(),g=c.createGain(),v=o.v||.12,len=Math.max(.12,d*(o.len||1));
+  s.type=o.type||'sine';s.frequency.value=f;
+  g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(v,t+(o.a||.01));g.gain.exponentialRampToValueAtTime(.0001,t+len);
+  s.connect(g);g.connect(dest);if(!o.dry)g.connect(dly(c,dest));s.start(t);s.stop(t+len+.1)}
+ function noise(c,dest,t,v,hp,dur){const n=Math.floor(c.sampleRate*dur),b=c.createBuffer(1,n,c.sampleRate),d=b.getChannelData(0);
+  for(let i=0;i<n;i++)d[i]=(Math.random()*2-1)*Math.exp(-i/(n*.25));
+  const s=c.createBufferSource(),f=c.createBiquadFilter(),g=c.createGain();s.buffer=b;f.type='highpass';f.frequency.value=hp;g.gain.value=v;
+  s.connect(f);f.connect(g);g.connect(dest);s.start(t)}
+ function kick(c,dest,t,v){const s=c.createOscillator(),g=c.createGain();s.frequency.setValueAtTime(140,t);s.frequency.exponentialRampToValueAtTime(45,t+.12);
+  g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.0001,t+.2);s.connect(g);g.connect(dest);s.start(t);s.stop(t+.25)}
+ function step(c,dest,B,st){const sec=60/B.bpm;
+  while(true){const x=B.e[st.idx],t=st.base+x[0]*sec;if(t>=c.currentTime+.6)break;
+   if(t>=c.currentTime-.05){if(x[1]==='k')kick(c,dest,t,.35);else if(x[1]==='h')noise(c,dest,t,.12,6000,.08);else if(x[1]==='t')noise(c,dest,t,.03,8000,.04);else osc(c,dest,x[3],t,x[4]*sec,x[5])}
+   st.idx++;if(st.idx>=B.e.length){st.idx=0;st.base+=B.len*sec}}}
+ /* Oyun içi müzik motoru bunları çağırır */
+ let last=null;
+ window.kmStyle=get;
+ window.kmSched=function(c,gain,idx,base){const id=get(),B=build(id);if(!B)return [idx,base];
+  if(last!==id||idx>=B.e.length){last=id;return [0,c.currentTime+.1]}
+  const st={idx,base};step(c,gain,B,st);return [st.idx,st.base]};
+ /* Önizleme */
+ let pv=null;
+ function ctxGet(){try{return soundManager._ctx()}catch(e){}if(!window.__kmc)window.__kmc=new (window.AudioContext||window.webkitAudioContext)();return window.__kmc}
+ function pvStop(){if(!pv)return;clearInterval(pv.t);const g=pv.g;try{g.gain.setTargetAtTime(0,pv.c.currentTime,.08)}catch(e){}setTimeout(()=>{try{g.disconnect()}catch(e){}},500);pv=null}
+ function pvPlay(id){pvStop();try{if(typeof musStop==='function')musStop()}catch(e){}const c=ctxGet();if(!c)return;try{c.resume()}catch(e){}
+  const g=c.createGain();g.gain.value=.8;g.connect(c.destination);
+  let B=build(id);
+  if(!B){/* mevcut müzik: marimba benzeri önizleme */
+   try{const ev=[],bs=60/132;MUS_EV.forEach(x=>{if(x[1]==='m'||x[1]==='b')ev.push([x[0],0,0,x[2],x[3],{type:'sine',v:x[4],len:x[3]>1?1.6:1.1}])});
+    B={bpm:132,e:ev,len:MUS_EV.loop}}catch(e){return}}
+  const st={idx:0,base:c.currentTime+.1};step(c,g,B,st);
+  pv={c,g,id,t:setInterval(()=>{if(!sec||!sec.isConnected||document.hidden){pvStop();return}try{step(c,g,B,st)}catch(e){}},120)};
+  setTimeout(()=>{if(pv&&pv.g===g){pvStop();paint()}},45000)}
+ let sec=null,sayT=0;
+ function say(m){if(!sec)return;const el=sec.querySelector('.kmS');if(!el)return;el.textContent=m;el.classList.add('show');clearTimeout(sayT);sayT=setTimeout(()=>{el.textContent='';el.classList.remove('show')},3500)}
+ function paint(){if(!sec||!sec.isConnected)return;const cur=get();
+  sec.querySelector('.kmL').innerHTML=S.map(s=>'<div class="kmR'+(cur===s.id?' on':'')+'"><span class="kmE">'+s.e+'</span><span class="kmI"><b>'+s.n+'</b><small>'+s.d+'</small></span>'
+   +'<span class="kmB"><button type="button" data-p="'+s.id+'">'+(pv&&pv.id===s.id?'⏸':'▶')+'</button><button type="button" data-s="'+s.id+'">'+(cur===s.id?'✓ Seçili':'Seç')+'</button></span></div>').join('')}
+ function mount(){
+  const bk=document.getElementById('bk');if(!bk)return;
+  if(document.getElementById('kidoMusicSection'))return;
+  pvStop();
+  sec=document.createElement('section');sec.id='kidoMusicSection';sec.setAttribute('aria-label','Uygulama müziği');
+  sec.innerHTML='<style>#kidoMusicSection .kmR{display:flex;align-items:center;gap:10px;padding:10px;margin:8px 0;border:1px solid var(--bd,#ddd);border-radius:14px;background:var(--bg,#fff)}#kidoMusicSection .kmR.on{border-color:var(--pr,#5b5bf0);box-shadow:0 0 0 1px var(--pr,#5b5bf0) inset}#kidoMusicSection .kmS{margin:8px 0;min-height:0;font-weight:800;color:var(--ok,#22a06b);text-align:center;font-size:15px}#kidoMusicSection .kmS:empty{display:none}#kidoMusicSection .kmS.show{padding:10px;border-radius:12px;background:var(--bg,#fff);border:1px solid var(--ok,#22a06b)}#kidoMusicSection .kmE{font-size:26px}#kidoMusicSection .kmI{flex:1;min-width:0;color:var(--tx,#222)}#kidoMusicSection .kmI b{display:block;font-size:14.5px}#kidoMusicSection .kmI small{display:block;color:var(--mu,#666);font-size:12px;line-height:1.35;margin-top:2px}#kidoMusicSection .kmB{display:flex;flex-direction:column;gap:6px}#kidoMusicSection .kmB button{padding:8px 10px;min-width:74px;border-radius:10px;border:1px solid var(--bd,#9998);background:var(--card,#fff);color:var(--tx,#222);font:inherit;font-weight:700;font-size:13px}#kidoMusicSection .kmB button[data-s]{background:var(--pr,#5b5bf0);color:#fff;border-color:transparent}</style>'
+   +'<h2>🎵 Uygulama müziği</h2><p class="sub">Ana sayfada çalacak müziği seç. ▶ ile önce dinleyebilirsin.</p><div class="kmL"></div><p class="kmS" role="status" aria-live="polite"></p><p class="sub" style="font-size:12px">Müziği tamamen açıp kapatmak için ana sayfadaki 🎵 Müzik düğmesini kullan.</p>';
+  const v=document.getElementById('kidoVoiceSection');(v||bk).before(sec);
+  sec.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
+   if(b.dataset.p){if(pv&&pv.id===b.dataset.p)pvStop();else pvPlay(b.dataset.p);paint()}
+   else if(b.dataset.s){const id=b.dataset.s,st=S.find(x=>x.id===id);pvStop();const saved=put(id);last=null;try{if(typeof musStop==='function')musStop()}catch(e){}paint();say('✅ '+st.n+' seçildi!'+(saved?'':' (Bu açılış için geçerli; cihaz hafızası kapalı olduğu için uygulamayı kapatınca eski müziğe döner.)'));setTimeout(()=>{try{if(typeof musUpdate==='function')musUpdate()}catch(e){}},700)}});
+  paint()}
+ if(typeof PPX!=='undefined')PPX.push(mount);
+ document.addEventListener('DOMContentLoaded',mount);
+ document.addEventListener('visibilitychange',()=>{if(document.hidden){pvStop();paint()}});
 })();
 </script>
 <script id="kidomind-parent-panel-ui">
@@ -16394,7 +16498,7 @@ setInterval(notice,60000);setTimeout(notice,2500);
  };
  /* Profil sekmesindeki kart yazısı */
  const fix=()=>{document.querySelectorAll('#kdv .card').forEach(c=>{if(/Profil\s*&\s*Rozetler/.test(c.textContent)){const s=c.querySelector("small");if(s&&!s.dataset.pf){s.dataset.pf=1;try{s.textContent="Seviye "+(Math.floor(Math.sqrt((meta.pts||0)/50))+1)+" • "+Object.keys(meta.bd||{}).length+"/"+BDG.length+" rozet • doğruluk"}catch(e){}}}})};
- try{new MutationObserver(fix).observe(document.body,{childList:true,subtree:true});fix()}catch(e){}
+ try{let _ft=0;new MutationObserver(()=>{if(_ft||document.hidden)return;_ft=setTimeout(()=>{_ft=0;if(document.getElementById('kdv'))fix()},350)}).observe(document.body,{childList:true,subtree:true});fix()}catch(e){}
 })();
 </script>
 <style>
@@ -16549,7 +16653,7 @@ setInterval(notice,60000);setTimeout(notice,2500);
    if(!seg.previousElementSibling||!seg.previousElementSibling.classList.contains("sx-sub")){}
   })}catch(e){}
  }
- let q=0;try{new MutationObserver(()=>{if(q)return;q=requestAnimationFrame(()=>{q=0;fmt()})}).observe(document.body,{childList:true,subtree:true,characterData:true})}catch(e){}
+ let q=0;try{new MutationObserver(()=>{if(q||document.hidden)return;q=setTimeout(()=>{q=0;if(document.getElementById('kdv'))fmt()},250)}).observe(document.body,{childList:true,subtree:true,characterData:true})}catch(e){}
  document.addEventListener("DOMContentLoaded",fmt);
 })();
 </script>
@@ -16828,6 +16932,17 @@ setInterval(notice,60000);setTimeout(notice,2500);
 })();
 
 </script>
+<style id="kidomind-perf">
+/* Performans: süs amaçlı sonsuz animasyonları ve ağır bulanıklıkları kapat (telefon kasmasın) */
+#kidomind-ambient{display:none!important}
+body::before,body::after{animation:none!important}
+#kdv:before,#kdv .kdhd:after,#kdv .kdcont,#kdv .kdcont:after,#kdv .kdch span,#hud button.hs::after,#hud .hsi,.kdgr-orb,.kdgr-wave,.kdstory-feature::before,.kdstory-feature-icon,#splash.kd2 .sp-go:before,.sp2-gift:before,.mc3 .mfox::after{animation:none!important}
+#hud,html body #hud,#kdnav,.mc3-ch button,.lvs-back,.en-hero .en-flag{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+html body #hud{background:color-mix(in srgb,var(--bg) 93%,transparent)!important}
+#kdnav{background:var(--card)!important}
+.ov{backdrop-filter:blur(3px)!important;-webkit-backdrop-filter:blur(3px)!important}
+#app *{scroll-behavior:auto}
+</style>
 </body>
 </html>
 
