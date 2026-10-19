@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
+<script id="kdprem-early">window.__kdPremOK=function(){try{var S=JSON.parse(localStorage.getItem("kdprem-v1")||"{}"),n=Math.max(Date.now(),S.seen||0);if(S.plan&&(S.plan==="lifetime"||(S.until||0)>n))return true;return !!S.trial&&S.trial+2592e5>n}catch(e){return false}};</script>
+
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Kidomind • Aksu Studio</title>
@@ -5085,8 +5087,8 @@ function hub(){
   gk.map(g=>card(g,GAMES[g].s,GAMES[g].n,"Seviye "+prog[g]+" • Hedef 100",Math.min(100,Math.max(0,(prog[g]-1))))).join("")+card("parent","👨‍👩‍👧","Ebeveyn Paneli","Gelişim raporu • ekran süresi"+(rwPend()?" • 📬 "+rwPend()+" ödül isteği":""))+card("shop","🛒","Mağaza","Tema • Karakter • Efekt • Unvan • 🪙 "+bal())+card("stats","🏅","Profil & Rozetler",badgeCount()+" / "+BDG.length+" rozet")+`</div><div class="seg"><button id="tsn">🔊 Ses: ${set.snd?"Açık":"Kapalı"}</button><button id="tvb">📳 Titreşim: ${set.vib?"Açık":"Kapalı"}</button><button id="tth">${THN[set.theme||"auto"]}</button><button id="tnt">🔔 Hatırlatma: ${nGet().on?"Açık":"Kapalı"}</button><button id="tac">♿ Erişim</button><button id="tce">📜 Sertifikalar</button><button id="tpv">🔒 Gizlilik</button></div><p class="sub" style="margin:18px 0 6px;font-size:13px">© Aksu Studio • Tüm hakları saklıdır</p>`;
   bindSeg(hub);
   const keepY=fn=>{window.__kdKeep={y:window.pageYOffset||document.documentElement.scrollTop||0,a:app.scrollTop||0};try{fn()}finally{window.__kdKeep=null}};
-  document.getElementById("tsn").onclick=()=>keepY(()=>{set.snd=!set.snd;saveSet();hub()});
-  document.getElementById("tth").onclick=()=>{const o=["auto","dark","light"];set.theme=o[(o.indexOf(set.theme||"auto")+1)%3];saveSet();applyTheme();keepY(hub)};document.getElementById("tvb").onclick=()=>keepY(()=>{set.vib=!set.vib;saveSet();hub()});document.getElementById("tnt").onclick=()=>parentGate(ntfPage,true);document.getElementById("tac").onclick=()=>acPage();document.getElementById("tce").onclick=()=>certPage();document.getElementById("tpv").onclick=()=>privPage();
+  document.getElementById("tsn").onclick=()=>{set.snd=!set.snd;saveSet();kdFlip("tsn",set.snd);try{musUpdate()}catch(e){}};
+  document.getElementById("tth").onclick=()=>{const o=["auto","dark","light"];set.theme=o[(o.indexOf(set.theme||"auto")+1)%3];saveSet();applyTheme();kdLbl("tth",THN[set.theme||"auto"])};document.getElementById("tvb").onclick=()=>{set.vib=!set.vib;saveSet();kdFlip("tvb",set.vib)};document.getElementById("tnt").onclick=()=>parentGate(ntfPage,true);document.getElementById("tac").onclick=()=>acPage();document.getElementById("tce").onclick=()=>certPage();document.getElementById("tpv").onclick=()=>privPage();
   app.querySelectorAll(".card").forEach(c=>c.onclick=()=>{const g=c.dataset.g;g==="lab"?lab():g==="arc"?arcade():g==="m"?menu():g==="stats"?stats():g==="shop"?shop():g==="health"?saglik():g==="kids"?cocuk():g==="safe"?gSafe():g==="eco"?gEco():g==="parent"?parentLock():g==="k"?kvIntro():g==="arena"?arena():g==="bq"?bq():g==="en"?enHome():g==="daily"?play("daily",1):g==="badges"?badgesPage():g==="album"?albumPage():g==="mascot"?masShop():intro(g)});
 }
 const RULES={same:["▶","Aynen tekrar et",p=>p],rev:["🔁","Ters sırayla bas",p=>[...p].reverse()],mir:["↔","Yatay aynala",(p,n)=>p.map(i=>(i/n|0)*n+(n-1-i%n))],rot:["⟳","90° sağa döndür",(p,n)=>p.map(i=>(i%n)*n+(n-1-(i/n|0)))],odd:["1️⃣","Sadece 1., 3., 5. adımları bas",p=>p.filter((_,i)=>i%2===0)]};
@@ -5233,7 +5235,7 @@ function makeQ(op,L,idx){
 function makeQ1(op,L,idx){
   if(!GAMES[op])return makeQ0(op,op==="story"?L:AD.eff(op,L),idx);
   let G=GAMES[op];if(op!=="daily")L=AD.eff(op,L);
-  if(op==="daily"){rnd=seedRng(TD()+prof+idx);G=GAMES[DAILY[idx%5]];L=40}
+  if(op==="daily"){const ci=window.__kdChildQ&&window.__kdChildQ("daily",idx);if(ci)return ci;rnd=seedRng(TD()+prof+idx);G=GAMES[DAILY[idx%5]];L=40}
   const x=G.gen(Math.max(1,Math.min(100,L))),r={txt:x.t,ans:x.a,opts:sh([...(x.o||nOpts(x.a))])};
   rnd=Math.random;return r;
 }
@@ -5420,7 +5422,7 @@ class SoundManager{
  constructor(){this.ctx=null;this.master=null}
  get isMuted(){return !set.snd}              /* ebeveyn "Sessiz Mod" = set.snd'nin tersi (localStorage: mat-set) */
  set isMuted(v){set.snd=!v;saveSet()}
- _ctx(){if(!this.ctx){const C=window.AudioContext||window.webkitAudioContext;if(!C)return null;try{this.ctx=new C({latencyHint:"interactive"})}catch(e){this.ctx=new C()}this.master=this.ctx.createGain();this.master.gain.value=.9;this.master.connect(this.ctx.destination)}return this.ctx}
+ _ctx(){if(!this.ctx){const C=window.AudioContext||window.webkitAudioContext;if(!C)return null;try{this.ctx=new C({latencyHint:"playback"})}catch(e){this.ctx=new C()}this.master=this.ctx.createGain();this.master.gain.value=.9;this.master.connect(this.ctx.destination)}return this.ctx}
  unlock(){const c=this._ctx();if(!c)return;if(c.state!=="running"){c.resume().catch(()=>{});try{const s=c.createBufferSource();s.buffer=c.createBuffer(1,1,22050);s.connect(c.destination);s.start(0)}catch(e){}}}
  _n(f,d,o){o=o||{};const c=this.ctx;if(this.isMuted||!c)return;if(c.state!=="running"){c.resume().then(()=>{if(c.state==="running")this._n(f,d,o)}).catch(()=>{});return}
   const t=c.currentTime+(o.t||0),os=c.createOscillator(),g=c.createGain(),v=o.v||.12;
@@ -5437,6 +5439,8 @@ class SoundManager{
  playDinoMilestone(){[660,880,1100].forEach((f,i)=>this._n(f,.1,{t:i*.045,type:"square",v:.035}))}
 }
 const soundManager=new SoundManager();
+window.kdLbl=function(id,t){try{const b=document.getElementById(id);if(!b)return;const p=b.querySelector(".sx-pill");if(p){p.textContent=t.split(/:\s*/)[1]||t;b.dataset.raw=t}else b.textContent=t}catch(e){}};
+window.kdFlip=function(id,on){try{const b=document.getElementById(id);if(!b)return;const sw=b.querySelector(".sx-sw");if(sw){sw.classList.toggle("on",!!on);b.setAttribute("aria-checked",!!on);if(b.dataset.raw)b.dataset.raw=b.dataset.raw.replace(/(Açık|Kapalı)\s*$/,on?"Açık":"Kapalı")}else{b.textContent=b.textContent.replace(/(Açık|Kapalı)\s*$/,on?"Açık":"Kapalı")}}catch(e){}};
 ["touchstart","touchend","pointerdown","click","keydown"].forEach(e=>document.addEventListener(e,()=>soundManager.unlock(),{passive:true,capture:true}));
 document.addEventListener("pointerdown",e=>{const b=e.target.closest&&e.target.closest("button,.card");if(b&&!b.classList.contains("opt")&&!b.classList.contains("kc"))soundManager.playClick()},true);
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&soundManager.ctx&&soundManager.ctx.state!=="running")soundManager.ctx.resume().catch(()=>{})});
@@ -5659,6 +5663,7 @@ rec=function(k,ok){_rec(k,ok);try{const w=meta.wk=meta.wk||{},d=TD(),x=w[d]=w[d]
 
 /* ---------- 4) Günlük giriş serisi (+50 🪙) ---------- */
 function dailyLogin(){
+ if(!(window.__kdPremOK&&window.__kdPremOK()))return; /* günlük giriş bonusu yalnızca premium/deneme */
  const L=meta.ls=meta.ls||{last:"",n:0,best:0},t=TD();if(L.last===t)return;
  L.n=L.last===YD()?L.n+1:1;L.last=t;L.best=Math.max(L.best||0,L.n);
  const big=L.n%7===0,bonus=big?100:50;
@@ -5826,7 +5831,7 @@ stats=function(){_stats();document.querySelectorAll(".bgs .bg").forEach((e,i)=>{
 PPX.push(parExtra);
 function parExtra(){
  const P=par(),S=P.sleep,bk=gid("bk");if(!bk)return;
- bk.insertAdjacentHTML("beforebegin",`<h2>👶 Çocuğun Adı ve Yaşı</h2><input class="pi" id="pn" type="text" maxlength="14" value="${esc(P.name)}" placeholder="Adı (örn: Elif)"><input class="pi" id="pg" type="number" inputmode="numeric" min="2" max="18" value="${P.age||""}" placeholder="Yaşı (örn: 7)" style="width:100%;margin-top:8px">
+ bk.insertAdjacentHTML("beforebegin",`<h2>👶 Çocuk Profili</h2><div class="rulec" style="display:flex;align-items:center;justify-content:space-between;gap:10px"><div><b>${esc(P.name||"—")}</b><div class="sub" style="margin:2px 0 0;font-size:13px">${P.age?P.age+" yaşında":"Yaş girilmedi"}${window.__kdChildGradeText&&window.__kdChildGradeText()?" • "+window.__kdChildGradeText():""}</div></div><button class="btn g" style="width:auto;margin:0;padding:8px 14px" onclick="window.__kdChildSetup&&window.__kdChildSetup(true)">✏️ Düzenle</button></div><input id="pn" type="hidden" value="${esc(P.name)}"><input id="pg" type="hidden" value="${P.age||""}">
  <h2>🌙 Gece Uyku Modu</h2><div class="seg"><button id="sl1" class="${S.on?"on":""}">${S.on?"Açık":"Kapalı"}</button><input class="pi" type="time" id="sl2" value="${S.from}"><input class="pi" type="time" id="sl3" value="${S.to}"></div><p class="sub" style="font-size:12px;margin-top:-6px">Bu saatler arasında uygulama kilitlenir.</p>
  <h2>👀 Göz Molası (20-20-20)</h2><div class="seg">${[10,15,20,0].map(v=>`<button data-e="${v}" class="${P.eye===v?"on":""}">${v?v+" dk'da bir":"Kapalı"}</button>`).join("")}</div>
  <h2>🎚️ Otomatik Zorluk</h2><div class="seg"><button id="adt" class="${P.adapt!==false?"on":""}">${P.adapt!==false?"Açık":"Kapalı"}</button><button id="adr">↺ Sıfırla</button></div><p class="sub" style="font-size:12px;margin-top:-6px">Üst üste doğru yapınca sorular zorlaşır, yanlış yapınca kolaylaşır (matematik, problemler ve zihin oyunları).${adSummary()}</p>
@@ -7847,8 +7852,8 @@ function musStart(){
  musIdx=0;musBase=c.currentTime+.1;musSched();musTimer=setInterval(musSched,120)}
 function musStop(){
  if(!musOn)return;musOn=false;clearInterval(musTimer);const g=musGain,c=soundManager.ctx;
- try{g.gain.cancelScheduledValues(c.currentTime);g.gain.setValueAtTime(g.gain.value,c.currentTime);g.gain.linearRampToValueAtTime(0,c.currentTime+.5)}catch(e){}
- setTimeout(()=>{try{g.disconnect()}catch(e){}},700)}
+ try{g.gain.cancelScheduledValues(c.currentTime);g.gain.setValueAtTime(g.gain.value,c.currentTime);g.gain.setTargetAtTime(0,c.currentTime,.12)}catch(e){}
+ setTimeout(()=>{try{g.disconnect()}catch(e){}},1500)}
 function musUpdate(){
  if(!musGest)return;
  const want=!!gid("msb")&&set.snd&&set.mus!==false&&!document.hidden;
@@ -7862,7 +7867,7 @@ new MutationObserver(()=>musUpdate()).observe(app,{childList:true});
 const _dhMus=decorateHub;
 decorateHub=function(){_dhMus();const t=gid("tsn");if(!t||gid("tmu"))return;
  t.insertAdjacentHTML("afterend",`<button id="tmu">🎵 Müzik: ${set.mus===false?"Kapalı":"Açık"}</button>`);
- gid("tmu").onclick=()=>{window.__kdKeep={y:window.pageYOffset||document.documentElement.scrollTop||0,a:app.scrollTop||0};try{set.mus=set.mus===false;saveSet();hub()}finally{window.__kdKeep=null}}};
+ gid("tmu").onclick=()=>{set.mus=set.mus===false;saveSet();kdFlip("tmu",set.mus!==false);try{musUpdate()}catch(e){}}};
 
 
 /* ---------- Maskotla Oyna: tüm uygulamadan karışık, sınırsız soru ---------- */
@@ -12146,8 +12151,9 @@ const TOPS=S=>g=>g>=S.min&&g<=S.max?topicsFor(S,g).flatMap(x=>x.L):[],GR=k=>g=>{
 const EXS=[["Türkçe","📖",GR("tr")],["Matematik","📐",GR("mat")],["Hayat Bilgisi","🌱",g=>TOPS(HB)(g)],["Fen","🔬",g=>TOPS(F)(g)],["Sosyal","🗺️",g=>TOPS(SO)(g)],["Din Kültürü","🕌",g=>TOPS(DK)(g)],["İngilizce","🇬🇧",g=>TOPS(EN)(g)]];
 const dnH=n=>{const L=(meta.dn||[]).slice(-n).reverse();return L.length?`<h2>Son denemeler</h2>`+L.map(x=>`<div class="row"><span>📝 ${x.g?x.g+". Sınıf":"Yanlışlarım"} • ${esc(String(x.d))}</span><span>${x.p} puan</span></div>`).join(""):""};
 function examMenu(){BKF=hub;gp();
- app.innerHTML=`<h1>📝 Deneme Sınavı</h1><p class="sub">Sınıfını seç • her dersten 10 soru • puan ve zayıf dersler</p><div class="grid">${[1,2,3,4,5,6,7,8].map(g=>{const L=EXS.map(x=>x[2](g).length).filter(l=>l>=4);return card(BGX,g,g,g+". Sınıf",L.length+" ders • "+L.reduce((a,l)=>a+Math.min(l,10),0)+" soru")}).join("")}<button class="card" id="yex" style="grid-column:1/-1;background:linear-gradient(135deg,#fef3c7,#fed7aa);border-color:transparent;color:#1d2340"><div class="s">📒</div><b>Yanlışlarımdan Deneme</b><small style="color:#4b5563">${(meta.wr||[]).length} soru defterde • en fazla 20 soru</small></button></div>${dnH(5)}<button class="btn g" id="bk" style="margin-top:14px">← Ana Sayfa</button>`;
- gid("yex").onclick=yanExam;gid("bk").onclick=hub;app.querySelectorAll("[data-i]").forEach(b=>b.onclick=()=>exam(+b.dataset.i))}
+ app.innerHTML=`<h1>📝 Deneme Sınavı</h1><p class="sub">Sınıfını seç • her dersten 10 soru • puan ve zayıf dersler</p><div class="grid">${[1,2,3,4,5,6,7,8].map(g=>card(BGX,g,g,g+". Sınıf","Tüm derslerden karışık")).join("")}<button class="card" id="yex" style="grid-column:1/-1;background:linear-gradient(135deg,#fef3c7,#fed7aa);border-color:transparent;color:#1d2340"><div class="s">📒</div><b>Yanlışlarımdan Deneme</b><small style="color:#4b5563">${(meta.wr||[]).length} soru defterde • en fazla 20 soru</small></button></div>${dnH(5)}<button class="btn g" id="bk" style="margin-top:14px">← Ana Sayfa</button>`;
+ gid("yex").onclick=yanExam;gid("bk").onclick=hub;app.querySelectorAll("[data-i]").forEach(b=>b.onclick=()=>exam(+b.dataset.i));
+ try{const cg=window.__kdChildGrade&&window.__kdChildGrade(),cb=cg&&app.querySelector('[data-i="'+cg+'"]');if(cb){cb.style.gridColumn="1/-1";cb.style.order="-1";cb.style.outline="3px solid #f59e0b"}}catch(e){}}
 function yanExam(){const L=meta.wr||[];if(L.length<3){toast("Önce birkaç soru çözmelisin: defterde en az 3 yanlış olmalı");return}
  const items=L.map(x=>({...x,o:[...(x.o||[])]})),n=Math.min(20,items.length);
  qzRun({title:"📒 Yanlışlarımdan Deneme",key:"Yanlışlarım",items,n,wm:1,back:examMenu,done:(sc,m)=>{
@@ -17561,5 +17567,826 @@ try{
  var oh=window.hub;
  if(typeof oh==="function"){window.hub=function(){leaveFS();return oh.apply(this,arguments)}}
 }catch(err){console.error("fs mini oyun",err)}
+})();
+</script>
+<style id="kdprem-css">
+/* ===== Kidomind Premium: kilitler • paywall • rozetler ===== */
+body.kdp-open{overflow:hidden}
+#kdp-ov{position:fixed;inset:0;z-index:2147483000;display:flex;align-items:flex-end;justify-content:center;background:rgba(15,18,40,.64);-webkit-backdrop-filter:blur(5px);backdrop-filter:blur(5px);animation:kdpf .22s ease both}
+@keyframes kdpf{from{opacity:0}to{opacity:1}}
+@keyframes kdpu{from{transform:translateY(46px);opacity:0}to{transform:none;opacity:1}}
+@keyframes kdps{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+@keyframes kdpg{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-6px) rotate(4deg)}}
+@keyframes kdpsh{0%{transform:translateX(-120%)}100%{transform:translateX(220%)}}
+.kdp-sheet{position:relative;width:100%;max-width:520px;max-height:94vh;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;background:var(--card,#fff);color:var(--tx,#1d2340);border-radius:28px 28px 0 0;box-shadow:0 -22px 60px -12px rgba(0,0,0,.5);animation:kdpu .34s cubic-bezier(.2,.9,.3,1) both;padding-bottom:0;font-family:inherit;text-align:left}
+.kdp-hero{position:relative;overflow:hidden;text-align:center;color:#fff;padding:22px 20px 16px;border-radius:28px 28px 0 0;background:linear-gradient(135deg,#6d28d9 0%,#db2777 58%,#f59e0b 100%)}
+.kdp-hero:before{content:"";position:absolute;right:-40px;top:-40px;width:150px;height:150px;border-radius:50%;background:rgba(255,255,255,.14)}
+.kdp-hero:after{content:"";position:absolute;left:-30px;bottom:-50px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.1)}
+.kdp-crown{position:relative;z-index:1;display:inline-block;font-size:44px;line-height:1;animation:kdpg 2.4s ease-in-out infinite;filter:drop-shadow(0 6px 10px rgba(0,0,0,.25))}
+.kdp-hero h2{position:relative;z-index:1;margin:6px 0 6px;font-size:25px;font-weight:900;color:#fff;letter-spacing:-.2px}
+.kdp-hero p{position:relative;z-index:1;margin:0 auto;max-width:360px;font-size:14px;line-height:1.4;font-weight:600;color:#fff;opacity:.97}
+.kdp-x{position:absolute;z-index:3;top:12px;right:12px;width:34px;height:34px;border-radius:50%;border:0;background:rgba(255,255,255,.22);color:#fff;font-size:17px;font-weight:800;cursor:pointer;display:grid;place-items:center}
+.kdp-body{padding:16px 16px 4px}
+.kdp-feat{list-style:none;margin:0 0 14px;padding:0;display:grid;gap:6px}
+.kdp-feat li{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:700;line-height:1.25;padding:7px 10px;border-radius:14px;background:color-mix(in srgb,var(--pr,#5b5bf0) 8%,var(--card,#fff));color:var(--tx,#1d2340)}
+.kdp-feat li i{font-style:normal;font-size:19px;flex:0 0 24px;text-align:center}
+.kdp-plans{display:grid;gap:9px;margin:4px 0 14px}
+.kdp-plan{position:relative;display:flex;align-items:center;gap:12px;width:100%;text-align:left;font:inherit;color:var(--tx,#1d2340);background:var(--card,#fff);border:2.5px solid var(--bd,#e4e7f5);border-radius:18px;padding:13px 14px;cursor:pointer;transition:transform .15s,border-color .15s,box-shadow .15s}
+.kdp-plan:active{transform:scale(.985)}
+.kdp-plan .r{flex:0 0 22px;width:22px;height:22px;border-radius:50%;border:2.5px solid var(--bd,#cfd3ea);display:grid;place-items:center;transition:.15s}
+.kdp-plan .r:after{content:"";width:10px;height:10px;border-radius:50%;background:#fff;transform:scale(0);transition:.15s}
+.kdp-plan .t{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.kdp-plan .t b{font-size:15.5px;font-weight:900}
+.kdp-plan .t small{font-size:12px;font-weight:700;color:var(--mu,#6b7280)}
+.kdp-plan .p{font-size:17px;font-weight:900;white-space:nowrap;text-align:right;line-height:1.15}
+.kdp-plan .p small{display:block;font-size:11px;font-weight:700;color:var(--mu,#6b7280)}
+.kdp-plan.on{border-color:#7c3aed;box-shadow:0 10px 24px -14px #7c3aed;background:color-mix(in srgb,#7c3aed 7%,var(--card,#fff))}
+.kdp-plan.on .r{background:#7c3aed;border-color:#7c3aed}.kdp-plan.on .r:after{transform:scale(1)}
+.kdp-tag{position:absolute;top:-10px;right:12px;padding:3px 9px;border-radius:999px;font-size:10px;font-weight:900;letter-spacing:.3px;color:#fff;background:linear-gradient(135deg,#f59e0b,#ec4899);box-shadow:0 6px 12px -6px #ec4899;white-space:nowrap}
+.kdp-cta{position:relative;overflow:hidden;display:block;width:100%;border:0;border-radius:18px;padding:15px 14px;font:inherit;font-size:16.5px;font-weight:900;color:#fff;cursor:pointer;background:linear-gradient(135deg,#7c3aed,#db2777 70%,#f59e0b);box-shadow:0 14px 26px -12px #db2777}
+.kdp-cta:after{content:"";position:absolute;top:0;bottom:0;width:38%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.38),transparent);animation:kdpsh 2.6s ease-in-out infinite}
+.kdp-cta:active{transform:scale(.98)}
+.kdp-trial{display:block;width:100%;margin-top:9px;border-radius:18px;padding:12px 14px;font:inherit;font-size:14.5px;font-weight:900;cursor:pointer;color:#047857;background:color-mix(in srgb,#10b981 12%,var(--card,#fff));border:2.5px dashed #10b981}
+.kdp-trial small{display:block;margin-top:2px;font-size:11.5px;font-weight:700;color:var(--mu,#6b7280)}
+.kdp-note{margin:9px 0 0;text-align:center;font-size:12.5px;font-weight:800;color:#047857}
+.kdp-link{display:block;margin:10px auto 0;border:0;background:none;font:inherit;font-size:13px;font-weight:800;color:var(--mu,#6b7280);text-decoration:underline;cursor:pointer;padding:6px}
+.kdp-fine{margin:8px 4px 0;font-size:11px;line-height:1.45;color:var(--mu,#6b7280);text-align:center}
+.kdp-gate{text-align:center;padding:6px 0 8px}
+.kdp-gate .gi{font-size:44px}
+.kdp-gate h3{margin:4px 0 4px;font-size:19px;font-weight:900;color:var(--tx,#1d2340)}
+.kdp-gate p{margin:0 0 12px;font-size:13px;color:var(--mu,#6b7280);font-weight:600}
+.kdp-gate .gq{font-size:34px;font-weight:900;margin:6px 0 12px;color:var(--tx,#1d2340)}
+.kdp-gate .go{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin-bottom:10px}
+.kdp-gate .go button{font:inherit;font-size:22px;font-weight:900;padding:14px 6px;border-radius:16px;border:2.5px solid var(--bd,#e4e7f5);background:var(--card,#fff);color:var(--tx,#1d2340);cursor:pointer}
+.kdp-gate.bad{animation:kdps .35s}
+.kdp-st{display:flex;flex-direction:column;gap:8px;margin:2px 0 12px}
+.kdp-st div{display:flex;justify-content:space-between;gap:10px;padding:11px 13px;border-radius:14px;background:color-mix(in srgb,var(--pr,#5b5bf0) 8%,var(--card,#fff));font-size:14px;font-weight:700}
+.kdp-st b{font-weight:900}
+/* kart rozetleri */
+.kdp-has{position:relative!important}
+.kdp-b{position:absolute;top:7px;right:7px;z-index:4;pointer-events:none;padding:3px 8px;border-radius:999px;font-size:10px;line-height:1.2;font-weight:900;letter-spacing:.2px;white-space:nowrap;color:#fff;background:linear-gradient(135deg,#f59e0b,#ec4899);box-shadow:0 6px 12px -6px #ec4899}
+.kdp-b.free{color:#065f46;background:#d1fae5;box-shadow:none;border:1px solid #6ee7b7}
+.kdp-lock{filter:saturate(.7)}
+.kdp-lock>*:not(.kdp-b){opacity:.62}
+.kdp-out>*:not(.kdp-b){opacity:.62}
+#kdc.kdp-has .kdp-b{top:8px;right:46px}
+/* premium şeridi */
+.kdp-strip{display:flex;align-items:center;gap:11px;width:100%;margin:8px 0 6px;padding:12px 14px;border:0;border-radius:20px;text-align:left;font:inherit;color:#fff;cursor:pointer;background:linear-gradient(135deg,#6d28d9,#db2777 62%,#f59e0b);box-shadow:0 14px 26px -16px #db2777;position:relative;overflow:hidden}
+.kdp-strip:active{transform:scale(.985)}
+.kdp-strip .i{flex:0 0 38px;width:38px;height:38px;border-radius:12px;background:rgba(255,255,255,.22);display:grid;place-items:center;font-size:22px}
+.kdp-strip .x{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+.kdp-strip .x b{font-size:15px;font-weight:900;color:#fff}
+.kdp-strip .x small{font-size:12px;font-weight:700;opacity:.95;color:#fff}
+.kdp-strip .g{flex:0 0 auto;padding:7px 12px;border-radius:999px;background:#fff;color:#be185d;font-size:12.5px;font-weight:900}
+.kdp-strip.on{background:linear-gradient(135deg,#059669,#10b981 60%,#34d399);box-shadow:0 14px 26px -16px #059669}
+.kdp-strip.on .g{color:#047857}
+.kdp-strip.tr{background:linear-gradient(135deg,#0ea5e9,#6366f1 60%,#a855f7);box-shadow:0 14px 26px -16px #6366f1}
+.kdp-strip.tr .g{color:#4338ca}
+/* ebeveyn paneli kilidi */
+#kdplb{display:flex;align-items:center;gap:11px;margin:4px 0 12px;padding:12px 14px;border-radius:18px;color:#fff;background:linear-gradient(135deg,#6d28d9,#db2777 62%,#f59e0b);box-shadow:0 12px 24px -16px #db2777;text-align:left}
+#kdplb .i{font-size:28px}
+#kdplb .x{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+#kdplb b{font-size:14.5px;font-weight:900;color:#fff}
+#kdplb small{font-size:12px;font-weight:700;color:#fff;opacity:.95;line-height:1.3}
+#kdplb button{flex:0 0 auto;width:auto!important;margin:0!important;padding:8px 13px!important;border:0;border-radius:999px;background:#fff!important;color:#be185d!important;font:inherit;font-size:12.5px;font-weight:900;cursor:pointer}
+.kdplk{opacity:.5!important;cursor:not-allowed!important}
+.kdplk:not(input):not(select):not(textarea){position:relative}
+@media (prefers-reduced-motion:reduce){.kdp-crown,.kdp-cta:after{animation:none}.kdp-sheet,#kdp-ov{animation:none}}
+
+.kdp-foot{position:sticky;bottom:0;z-index:5;padding:12px 16px calc(env(safe-area-inset-bottom,0px) + 10px);background:var(--card,#fff);border-top:1px solid var(--bd,#e4e7f5);box-shadow:0 -14px 22px -16px rgba(0,0,0,.35)}
+.kdp-foot .kdp-trial{margin-top:8px;padding:9px 12px}
+.kdp-foot .kdp-link{margin-top:4px;padding:4px}
+.kdp-body+.kdp-foot{margin-top:0}
+.kdp-body{padding-bottom:12px}
+
+.kdp-hero{padding:26px 20px 20px!important}
+.kdp-crown{font-size:46px!important;letter-spacing:-6px}
+.kdp-hero h2{font-size:27px!important;background:linear-gradient(180deg,#fff,#ffe9b8);-webkit-background-clip:text;background-clip:text;color:transparent!important;-webkit-text-fill-color:transparent;text-shadow:none}
+.kdp-hero p.kdp-rs{display:inline-block;margin-top:2px;padding:8px 14px;border-radius:16px;background:rgba(255,255,255,.2);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);font-size:13.5px;border:1px solid rgba(255,255,255,.28)}
+.kdp-sp{position:absolute;z-index:1;font-style:normal;font-size:16px;opacity:.9;animation:kdpt 2.8s ease-in-out infinite}
+.kdp-sp.s1{left:14%;top:22px}.kdp-sp.s2{right:20%;top:30px;animation-delay:-.9s}.kdp-sp.s3{left:8%;bottom:34px;animation-delay:-1.6s}.kdp-sp.s4{right:9%;bottom:44px;animation-delay:-2.1s}
+@keyframes kdpt{0%,100%{transform:scale(.7) rotate(0);opacity:.35}50%{transform:scale(1.25) rotate(18deg);opacity:1}}
+.kdp-feat{grid-template-columns:1fr 1fr!important;gap:8px!important}
+.kdp-feat li{flex-direction:column;align-items:flex-start!important;gap:6px!important;padding:11px!important;border-radius:16px!important;border:1.5px solid color-mix(in srgb,var(--pr,#5b5bf0) 14%,transparent)}
+.kdp-feat li i{font-size:24px!important;flex:none!important;width:42px;height:42px;display:grid;place-items:center;border-radius:13px;background:linear-gradient(135deg,color-mix(in srgb,#7c3aed 18%,var(--card,#fff)),color-mix(in srgb,#ec4899 16%,var(--card,#fff)))}
+.kdp-feat li span b{display:block;font-size:13.5px;font-weight:900}
+.kdp-feat li span small{display:block;margin-top:1px;font-size:11.5px;font-weight:600;line-height:1.3;color:var(--mu,#6b7280)}
+.kdp-plan{border-radius:20px!important;padding:14px!important}
+.kdp-plan.on{box-shadow:0 0 0 4px color-mix(in srgb,#7c3aed 16%,transparent),0 14px 26px -14px #7c3aed!important}
+.kdp-plan .t b{font-size:16px!important}
+.kdp-trust{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin:12px 0 2px}
+.kdp-trust span{padding:5px 10px;border-radius:999px;font-size:11.5px;font-weight:800;color:#047857;background:color-mix(in srgb,#10b981 12%,var(--card,#fff))}
+.kdp-cta{font-size:17px!important;padding:16px 14px!important;border-radius:20px!important}
+
+#kdp-weekly{margin:8px 0 6px}
+.kdw-h{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:2px 2px 8px}
+.kdw-h b{font-size:16px;font-weight:900;color:var(--tx,#1d2340)}
+.kdw-h span{font-size:11.5px;font-weight:800;padding:4px 9px;border-radius:999px;background:color-mix(in srgb,#f59e0b 18%,var(--card,#fff));color:#b45309;white-space:nowrap}
+.kdw-g{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.kdw{position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:flex-start;gap:3px;text-align:left;font:inherit;border:0;border-radius:22px;padding:14px 12px 12px;color:#fff;cursor:pointer;min-height:158px;box-shadow:0 14px 26px -16px rgba(0,0,0,.5)}
+.kdw.kdw-q{background:linear-gradient(145deg,#2563eb,#7c3aed)}
+.kdw.kdw-g{background:linear-gradient(145deg,#f97316,#ec4899)}
+.kdw:active{transform:scale(.97)}
+.kdw:after{content:"";position:absolute;right:-26px;top:-26px;width:90px;height:90px;border-radius:50%;background:rgba(255,255,255,.14)}
+.kdw .e{font-size:34px;line-height:1;margin-bottom:4px}
+.kdw b{font-size:15px;font-weight:900;color:#fff}
+.kdw small{font-size:11.5px;font-weight:700;line-height:1.3;opacity:.95;color:#fff}
+.kdw em{margin-top:auto;font-style:normal;font-size:11.5px;font-weight:900;padding:5px 10px;border-radius:999px;background:#fff;color:#7c3aed}
+.kdw.kdw-g em{color:#be185d}
+.kdw-n{position:absolute;top:10px;right:10px;z-index:2;font-style:normal;font-size:9.5px;font-weight:900;letter-spacing:.5px;padding:3px 7px;border-radius:999px;background:#fde047;color:#7c2d12;animation:kdpt 2.2s ease-in-out infinite}
+</style>
+<script id="kidomind-premium">
+/* ===== KIDOMIND PREMIUM v1 =====
+   Ücretsiz sürüm sınırları • kilitler • 3 gün deneme • Aylık / Yıllık / Ömür boyu premium.
+   Satın alma Google Play Faturalandırma ile bağlanacak: aşağıdaki "KidomindBilling" köprüsüne bak. */
+(function(){
+"use strict";
+if(window.KidomindPremium)return;
+
+/* ---------- AYARLAR ---------- */
+const CFG={
+ /* YAYINA ALMADAN ÖNCE false KALMALI. true yaparsan satın alma düğmeleri test için premium'u doğrudan açar. */
+ TEST_MODE:false,
+ TRIAL_DAYS:3,
+ MINI_SECONDS:600,                       /* Mini Oyunlar: toplam 10 dakika */
+ LIMITS:{home:10,lessons:10,learn:5,games:5,misc:10},
+ PRICES:{monthly:"149,90 ₺",yearly:"899,90 ₺",lifetime:"1.099,90 ₺"},
+ PRODUCTS:{monthly:"premium-monthly",yearly:"premium-yearly",lifetime:"premium_lifetime"},
+ MANAGE_URL:"https://play.google.com/store/account/subscriptions"
+};
+const KEY="kdprem-v1";            /* "mat-" ile başlamaz: yedeğe girmez, yedekten geri yüklenemez */
+const DEF={plan:null,until:0,trial:0,trialEnd:0,seen:0,used:{},mini:0};
+let S=(function(){try{const o=JSON.parse(localStorage.getItem(KEY)||"null");return Object.assign({},DEF,o&&typeof o==="object"?o:{},{used:Object.assign({},(o&&o.used)||{})})}catch(e){return Object.assign({},DEF,{used:{}})}})();
+let lastSave=0;
+function save(force){const n=Date.now();if(!force&&n-lastSave<1500)return;lastSave=n;try{S.seen=Math.max(S.seen||0,n);localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+const now=()=>Math.max(Date.now(),S.seen||0);    /* saati geri alıp denemeyi uzatmayı engeller */
+const planActive=()=>!!S.plan&&(S.plan==="lifetime"||(S.until||0)>now());
+const trialLeft=()=>S.trial?Math.max(0,S.trial+CFG.TRIAL_DAYS*864e5-now()):0;
+const isPremium=()=>planActive()||trialLeft()>0;
+const used=id=>S.used[id]||0;
+
+/* ---------- KURALLAR ---------- */
+const $=s=>document.querySelector(s);
+const appEl=()=>document.getElementById("app");
+const TAB=()=>{const b=$("#kdnav button.on");return b?b.dataset.t:"home"};
+const norm=s=>String(s||"").toLocaleLowerCase("tr").replace(/[^a-zçğıöşü0-9 ]/g," ").replace(/\s+/g," ").trim();
+const slug=s=>norm(s).replace(/ /g,"-");
+const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const keyOf=el=>(el.dataset&&el.dataset.g)||el.id||"";
+const titleOf=el=>{const b=el.querySelector("b");return norm(b?b.textContent:"")};
+const rawTitle=el=>{const b=el.querySelector("b");return b?b.textContent.trim():""};
+const LOCK_K=new Set(["wkc","ydc","eco"]);
+const LOCK_T=[/geri dönüşüm/,/interaktif/,/çizim.*boyama/,/^ilerlemem$/,/^hedefler$/,/^rekorlar$/,/^sertifikalar$/,/zayıf konular/,/yanlışlarım defteri/];
+const lim=(id,n)=>({id,type:"limit",limit:n});
+const R_CONT=lim("cont",CFG.LIMITS.home),R_DAILY=lim("daily",CFG.LIMITS.home),R_EXAM=lim("exam",CFG.LIMITS.home),R_MISC=lim("misc",CFG.LIMITS.misc);
+const R_MINI={id:"mini",type:"time",get limit(){return CFG.MINI_SECONDS}};
+function lockRule(el){const k=keyOf(el),t=titleOf(el);if(LOCK_K.has(k)||LOCK_T.some(r=>r.test(t)))return{id:"lock:"+(k||slug(t)),type:"lock",label:rawTitle(el)||"Bu bölüm"};return null}
+function ruleFor(el){
+ const lk=lockRule(el);if(lk)return lk;
+ const k=keyOf(el),t=titleOf(el),tab=TAB();
+ if(el.id==="kdc")return R_CONT;
+ if(tab==="home"){if(k==="daily")return R_DAILY;if(t==="deneme sınavı")return R_EXAM;return null}
+ if(tab==="lessons")return lim("lessons:"+(k||slug(t)),CFG.LIMITS.lessons);
+ if(tab==="learn")return lim("learn:"+(/çocuk dünyası/.test(t)?"cocuk":(k||slug(t))),CFG.LIMITS.learn);
+ if(tab==="games"){if(k==="arc"||t==="mini oyunlar")return R_MINI;return lim("games:"+(k||slug(t)),CFG.LIMITS.games)}
+ return null;
+}
+function exhausted(r){if(!r)return false;if(r.type==="time")return(S.mini||0)>=r.limit;if(r.type==="limit")return used(r.id)>=r.limit;return false}
+function leftOf(r){return r.type==="time"?Math.max(0,r.limit-(S.mini||0)):Math.max(0,r.limit-used(r.id))}
+
+/* ---------- BAĞLAM (şu an hangi bölümde soru çözülüyor) ---------- */
+let ctx=null,pendingCont=false;
+const block=e=>{e.preventDefault();e.stopImmediatePropagation();e.stopPropagation()};
+const ALLOW=/^(‹|←|⬅|◀|✕|×)|geri|çık|ana sayfa|kapat|sonucu gör|karne|bitir|vazgeç|menü/;
+const ALLOW_ID=new Set(["qx","quit","bk","bk2","mback","exq","exh","pb","mb","mx"]);
+function allowed(t){const b=t.closest("button,a,[role=button]");if(!b)return false;if(b.id&&ALLOW_ID.has(b.id))return true;if(b.classList.contains("kdback"))return true;return ALLOW.test((b.textContent||"").trim().toLocaleLowerCase("tr"))}
+
+function onClick(e){
+ const t=e.target;if(!t||!t.closest)return;
+ if(t.closest("#kdp-ov"))return;
+ /* Ebeveyn paneli: kilitli seçenekler */
+ if(t.closest(".kdplk")){block(e);openPaywall("parent");return}
+ const xk=t.closest("[data-kdpx]");if(xk&&!isPremium()){block(e);openPaywall("lock",{label:"20 soru ve üzeri sınavlar"});return}
+ const app=appEl();if(!app||!app.contains(t))return;
+ const prem=isPremium();
+ /* Ana sayfa / sekme kartları */
+ const card=t.closest("#kdv .card,#kdv #kdc");
+ if(card){
+  if(prem){ctx=null;return}
+  let r=ruleFor(card);
+  if(card.id==="kdc"){pendingCont=true;setTimeout(()=>{pendingCont=false},60);if(exhausted(R_CONT)){pendingCont=false;block(e);openPaywall("limit",{limit:R_CONT.limit});}return}
+  if(r&&r.type==="lock"){pendingCont=false;block(e);openPaywall("lock",{label:r.label});return}
+  if(pendingCont){r=R_CONT;pendingCont=false}
+  if(r&&exhausted(r)){block(e);openPaywall(r.type==="time"?"mini":"limit",{limit:r.limit});return}
+  ctx=r;return;
+ }
+ if(prem)return;
+ /* Sınıfını seç, hemen başla */
+ const gr=t.closest("[data-grade]");
+ if(gr){const r=lim("kido:"+gr.dataset.grade,CFG.LIMITS.home);if(exhausted(r)){block(e);openPaywall("limit",{limit:r.limit});return}ctx=r;return}
+ /* Deneme sınavı: şıklar işaretlenince cevap sayılır */
+ if(ctx&&ctx.id==="exam"&&t.closest(".opt")&&app.querySelector(".exh")){if(!exhausted(ctx)){unit()}else{block(e);openPaywall("limit",{limit:ctx.limit});}return}
+ /* Beyin Atölyesi: cevapsız oyunlar başlatma ile sayılır */
+ if(ctx&&ctx.id==="games:lab"&&!app.querySelector("#kdv")){const b=t.closest("[data-a]");if(b&&(b.dataset.a==="sc"||b.dataset.a==="dg")&&/Beyin Atölyesi/.test((app.querySelector("h1")||{}).textContent||"")){if(exhausted(ctx)){block(e);openPaywall("limit",{limit:ctx.limit});return}unit()}}
+ /* Limit dolduysa yeni soru/oyun başlamasın */
+ const c=ctx;
+ if(c&&c.type==="limit"&&exhausted(c)&&!app.querySelector("#kdv")&&t.closest("button,a,[role=button],[onclick],.opt")&&!allowed(t)){block(e);openPaywall("limit",{limit:c.limit});return}
+ if(!c&&exhausted(R_MISC)&&t.closest(".opt")&&!app.querySelector("#kdv")){block(e);openPaywall("limit",{limit:R_MISC.limit})}
+}
+window.addEventListener("click",onClick,true);
+/* kilitli alanlarda klavye açılmasın */
+["pointerdown","touchstart","mousedown"].forEach(ev=>window.addEventListener(ev,e=>{const t=e.target;if(t&&t.closest&&t.closest(".kdplk")&&/^(INPUT|SELECT|TEXTAREA)$/.test(t.tagName)){e.preventDefault()}},{capture:true,passive:false}));
+window.addEventListener("focusin",e=>{const t=e.target;if(t&&t.closest&&t.closest(".kdplk")&&t.blur)t.blur()},true);
+
+/* ---------- SORU SAYACI ---------- */
+function unit(){
+ if(isPremium())return;const c=ctx||R_MISC;if(c.type==="time")return;
+ S.used[c.id]=used(c.id)+1;save(true);sched();
+}
+const MARK=/(^|\s)(ok|no|hit|miss)(\s|$)/,lastCount=new WeakMap();
+function cand(t){
+ if(isPremium()||t.closest("#kdp-ov,#kdv,#kdplb"))return;
+ if(!(t.tagName==="BUTTON"||t.matches(".opt,[data-v],[data-d],[data-i],[data-j],.hd-item,.mc,.card")))return;
+ const c=ctx;if(c&&c.type==="time")return;
+ const par=t.parentElement||t,n=Date.now(),p=lastCount.get(par)||0;
+ if(n-p<1200){lastCount.set(par,n);return}
+ lastCount.set(par,n);unit();
+}
+let raf=0;function sched(){if(raf)return;raf=requestAnimationFrame(()=>{raf=0;try{decorate()}catch(e){console.error("premium:",e)}})}
+function onMut(recs){
+ let dec=false;
+ for(const r of recs){
+  if(r.type==="attributes"){const t=r.target;if(!(t instanceof Element)||typeof t.className!=="string")continue;if(MARK.test(t.className)&&!MARK.test(r.oldValue||""))cand(t)}
+  else if(r.type==="childList"){
+   if(r.target&&r.target.id==="app"&&r.addedNodes.length){const a=appEl();if(a&&a.querySelector("#kdv"))ctx=null}
+   dec=true;
+  }
+ }
+ if(dec)sched();
+}
+
+/* ---------- KARTLARA ROZET ---------- */
+function setBadge(el,cls,txt,sig){
+ if(el.dataset.kdpS===sig)return;el.dataset.kdpS=sig;
+ let b=el.querySelector(":scope>.kdp-b");
+ if(!txt){if(b)b.remove();el.classList.remove("kdp-has","kdp-lock","kdp-out");return}
+ el.classList.add("kdp-has");el.classList.toggle("kdp-lock",cls==="lock");el.classList.toggle("kdp-out",cls==="out");
+ if(!b){b=document.createElement("span");el.appendChild(b)}
+ b.className="kdp-b"+(cls==="free"?" free":"");b.textContent=txt;
+}
+function decorate(){
+ const app=appEl();if(!app)return;
+ const prem=isPremium();
+ app.querySelectorAll("#kdv .card,#kdv #kdc").forEach(el=>{
+  if(prem){setBadge(el,"","", "p");return}
+  const r=ruleFor(el);
+  if(!r){setBadge(el,"","", "n");return}
+  if(r.type==="lock")return setBadge(el,"lock","👑 Premium Al","L");
+  if(exhausted(r))return setBadge(el,"out","👑 Premium Al","O"+r.id);
+  const l=leftOf(r);
+  setBadge(el,"free",r.type==="time"?"⏱ "+Math.ceil(l/60)+" dk":"🎁 "+l+" soru","F"+r.id+l);
+ });
+ strip();try{weekly()}catch(e){console.error(e)}examLimit(app,prem);
+ if(app.querySelector("#kdplb")){if(prem)unlockParent();else lockParent()}
+}
+
+/* Deneme sınavı: ücretsizde yalnızca 10 soruluk "Hızlı" seçeneği */
+function examLimit(app,prem){
+ const go=app.querySelector("#exs");if(!go)return;
+ const chips=[...app.querySelectorAll("button")].filter(b=>/^(⚡|📘|📚|🏔️)/.test(b.textContent.trim()));
+ if(prem){chips.forEach(b=>{b.removeAttribute("data-kdpx");const x=b.querySelector(".kdp-b");if(x)x.remove()});return}
+ if(!chips.length)return;
+ chips.forEach(b=>{if(/^⚡/.test(b.textContent.trim()))return;if(b.hasAttribute("data-kdpx"))return;b.setAttribute("data-kdpx","1");b.classList.add("kdp-has");const x=document.createElement("span");x.className="kdp-b";x.textContent="👑";b.appendChild(x)});
+ const fast=chips.find(b=>/^⚡/.test(b.textContent.trim()));
+ if(fast&&!fast.classList.contains("on")&&!go.dataset.kdpf){go.dataset.kdpf="1";fast.click()}
+}
+
+/* ---------- PREMIUM ŞERİDİ (Ana sayfa + Profil) ---------- */
+function fmtLeft(ms){const d=Math.floor(ms/864e5),h=Math.floor(ms%864e5/36e5),m=Math.floor(ms%36e5/6e4);return d>0?d+" gün "+h+" saat":h>0?h+" saat "+m+" dk":Math.max(1,m)+" dk"}
+const PLAN_N={monthly:"Aylık",yearly:"Yıllık",lifetime:"Ömür boyu"};
+function strip(){
+ const v=document.getElementById("kdv"),tab=TAB();let s=document.getElementById("kdp-strip");
+ if(!v||(tab!=="home"&&tab!=="profile")){if(s)s.remove();return}
+ const hdr=v.querySelector(":scope>header.kdgr");if(!hdr)return;
+ let cls="",ic="👑",ti="",su="",go="";
+ if(planActive()){cls="on";ti="Premium aktif • "+PLAN_N[S.plan];su="Tüm kilitler açık, sınırsız eğlen!";go="Detay"}
+ else if(trialLeft()>0){cls="tr";ic="🎁";ti="Ücretsiz deneme • "+fmtLeft(trialLeft())+" kaldı";su="Tüm kilitler şu an açık";go="Premium Al"}
+ else{ti="Premium Al";su=S.trial?"Kilitleri aç • sınırsız soru ve oyun":"Sınırsız soru ve oyun • 3 gün ücretsiz dene";go="İncele"}
+ const sig=cls+ti+su;
+ if(!s){s=document.createElement("button");s.id="kdp-strip";s.type="button";hdr.insertAdjacentElement("afterend",s);s.addEventListener("click",()=>openPaywall("strip"))}
+ if(s.dataset.sig!==sig){s.dataset.sig=sig;s.className="kdp-strip "+cls;s.innerHTML='<span class="i">'+ic+'</span><span class="x"><b>'+esc(ti)+'</b><small>'+esc(su)+'</small></span><span class="g">'+go+'</span>'}
+}
+
+
+/* ---------- HAFTALIK YENİLİKLER: her hafta yeni sorular + haftanın oyunu ---------- */
+const WGAMES=[["gSnake","🐍","Yılan","Yemleri ye, uzadıkça uzan!"],["g2048","🔢","2048","Sayıları birleştir, 2048'e ulaş!"],["gMem","🃏","Hafıza Kartları","Eşleri bul, hafızanı güçlendir!"],["gTetris","🧱","Tetris","Blokları diz, satırları temizle!"],["gBrick","🧨","Tuğla Kırma","Topu sektir, tuğlaları patlat!"],["gMole","🔨","Köstebek Avı","Hızlı ol, köstebekleri yakala!"],["gBalloon","🎈","Balon Patlat","Doğru balonları patlat!"],["gDino","🦖","Dino Koşusu","Engellerin üstünden zıpla!"],["gHang","🔤","Adam Asmaca","Kelimeyi harf harf bul!"],["gHoops","🏀","Basket","Topu potaya at, skor yap!"],["gTower","🏗️","Kule Yap","Blokları üst üste dengele!"],["gSimon","🎵","Simon","Renk ve ses sırasını hatırla!"],["gFruit","🍉","Meyve Kes","Meyveleri yakala, seri yap!"],["gFlood","🌊","Renk Taşkını","Tahtayı tek renge boya!"],["gBub","🫧","Baloncuk Patlat","Aynı renkleri eşleştir!"],["gJump","🦘","Zıpla","Yukarı çık, rekor kır!"],["gCandy","🍬","Şekerleme","Şekerleri eşleştir, patlat!"],["gPiano","🎹","Piyano","Melodiler çal, müzik yap!"]];
+const WCATS=["gk","cg","bt","sn","sp","tr"];
+function wkInfo(){
+ const d=new Date();d.setHours(0,0,0,0);d.setDate(d.getDate()-((d.getDay()+6)%7));      /* Pazartesi */
+ const id=d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate(),idx=Math.floor((d.getTime()-d.getTimezoneOffset()*6e4)/6048e5);
+ const nxt=new Date(d.getTime());nxt.setDate(nxt.getDate()+7);
+ const gl=WGAMES.filter(g=>typeof window[g[0]]==="function"),g=gl.length?gl[idx%gl.length]:null;
+ const cat=WCATS[idx%WCATS.length],cn=(typeof QCATS!=="undefined"&&QCATS[cat])?QCATS[cat]:["📝","Genel Kültür"];
+ return{id,idx,left:Math.max(0,nxt.getTime()-Date.now()),game:g,cat,cn};
+}
+function rng(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function weeklyItems(w){
+ {const ci=window.__kdChildItems&&window.__kdChildItems("w"+w.idx,10);if(ci&&ci.length)return ci}
+ const r=rng(w.idx*7919+13),L=qBank().filter(q=>q[0]===w.cat).map(q=>({q:q[1],a:q[2],o:q.slice(3),k:"Haftalık"}));
+ for(let i=L.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[L[i],L[j]]=[L[j],L[i]]}
+ return L.slice(0,10);
+}
+const wRule=w=>lim("weekly:"+w.id,5);
+function weeklyGo(kind){
+ const w=wkInfo(),prem=isPremium(),hubF=()=>{try{window.hub()}catch(e){}};
+ if(kind==="q"){
+  const r=wRule(w);if(!prem&&exhausted(r)){openPaywall("limit",{limit:r.limit});return}
+  ctx=prem?null:r;
+  qzRun({title:"📝 Haftanın Soruları • "+((window.__kdChildGradeText&&window.__kdChildGradeText())||w.cn[1]),key:"Haftalık",items:weeklyItems(w),n:10,back:hubF});
+ }else if(w.game){
+  if(!prem&&exhausted(R_MINI)){openPaywall("mini",{limit:CFG.MINI_SECONDS});return}
+  ctx=prem?null:R_MINI;try{BKF=hubF}catch(e){}
+  window[w.game[0]]();
+ }
+}
+function fmtDays(ms){const d=Math.floor(ms/864e5),h=Math.floor(ms%864e5/36e5);return d>0?d+" gün":h+" saat"}
+function weekly(){
+ const v=document.getElementById("kdv"),tab=TAB();let s=document.getElementById("kdp-weekly");
+ if(!v||tab!=="home"||typeof qzRun!=="function"||typeof qBank!=="function"){if(s)s.remove();return}
+ const anchor=document.getElementById("kdp-strip")||v.querySelector(":scope>header.kdgr");if(!anchor)return;
+ const w=wkInfo(),prem=isPremium(),r=wRule(w),ql=prem?10:leftOf(r),qOut=!prem&&exhausted(r),gOut=!prem&&exhausted(R_MINI);
+ const sig=[(window.__kdChildGradeText&&window.__kdChildGradeText()),w.id,prem,ql,gOut,fmtDays(w.left)].join("|");
+ if(s&&s.dataset.sig===sig)return;
+ if(!s){s=document.createElement("section");s.id="kdp-weekly";anchor.insertAdjacentElement("afterend",s);
+  s.addEventListener("click",e=>{const b=e.target.closest("[data-w]");if(b)weeklyGo(b.dataset.w)})}
+ s.dataset.sig=sig;
+ s.innerHTML='<div class="kdw-h"><b>🔥 Bu Haftanın Yenilikleri</b><span>⏳ '+fmtDays(w.left)+' sonra yenilenir</span></div><div class="kdw-g">'
+  +'<button type="button" class="kdw kdw-q" data-w="q"><i class="kdw-n">YENİ</i><span class="e">'+w.cn[0]+'</span><b>Haftanın Soruları</b><small>10 yeni soru • '+esc((window.__kdChildGradeText&&window.__kdChildGradeText())||w.cn[1])+'</small><em>'+(prem?"Sınırsız":qOut?"👑 Premium Al":"🎁 "+ql+" soru ücretsiz")+'</em></button>'
+  +(w.game?'<button type="button" class="kdw kdw-g" data-w="g"><i class="kdw-n">YENİ</i><span class="e">'+w.game[1]+'</span><b>Haftanın Oyunu</b><small>'+esc(w.game[2])+' • '+esc(w.game[3])+'</small><em>'+(prem?"Sınırsız":gOut?"👑 Premium Al":"⏱ Ücretsiz dene")+'</em></button>':'')
+  +'</div>';
+}
+
+/* ---------- EBEVEYN PANELİ KİLİDİ ---------- */
+function lockParent(){
+ const app=appEl();if(!app)return;
+ if(!app.querySelector("#kdplb")){const d=document.createElement("div");d.id="kdplb";d.innerHTML='<span class="i">🔒</span><span class="x"><b>Premium ile açılır</b><small>Panelin tüm seçenekleri Premium üyelere özel.</small></span><button type="button">👑 Premium Al</button>';app.insertBefore(d,app.firstChild);d.querySelector("button").addEventListener("click",ev=>{ev.stopPropagation();openPaywall("parent")})}
+ app.querySelectorAll("button,input,select,textarea,summary,label,[onclick],[role=button],[role=switch]").forEach(el=>{
+  if(el.closest("#kdplb")||el.id==="bk"||el.classList.contains("kdback"))return;
+  if(/kilitle\s*&?\s*çık/i.test((el.textContent||"").trim()))return;
+  el.classList.add("kdplk");
+ });
+}
+function unlockParent(){document.querySelectorAll(".kdplk").forEach(e=>e.classList.remove("kdplk"));const b=document.getElementById("kdplb");if(b)b.remove()}
+
+/* ---------- KİLİTLİ SAYFALARI İŞLEVLERDEN DE KORU ---------- */
+function wrapLock(name,label){
+ const f=window[name];if(typeof f!=="function"||f.__kdp)return;
+ const w=function(){if(isPremium())return f.apply(this,arguments);openPaywall("lock",{label:label})};
+ try{Object.assign(w,f)}catch(e){}w.__kdp=1;window[name]=w;
+}
+function wrapFn(name,fn){const f=window[name];if(typeof f!=="function"||f.__kdp)return;const w=function(){return fn.call(this,f,arguments)};try{Object.assign(w,f)}catch(e){}w.__kdp=1;window[name]=w}
+function install(){
+ [["goalsPage","Hedefler"],["recPage","Rekorlar"],["progressPage","İlerlemem"],["certPage","Sertifikalar"],["wkPage","Zayıf Konularım"],["yanDefter","Yanlışlarım Defteri"],["interactiveStories","İnteraktif Çizgi Hikâyeler"],["gEco","Geri Dönüşüm"],["studio","Çizim & Boyama Atölyesi"]].forEach(a=>wrapLock(a[0],a[1]));
+ wrapFn("parentPanel",function(orig,args){const r=orig.apply(this,args);if(!isPremium()){lockParent();setTimeout(()=>{try{if(!isPremium())lockParent()}catch(e){}},120);setTimeout(()=>{try{if(!isPremium())lockParent()}catch(e){}},600)}return r});
+ wrapFn("examRun",function(orig,args){
+  if(!isPremium()){
+   if(exhausted(R_EXAM)){openPaywall("limit",{limit:R_EXAM.limit,leave:true});return}
+   ctx=R_EXAM;args=Array.prototype.slice.call(args);args[0]=Math.min(+args[0]||10,leftOf(R_EXAM));
+  }
+  return orig.apply(this,args);
+ });
+}
+
+/* ---------- SÜRE SAYACI (Mini Oyunlar) + deneme bitişi ---------- */
+let wasPrem=isPremium();
+setInterval(()=>{
+ const p=isPremium();
+ if(wasPrem&&!p&&S.trial&&!planActive()&&!S.trialEnd){S.trialEnd=1;save(true);unlockParent();openPaywall("trialend",{leave:true});sched()}
+ if(wasPrem!==p){sched()}wasPrem=p;
+ if(p||document.hidden)return;
+ S.seen=Math.max(S.seen||0,Date.now());
+ if(ctx&&ctx.type==="time"){
+  S.mini=(S.mini||0)+1;save(false);
+  if(S.mini>=CFG.MINI_SECONDS){save(true);openPaywall("mini",{limit:CFG.MINI_SECONDS,leave:true});sched()}
+ }
+},1000);
+document.addEventListener("visibilitychange",()=>{if(document.hidden)save(true)});
+window.addEventListener("pagehide",()=>save(true));
+
+/* ---------- SATIN ALMA / DENEME ---------- */
+function grant(plan,expiresAt){
+ S.plan=plan;S.until=plan==="lifetime"?0:(expiresAt||Date.now()+(plan==="yearly"?366:31)*864e5);save(true);
+ unlockParent();sched();
+}
+function startTrial(){
+ if(S.trial)return false;S.trial=Date.now();S.trialEnd=0;save(true);unlockParent();wasPrem=true;sched();return true;
+}
+const T=m=>{try{(window.toast||function(){})(m)}catch(e){}};
+async function purchase(plan){
+ const B=window.KidomindBilling;
+ if(B&&typeof B.purchase==="function"){
+  try{const r=await B.purchase(CFG.PRODUCTS[plan],plan);if(r&&r.ok!==false){grant(plan,r.expiresAt);done("🎉 Premium aktif! Teşekkürler 💜")}else T("Satın alma tamamlanmadı")}
+  catch(e){T("Satın alma başarısız oldu, lütfen tekrar dene")}
+  return;
+ }
+ if(CFG.TEST_MODE){grant(plan);done("🧪 Test: "+PLAN_N[plan]+" Premium açıldı");return}
+ T(S.trial?"Satın alma yakında Google Play üzerinden açılacak 💜":"Satın alma yakında açılacak. Şimdilik 3 gün ücretsiz deneyebilirsin 🎁");
+}
+async function restore(){
+ const B=window.KidomindBilling;
+ if(B&&typeof B.restore==="function"){
+  try{const r=await B.restore();if(r&&r.plan){grant(r.plan,r.expiresAt);done("✅ Satın alımların geri yüklendi")}else T("Geri yüklenecek satın alım bulunamadı")}
+  catch(e){T("Geri yükleme başarısız oldu")}
+  return;
+ }
+ T(planActive()?"Premium zaten aktif ✅":"Geri yüklenecek satın alım bulunamadı");
+}
+function done(msg){closePaywall();T(msg);sched()}
+
+/* ---------- PAYWALL ---------- */
+let sel="yearly",leaveOnClose=false;
+function reasonText(r,i){
+ i=i||{};
+ if(r==="limit")return"🎉 Bu bölümdeki ücretsiz "+i.limit+" soru hakkını kullandın! Devam etmek için Premium'a geç.";
+ if(r==="mini")return"⏱️ Mini oyunlardaki 10 dakikalık ücretsiz süren doldu!";
+ if(r==="lock")return"🔒 "+esc(i.label||"Bu bölüm")+" Premium üyelere özel.";
+ if(r==="parent")return"👨‍👩‍👧 Ebeveyn panelindeki tüm seçenekler Premium ile açılır.";
+ if(r==="trialend")return"⏳ 3 günlük ücretsiz deneme süren bitti. Devam etmek için Premium'a geç.";
+ return"Sınırsız öğren, sınırsız oyna! Tüm kilitleri aç. 🚀";
+}
+const FEAT=[["♾️","Sınırsız soru","Tüm ders ve oyunlarda"],["🎮","Tüm oyunlar","Mini oyunlar + Çizim & Boyama"],["📊","Gelişim takibi","İlerleme, hedef, rekor, sertifika"],["🎯","Akıllı tekrar","Zayıf konular + yanlış defteri"],["👨‍👩‍👧","Ebeveyn paneli","Tüm seçenekler açık"],["🎬","Özel içerikler","Geri dönüşüm + çizgi hikâyeler"]];
+function openPaywall(reason,info){
+ info=info||{};
+ if(document.getElementById("kdp-ov"))return;
+ leaveOnClose=!!info.leave;
+ const ov=document.createElement("div");ov.id="kdp-ov";ov.setAttribute("role","dialog");ov.setAttribute("aria-modal","true");
+ ov.innerHTML='<div class="kdp-sheet"></div>';document.body.appendChild(ov);document.body.classList.add("kdp-open");
+ ov.addEventListener("click",e=>{if(e.target===ov)closePaywall()});
+ ov._r=[reason,info];render(ov);
+}
+function closePaywall(){
+ const ov=document.getElementById("kdp-ov");if(!ov)return;
+ ov.remove();document.body.classList.remove("kdp-open");
+ const go=leaveOnClose;leaveOnClose=false;
+ if(go&&!isPremium()){try{(window.hub||function(){})()}catch(e){}}
+}
+function render(ov){
+ const sh=ov.firstChild,reason=ov._r[0],info=ov._r[1];
+ const x='<button class="kdp-x" type="button" aria-label="Kapat">✕</button>';
+ /* Premium zaten aktifse durum ekranı */
+ if(planActive()){
+  const exp=S.plan==="lifetime"?"Süresiz":new Date(S.until).toLocaleDateString("tr-TR");
+  sh.innerHTML='<div class="kdp-hero">'+x+'<div class="kdp-crown">👑</div><h2>Premium aktif</h2><p>Tüm kilitler açık. İyi eğlenceler! 🎉</p></div><div class="kdp-body"><div class="kdp-st"><div><span>Plan</span><b>'+PLAN_N[S.plan]+'</b></div><div><span>'+(S.plan==="lifetime"?"Geçerlilik":"Yenileme / bitiş")+'</span><b>'+exp+'</b></div></div>'+(S.plan!=="lifetime"?'<button class="kdp-cta" type="button" data-a="manage">Aboneliği Yönet</button>':'')+'<button class="kdp-link" type="button" data-a="close">Kapat</button></div>';
+ }else{
+  const tl=trialLeft(),canTrial=!S.trial;
+  const P=CFG.PRICES;
+  const plans=[["monthly","🌙 Aylık","Her ay yenilenir",P.monthly,"/ ay",""],["yearly","🌟 Yıllık","Ayda ≈ 75 ₺ • %50 tasarruf",P.yearly,"/ yıl","EN AVANTAJLI"],["lifetime","💎 Ömür boyu","Tek seferlik ödeme • sınırsız",P.lifetime,"tek sefer","TEK SEFERLİK"]];
+  sh.innerHTML='<div class="kdp-hero">'+x+'<i class="kdp-sp s1">✨</i><i class="kdp-sp s2">⭐</i><i class="kdp-sp s3">✨</i><i class="kdp-sp s4">🌟</i><div class="kdp-crown">🦊👑</div><h2>Kidomind Premium</h2><p class="kdp-rs">'+reasonText(reason,info)+'</p></div><div class="kdp-body">'
+   +'<div class="kdp-plans">'+plans.map(p=>'<button type="button" class="kdp-plan'+(sel===p[0]?" on":"")+'" data-p="'+p[0]+'">'+(p[5]?'<span class="kdp-tag">'+p[5]+'</span>':'')+'<span class="r"></span><span class="t"><b>'+p[1]+'</b><small>'+p[2]+'</small></span><span class="p">'+p[3]+'<small>'+p[4]+'</small></span></button>').join("")+'</div>'
+   +'<ul class="kdp-feat">'+FEAT.map(f=>'<li><i>'+f[0]+'</i><span><b>'+f[1]+'</b><small>'+f[2]+'</small></span></li>').join("")+'</ul>'
+   +'<div class="kdp-trust"><span>🚫 Reklamsız</span><span>📴 Çevrimdışı</span><span>🔒 Google Play ile güvenli ödeme</span></div><p class="kdp-fine">Aylık ve yıllık planlar Google Play hesabın üzerinden otomatik yenilenir; istediğin zaman Play Store › Abonelikler bölümünden iptal edebilirsin. Ömür boyu plan tek seferlik ödemedir. Ödeme Google Play tarafından alınır.</p></div>'
+   +'<div class="kdp-foot"><button class="kdp-cta" type="button" data-a="buy">👑 '+PLAN_N[sel]+' Premium Al • '+P[sel]+'</button>'
+   +(tl>0?'<p class="kdp-note">🎁 Ücretsiz deneme aktif • '+fmtLeft(tl)+' kaldı</p>':canTrial?'<button class="kdp-trial" type="button" data-a="trial">🎁 3 Gün Ücretsiz Dene<small>Tüm kilitler 3 gün açılır • bir kez kullanılır</small></button>':'')
+   +'<button class="kdp-link" type="button" data-a="restore">Satın alımları geri yükle</button></div>';
+
+ }
+ sh.querySelector(".kdp-x")&&sh.querySelector(".kdp-x").addEventListener("click",closePaywall);
+ sh.querySelectorAll("[data-p]").forEach(b=>b.addEventListener("click",()=>{sel=b.dataset.p;render(ov)}));
+ sh.querySelectorAll("[data-a]").forEach(b=>b.addEventListener("click",()=>{
+  const a=b.dataset.a;
+  if(a==="close")closePaywall();
+  else if(a==="buy")gate(ov,()=>purchase(sel));
+  else if(a==="trial")gate(ov,()=>{if(startTrial()){closePaywall();T("🎉 3 günlük ücretsiz deneme başladı! Tüm kilitler açık")}});
+  else if(a==="restore")restore();
+  else if(a==="manage"){const B=window.KidomindBilling;try{if(B&&B.manage)B.manage();else window.open(CFG.MANAGE_URL,"_blank")}catch(e){}}
+ }));
+}
+/* Ebeveyn onayı: çocukların yanlışlıkla satın almasını / denemeyi başlatmasını önler */
+function gate(ov,ok){
+ const sh=ov.firstChild,a=6+Math.floor(Math.random()*4),b=6+Math.floor(Math.random()*4),ans=a*b;
+ const set=new Set([ans]);while(set.size<4){const d=ans+(Math.floor(Math.random()*13)-6);if(d>0&&d!==ans)set.add(d)}
+ const opts=[...set].sort(()=>Math.random()-.5);
+ sh.innerHTML='<div class="kdp-hero" style="padding-bottom:16px"><button class="kdp-x" type="button" aria-label="Kapat">✕</button><div class="kdp-crown" style="font-size:40px">🔐</div><h2>Ebeveyn onayı</h2><p>Devam etmek için bir yetişkinin işlemi çözmesi gerekir.</p></div><div class="kdp-body"><div class="kdp-gate"><div class="gq">'+a+' × '+b+' = ?</div><div class="go">'+opts.map(o=>'<button type="button" data-v="'+o+'">'+o+'</button>').join("")+'</div></div><button class="kdp-link" type="button" data-a="back">‹ Geri dön</button></div>';
+ sh.querySelector(".kdp-x").addEventListener("click",closePaywall);
+ sh.querySelector("[data-a=back]").addEventListener("click",()=>render(ov));
+ sh.querySelectorAll("[data-v]").forEach(btn=>btn.addEventListener("click",()=>{
+  if(+btn.dataset.v===ans){ok()}
+  else{const g=sh.querySelector(".kdp-gate");g.classList.remove("bad");void g.offsetWidth;g.classList.add("bad");setTimeout(()=>gate(ov,ok),380)}
+ }));
+}
+
+/* ---------- AÇIK API (Play Faturalandırma köprüsü için) ---------- */
+window.__kdPremOK=isPremium;
+window.KidomindPremium={
+ config:CFG,
+ isPremium:()=>isPremium(),
+ status:()=>({premium:isPremium(),plan:S.plan,until:S.until||0,trialStarted:S.trial||0,trialMsLeft:trialLeft(),used:Object.assign({},S.used),miniSeconds:S.mini||0}),
+ openPaywall:(r,i)=>openPaywall(r||"strip",i),
+ /* Google Play'den doğrulanmış satın alma geldiğinde çağır: grantFromStore({plan:"yearly",expiresAt:ms}) */
+ grantFromStore:o=>{if(o&&PLAN_N[o.plan])grant(o.plan,o.expiresAt)},
+ /* Abonelik iptal/bitti ise çağır */
+ revoke:()=>{S.plan=null;S.until=0;save(true);sched()},
+ /* Test için: tüm sayaçları sıfırla */
+ resetCounters:()=>{S.used={};S.mini=0;save(true);sched()}
+};
+
+/* ---------- BAŞLAT ---------- */
+function start(){
+ install();
+ const app=appEl();
+ if(app)new MutationObserver(onMut).observe(app,{subtree:true,childList:true,attributes:true,attributeFilter:["class"],attributeOldValue:true});
+ const nav=document.getElementById("kdnav");
+ if(nav)new MutationObserver(sched).observe(nav,{subtree:true,attributes:true,attributeFilter:["class"]});
+ sched();
+}
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",start);else start();
+})();
+</script>
+<script id="kidomind-billing">
+/* ===== KIDOMIND GOOGLE PLAY FATURALANDIRMA KÖPRÜSÜ =====
+   Capacitor + "cordova-plugin-purchase" (CdvPurchase). Tarayıcıda hiçbir şey yapmaz.
+   Ürünler: premium-monthly / premium-yearly (abonelik), premium_lifetime (tek seferlik). */
+(function(){
+"use strict";
+let native=false;
+try{native=!!(window.Capacitor&&Capacitor.isNativePlatform&&Capacitor.isNativePlatform())}catch(e){}
+if(!native||window.KidomindBilling)return;
+
+const PRODUCTS={"premium-monthly":"monthly","premium-yearly":"yearly","premium_lifetime":"lifetime"};
+const ORDER=["lifetime","yearly","monthly"];
+const idOf=pl=>Object.keys(PRODUCTS).find(k=>PRODUCTS[k]===pl);
+const MANAGE_URL="https://play.google.com/store/account/subscriptions";
+let C=null,store=null,initP=null;const pending={};
+
+const waitLib=ms=>new Promise((res,rej)=>{const t0=Date.now();(function chk(){
+ if(window.CdvPurchase)return res(window.CdvPurchase);
+ if(Date.now()-t0>ms)return rej(new Error("purchase plugin yok"));
+ setTimeout(chk,300)})()});
+const grant=pl=>{try{window.KidomindPremium&&KidomindPremium.grantFromStore({plan:pl})}catch(e){}};
+function ownedPlan(){
+ for(const pl of ORDER){try{if(store.owned({id:idOf(pl),platform:C.Platform.GOOGLE_PLAY}))return pl}catch(e){}}
+ return null;
+}
+function syncOwned(){const pl=ownedPlan();if(pl)grant(pl);return pl}
+
+function init(){
+ if(initP)return initP;
+ initP=waitLib(15000).then(async lib=>{
+  C=lib;store=lib.store;
+  const G=C.Platform.GOOGLE_PLAY;
+  store.register([
+   {id:"premium-monthly",type:C.ProductType.PAID_SUBSCRIPTION,platform:G},
+   {id:"premium-yearly",type:C.ProductType.PAID_SUBSCRIPTION,platform:G},
+   {id:"premium_lifetime",type:C.ProductType.NON_CONSUMABLE,platform:G}
+  ]);
+  /* Satın alma onaylanınca: premium'u aç, Google'a "onaylandı (acknowledge)" bildir */
+  store.when().approved(tr=>{
+   (tr.products||[]).forEach(p=>{
+    const pl=PRODUCTS[p.id];if(!pl)return;
+    grant(pl);
+    const w=pending[p.id];if(w){delete pending[p.id];w.res(pl)}
+   });
+   try{tr.finish()}catch(e){}
+  });
+  store.when().receiptsReady(()=>{syncOwned()});
+  await store.initialize([G]);
+  syncOwned();
+ }).catch(e=>{initP=null;throw e});
+ return initP;
+}
+
+window.KidomindBilling={
+ async purchase(productId,plan){
+  await init();
+  const prod=store.get(productId,C.Platform.GOOGLE_PLAY);
+  const offer=prod&&prod.getOffer&&prod.getOffer();
+  if(!offer)return{ok:false,error:"urun-bulunamadi"};
+  const done=new Promise(res=>{pending[productId]={res}});
+  const err=await offer.order();
+  if(err){delete pending[productId];return{ok:false,error:err.message||String(err.code)}}
+  const r=await Promise.race([done,new Promise(res=>setTimeout(()=>res(null),90000))]);
+  if(!r){delete pending[productId];return{ok:false,error:"zaman-asimi"}}
+  return{ok:true,plan:r};
+ },
+ async restore(){
+  await init();
+  try{await store.restorePurchases()}catch(e){}
+  const pl=ownedPlan();
+  return pl?{plan:pl}:{plan:null};
+ },
+ manage(){
+  init().then(()=>store.manageSubscriptions(C.Platform.GOOGLE_PLAY))
+   .catch(()=>{try{window.open(MANAGE_URL,"_blank")}catch(e){}});
+ }
+};
+
+/* Uygulama açılınca: Google'da aktif satın alım varsa premium'u yenile */
+setTimeout(()=>{init().catch(()=>{})},1500);
+})();
+</script>
+<script id="kidomind-child">
+/* ===== ÇOCUK PROFİLİ: ilk açılışta isim • yaş • sınıf ===== */
+(function(){
+"use strict";
+const KEY="kdprem-child";
+const get=()=>{try{const c=JSON.parse(localStorage.getItem(KEY)||"null");return c&&c.name&&c.age?c:null}catch(e){return null}};
+const gOf=c=>Math.min(8,Math.max(1,Math.round(+c.age)-5));
+const grade=()=>{const c=get();return c?gOf(c):0};
+window.__kdChildGrade=grade;
+window.__kdChildGradeText=()=>{const c=get();return c?gOf(c)+". Sınıf":""};
+
+/* ---- sınıfa göre soru havuzu (Türkçe + Matematik, sınıf bankalarından) ---- */
+const hash=s=>{let h=2166136261;for(const ch of String(s))h=Math.imul(h^ch.charCodeAt(0),16777619);return h>>>0};
+const rngOf=a=>()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296};
+const shuf=(arr,r)=>{const a=arr.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const okItem=x=>x&&x.q!=null&&x.a!=null&&Array.isArray(x.o)&&x.o.length>0;
+function pools(g){
+ const G=window.__kdGR||{},out=[];
+ ["mat","tr"].forEach(k=>{try{const l=[];(G[k]&&G[k][g]?G[k][g]:[]).forEach(x=>{try{l.push(...x[4]())}catch(e){}});const f=l.filter(okItem);if(f.length)out.push(f)}catch(e){}});
+ return out;
+}
+const cache={};
+function list(seed,n){
+ const g=grade();if(!g)return null;
+ const ck=seed+"|"+g;if(cache[ck])return cache[ck];
+ const P=pools(g);if(!P.length)return null;
+ const r=rngOf(hash(ck)),S=P.map(l=>shuf(l,r)),res=[],seen=new Set();
+ for(let i=0,guard=0;res.length<n&&guard<n*40;i++,guard++){
+  const l=S[i%S.length],it=l[Math.floor(i/S.length)%l.length];
+  if(seen.has(it.q)&&seen.size<S.reduce((a,l)=>a+l.length,0))continue;
+  seen.add(it.q);res.push(Object.assign({},it,{o:it.o.slice()}));
+ }
+ return cache[ck]=res;
+}
+window.__kdChildItems=(seed,n)=>list(seed,n);
+window.__kdChildQ=(kind,idx)=>{
+ if(kind!=="daily")return null;
+ const L=list("d"+new Date().toDateString(),50);if(!L||!L.length)return null;
+ const it=L[idx%L.length];
+ return{txt:it.q,ans:it.a,opts:shuf([it.a].concat(it.o),Math.random)};
+};
+
+/* ---- kurulum ekranı ---- */
+const css=`#kdsetup{position:fixed;inset:0;z-index:99990;overflow:auto;background:var(--bg,#f6f7ff);color:var(--tx,#1d2340);padding:calc(env(safe-area-inset-top,0px) + 18px) 18px calc(env(safe-area-inset-bottom,0px) + 18px)}
+#kdsetup .in{max-width:440px;margin:0 auto}#kdsetup h1{margin:6px 0 4px;font-size:26px;text-align:center}#kdsetup .em{font-size:54px;text-align:center}
+#kdsetup p.s{margin:0 0 14px;text-align:center;color:var(--mu,#667)}#kdsetup label{display:block;font-weight:800;margin:14px 0 6px}
+#kdsetup input{width:100%;box-sizing:border-box;font:inherit;font-size:18px;font-weight:700;padding:13px 14px;border-radius:14px;border:2px solid var(--bd,#d8dcf0);background:var(--card,#fff);color:inherit}
+#kdsetup .gr{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+#kdsetup .gr button{font:inherit;font-weight:800;font-size:15px;padding:12px 4px;border-radius:14px;border:2px solid var(--bd,#d8dcf0);background:var(--card,#fff);color:inherit;cursor:pointer}
+#kdsetup .gr button.on{border-color:var(--pr,#5b5bf0);background:var(--pr,#5b5bf0);color:#fff}
+#kdsetup .go{display:block;width:100%;margin-top:20px;border:0;border-radius:16px;padding:15px;font:inherit;font-weight:900;font-size:18px;background:var(--pr,#5b5bf0);color:#fff;cursor:pointer}
+#kdsetup .nt{margin:14px 0 0;padding:10px 12px;border-radius:14px;text-align:center;font-size:13px;line-height:1.4;color:var(--tx,#1d2340);background:color-mix(in srgb,#f59e0b 16%,var(--card,#fff));border:1px solid color-mix(in srgb,#f59e0b 40%,var(--bd,#d8dcf0))}#kdsetup .go:disabled{opacity:.45}#kdsetup .cx{display:block;width:100%;margin-top:10px;border:0;background:none;color:var(--mu,#667);font:inherit;font-weight:700;padding:10px;cursor:pointer}`;
+function setup(edit){
+ if(document.getElementById("kdsetup"))return;
+ const old=get()||{},P=(()=>{try{return par()}catch(e){return{}}})();
+ let name=old.name||P.name||"",age=old.age||P.age||0;
+ if(!document.getElementById("kdsetup-css")){const st=document.createElement("style");st.id="kdsetup-css";st.textContent=css;document.head.appendChild(st)}
+ const o=document.createElement("div");o.id="kdsetup";
+ o.innerHTML='<div class="in"><div class="em">🦊</div><h1>'+(edit?"Çocuk Profili":"Seni tanıyalım!")+'</h1><p class="s">Sorular yaşına uygun hazırlanacak.</p>'
+  +'<label for="kdsn">Adın ne?</label><input id="kdsn" type="text" maxlength="14" autocomplete="off" placeholder="Örn: Elif">'
+  +'<label for="kdsa">Kaç yaşındasın?</label><input id="kdsa" type="number" inputmode="numeric" min="3" max="18" placeholder="Örn: 7">'
+  +'<button class="go" id="kdsgo" type="button" disabled>Başlayalım 🚀</button><p class="nt">👑 <b>Premium abonelere özel:</b> İkinci çocuk paneli de Ebeveyn panelinde mevcuttur.</p>'+(edit?'<button class="cx" id="kdscx" type="button">Vazgeç</button>':"")+'</div>';
+ document.body.appendChild(o);
+ const ni=o.querySelector("#kdsn"),ai=o.querySelector("#kdsa"),go=o.querySelector("#kdsgo");
+ ni.value=name;if(age)ai.value=age;
+ const paint=()=>{go.disabled=!(ni.value.trim().length>0&&+ai.value>=3&&+ai.value<=18)};
+ ai.addEventListener("input",paint);
+ ni.addEventListener("input",paint);
+ const cx=o.querySelector("#kdscx");if(cx)cx.onclick=()=>o.remove();
+ go.onclick=()=>{
+  const c={name:ni.value.trim().slice(0,14),age:Math.round(+ai.value)};c.grade=gOf(c);
+  try{localStorage.setItem(KEY,JSON.stringify(c))}catch(e){}
+  try{const p=par();p.name=c.name;p.age=c.age;saveSet()}catch(e){}
+  try{if(prof==="kid"||prof==="kid2"){const s=JSON.parse(localStorage.getItem("mat-pnames")||"{}");s[prof]=c.name.slice(0,12);localStorage.setItem("mat-pnames",JSON.stringify(s));if(typeof kdApply==="function")kdApply()}}catch(e){}
+  o.remove();
+  try{if(edit&&typeof parentPanel==="function")parentPanel();else if(window.hub)window.hub()}catch(e){}
+ };
+ paint();setTimeout(()=>{try{ni.focus()}catch(e){}},300);
+}
+window.__kdChildSetup=setup;
+
+/* Açılış + tanıtım kapanınca, profil yoksa göster */
+let tries=0;
+const iv=setInterval(()=>{
+ tries++;
+ if(get()){clearInterval(iv);return}
+ let onb=false;try{onb=!!localStorage.getItem("kdprem-onb")}catch(e){onb=true}
+ if(!document.getElementById("splash")&&document.getElementById("app")&&onb&&tries>4){clearInterval(iv);setup(false)}
+ else if(tries>1200)clearInterval(iv);
+},300);
+})();
+</script>
+
+<script id="kidomind-onboarding">
+/* ===== İLK AÇILIŞ TANITIMI (3 sayfa, yalnızca bir kez) ===== */
+(function(){
+"use strict";
+const OK="kdprem-onb";
+try{if(localStorage.getItem(OK))return}catch(e){}
+const P=[
+{c:"linear-gradient(160deg,#4338ca,#7c3aed 55%,#db2777)",e:"🏢",t:"Aksu Studio Hakkında",b:`
+<p class="o-p">Aksu Studio, yenilikçi mobil uygulamalar, eğitici teknolojiler ve eğlenceli dijital deneyimler geliştiren bağımsız bir teknoloji ve yazılım stüdyosudur.</p>
+<p class="o-p">Yazılım geliştirme, dijital tasarım ve yapay zekâ entegrasyonlarını bir araya getirerek kullanıcıların hayatını kolaylaştıran, eğiten ve keyifli vakit geçirmelerini sağlayan mobil çözümler sunuyoruz.</p>
+<p class="o-p">Çocuklara özel tasarladığımız KidoMind gibi eğitici platformlardan, günlük hayatı pratikleştiren ve eğlendiren mobil araçlara kadar geniş bir yelpazede yüksek kaliteli içerikler üretiyoruz.</p>
+<div class="o-card"><h4>💡 Misyonumuz</h4><p>Kullanıcı dostu, estetik, güvenli ve performansı yüksek mobil uygulamalar geliştirerek dijital dünyada fark yaratan bir deneyim sunmak. Özellikle çocuk odaklı projelerimizde ebeveyn güvenliğini, reklamsız ve nitelikli eğitimi ön planda tutmak.</p></div>
+<div class="o-card"><h4>🎯 Vizyonumuz</h4><p>Mobil uygulama ve mobil oyun sektöründe yenilikçi yaklaşımlar, yapay zekâ destekli çözümler ve özgün tasarımlarla küresel ölçekte tanınan bir dijital marka olmak.</p></div>
+<h3 class="o-h">✨ Bizi Öne Çıkaran Değerler</h3>
+<div class="o-g">
+<div><i>🎨</i><b>Özgün Tasarım & Yüksek UX</b><small>Kullanıcı dostu, modern ve akıcı arayüzler.</small></div>
+<div><i>🛡️</i><b>Güvenli İçerik</b><small>Çocuk ve aile dostu, Google Play standartlarına uyumlu projeler.</small></div>
+<div><i>⚡</i><b>Teknoloji ve Yenilik</b><small>Güncel yazılım mimarileri ve yapay zekâ entegrasyonları.</small></div>
+<div><i>🎯</i><b>Öğrenme ve Eğlence</b><small>Eğitimi oyunlaştırarak sunan interaktif çözümler.</small></div></div>`},
+{c:"linear-gradient(160deg,#0ea5e9,#6366f1 55%,#a855f7)",e:"🦊",t:"KidoMind Nedir?",b:`
+<p class="o-p">KidoMind, çocuklar için tasarlanmış; öğrenmeyi eğlenceli, interaktif ve güvenli hale getiren eğitici bir mobil uygulama ve öğrenme platformudur.</p>
+<p class="o-p">Aksu Studio tarafından geliştirilen uygulama, çocukların zihinsel gelişimini desteklerken ebeveynlerin de içinin rahat etmesini sağlayacak bir yapıda kurgulanmıştır.</p>
+<h3 class="o-h">🌟 Öne Çıkan Özellikler</h3>
+<div class="o-l">
+<div><i>📚</i><span><b>Zengin Soru ve Ders Desteği</b><small>Farklı derslerde bilgi seviyesini artıran, zekâ gelişimini ve okul başarısını destekleyen soru havuzları.</small></span></div>
+<div><i>🎮</i><span><b>Mini Oyunlar ve Yaratıcı Atölyeler</b><small>Eğlenip öğrenebilecekleri zekâ oyunları ve hayal güçlerini geliştirecek Çizim & Boyama Atölyesi.</small></span></div>
+<div><i>🎬</i><span><b>İnteraktif Çizgi Hikâyeler & Geri Dönüşüm</b><small>Çevre bilinci ve olumlu alışkanlıklar kazandıran interaktif anlatımlar.</small></span></div>
+<div><i>📊</i><span><b>Gelişim Takibi ve Sertifikalar</b><small>İlerlemeyi, hedefleri, rekorları ve başarı sertifikalarını takip etme imkânı.</small></span></div>
+<div><i>🎯</i><span><b>Zayıf Konularım & Yanlışlarım Defteri</b><small>Eksik kalınan noktaları tespit edip tekrar ettiren akıllı öğrenme sistemi.</small></span></div>
+<div><i>👨‍👩‍👧</i><span><b>Ebeveyn Paneli ve Güvenlik</b><small>Çocuğun durumunu detaylıca analiz edebileceğin özel panel • Yanlışlıkla satın almayı engelleyen Ebeveyn Onayı • Reklamsız ve çocuk dostu içerik.</small></span></div></div>
+<div class="o-card o-k"><h4>💡 Kısacası KidoMind</h4><p>Çocukların ekran süresini verimli ve kaliteli bir öğrenme sürecine dönüştüren, eğitim ve eğlenceyi (Edutainment) bir araya getiren dijital bir öğrenme asistanıdır.</p></div>`},
+{c:"linear-gradient(160deg,#059669,#0ea5e9 60%,#6366f1)",e:"❓",t:"Sıkça Sorulan Sorular",faq:1,b:""}
+];
+const FAQ=[
+["KidoMind nedir ve hangi yaş grubuna uygundur?","KidoMind; çocukların zihinsel gelişimini, okul başarısını ve hayal gücünü desteklemek için geliştirilmiş interaktif bir öğrenme ve eğlence platformudur. İçerikler ve mini oyunlar okul öncesi ve ilkokul çağındaki çocuklar için özel olarak tasarlanmıştır; 1. sınıftan 8. sınıfa kadar ders programları vardır."],
+["Uygulama çocuklar için güvenli mi? Reklam içeriyor mu?","Evet. KidoMind çocuk güvenliğini ve gizliliğini en ön planda tutar. Uygulamada çocukların uygunsuz içeriklerle karşılaşmasına neden olacak hiçbir üçüncü taraf reklam yer almaz. Ayrıca ebeveyn paneli ve satın alma ekranları Ebeveyn Onayı (Parental Gate) ile koruma altındadır."],
+["Ücretsiz deneme süresi nasıl çalışır?","KidoMind Premium'u 3 gün boyunca hiçbir ücret ödemeden tüm özellikleri açık şekilde deneyebilirsiniz. 3 günlük deneme süresi dolmadan iptal etmeniz durumunda hesabınızdan hiçbir ücret kesilmez."],
+["Aboneliğimi dilediğim zaman iptal edebilir miyim?","Kesinlikle. Aboneliğinizi dilediğiniz an Google Play Store'daki Abonelikler menüsünden tek tıkla iptal edebilirsiniz. Herhangi bir taahhüt veya cayma bedeli bulunmamaktadır."],
+["Ücretsiz sürüm ile Premium arasındaki fark nedir?","Ücretsiz sürümde belirli sayıda ders sorusu ve sınırlı içerik erişimi sunulur. Premium ile tüm ders ve oyunlarda sınırsız soruya, mini oyunlar ve Çizim & Boyama Atölyesi'ne, interaktif çizgi hikâyelere, ilerleme raporları, sertifikalar ve Yanlışlarım Defteri gibi akıllı öğrenme araçlarına sınırsız erişirsiniz."],
+["Ömür boyu lisans nedir?","Ömür Boyu plan, tek seferlik bir ödemedir. Bir kez satın aldığınızda herhangi bir aylık veya yıllık yenileme ücreti ödemeden KidoMind'ın mevcut ve gelecekte eklenecek tüm özelliklerine sınırsız erişim sağlarsınız."],
+["Çocuğumun gelişimini nasıl takip edebilirim?","Ebeveyn Paneli üzerinden çocuğunuzun çözdüğü soru sayılarını, başarı oranlarını, zorlandığı konuları (Yanlışlarım Defteri) ve kazandığı sertifikaları detaylı olarak inceleyebilirsiniz."],
+["Yanlışlıkla satın alma yapılabilir mi?","Hayır. Satın alma ekranına geçişte yetişkinlerin çözebileceği bir matematik doğrulaması (Ebeveyn Onayı) bulunur. Çocukların yanlışlıkla satın butonuna basması engellenmiştir."],
+["Aynı aboneliği farklı cihazlarda kullanabilir miyim?","Evet. Satın alma yaptığınız Google Play hesabınızın tanımlı olduğu tüm cihazlarda aboneliğinizi aktif edebilir, \"Satın alımları geri yükle\" butonuyla Premium haklarınızı tanımlayabilirsiniz."]
+];
+const css=`
+#kdo{position:fixed;inset:0;z-index:2147482000;display:flex;flex-direction:column;background:#1e1b4b;color:#fff;font-family:inherit;animation:kdof .35s ease both;overflow:hidden}
+@keyframes kdof{from{opacity:0}to{opacity:1}}
+#kdo.out{opacity:0;transition:opacity .35s}
+#kdo .o-bg{position:absolute;inset:0;transition:background .5s}
+#kdo .o-bg:before,#kdo .o-bg:after{content:"";position:absolute;border-radius:50%;background:rgba(255,255,255,.1)}
+#kdo .o-bg:before{width:260px;height:260px;right:-90px;top:-80px}#kdo .o-bg:after{width:200px;height:200px;left:-80px;bottom:90px}
+#kdo .o-top{position:relative;z-index:2;display:flex;align-items:center;justify-content:space-between;padding:calc(env(safe-area-inset-top,0px) + 14px) 18px 6px}
+#kdo .o-dots{display:flex;gap:7px}#kdo .o-dots i{width:9px;height:9px;border-radius:99px;background:rgba(255,255,255,.4);transition:.3s}#kdo .o-dots i.on{width:28px;background:#fff}
+#kdo .o-skip{border:0;background:rgba(255,255,255,.2);color:#fff;font:inherit;font-weight:800;font-size:13px;padding:7px 14px;border-radius:99px;cursor:pointer}
+#kdo .o-vw{position:relative;z-index:2;flex:1;overflow:hidden;min-height:0}
+#kdo .o-tr{display:flex;height:100%;width:300%;transition:transform .45s cubic-bezier(.3,.8,.3,1)}
+#kdo .o-pg{width:33.3334%;height:100%;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:6px 18px 18px;box-sizing:border-box;text-align:left}
+#kdo .o-hd{text-align:center;padding:4px 0 10px}
+#kdo .o-em{display:inline-grid;place-items:center;width:84px;height:84px;border-radius:28px;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.35);font-size:46px;box-shadow:0 18px 30px -16px rgba(0,0,0,.5);animation:kdpg 3s ease-in-out infinite}
+#kdo h1{margin:10px 0 0;font-size:26px;font-weight:900;color:#fff;letter-spacing:-.3px}
+#kdo .o-p{margin:0 0 10px;font-size:14.5px;line-height:1.55;font-weight:600;color:#fff;opacity:.97}
+#kdo .o-h{margin:16px 0 8px;font-size:16.5px;font-weight:900;color:#fff}
+#kdo .o-card{margin:10px 0;padding:13px 14px;border-radius:20px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.28);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+#kdo .o-card h4{margin:0 0 4px;font-size:15px;font-weight:900;color:#fff}#kdo .o-card p{margin:0;font-size:13.5px;line-height:1.5;font-weight:600;color:#fff;opacity:.97}
+#kdo .o-k{background:rgba(255,255,255,.26)}
+#kdo .o-g{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+#kdo .o-g>div{padding:12px;border-radius:18px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.26)}
+#kdo .o-g i{font-style:normal;font-size:26px;display:block;margin-bottom:4px}
+#kdo .o-g b{display:block;font-size:13.5px;font-weight:900;color:#fff}#kdo .o-g small{display:block;margin-top:2px;font-size:12px;line-height:1.35;font-weight:600;color:#fff;opacity:.92}
+#kdo .o-l{display:grid;gap:9px}
+#kdo .o-l>div{display:flex;gap:11px;align-items:flex-start;padding:11px 12px;border-radius:18px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.26)}
+#kdo .o-l i{font-style:normal;flex:0 0 40px;height:40px;display:grid;place-items:center;font-size:23px;border-radius:13px;background:rgba(255,255,255,.22)}
+#kdo .o-l b{display:block;font-size:13.5px;font-weight:900;color:#fff}#kdo .o-l small{display:block;margin-top:2px;font-size:12.2px;line-height:1.4;font-weight:600;color:#fff;opacity:.93}
+#kdo .o-q{border-radius:18px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.26);margin:0 0 9px;overflow:hidden}
+#kdo .o-q button{width:100%;display:flex;align-items:center;gap:10px;text-align:left;border:0;background:none;color:#fff;font:inherit;font-weight:800;font-size:13.8px;line-height:1.3;padding:13px 14px;cursor:pointer}
+#kdo .o-q button span.n{flex:0 0 24px;height:24px;border-radius:50%;background:rgba(255,255,255,.25);display:grid;place-items:center;font-size:12px}
+#kdo .o-q button span.t{flex:1}#kdo .o-q button span.a{flex:0 0 auto;transition:transform .25s}
+#kdo .o-q.open button span.a{transform:rotate(180deg)}
+#kdo .o-q div{max-height:0;overflow:hidden;transition:max-height .35s ease;padding:0 14px;font-size:13.3px;line-height:1.55;font-weight:600;color:#fff;opacity:.97}
+#kdo .o-q.open div{padding:0 14px 14px}
+#kdo .o-bt{position:relative;z-index:2;padding:10px 18px calc(env(safe-area-inset-bottom,0px) + 16px)}
+#kdo .o-go{display:block;width:100%;border:0;border-radius:20px;padding:16px;font:inherit;font-size:17px;font-weight:900;color:#4338ca;background:#fff;box-shadow:0 16px 28px -14px rgba(0,0,0,.55);cursor:pointer}
+#kdo .o-go:active{transform:scale(.98)}
+@media (prefers-reduced-motion:reduce){#kdo .o-em{animation:none}#kdo .o-tr{transition:none}}`;
+function show(){
+ if(document.getElementById("kdo"))return;
+ const st=document.createElement("style");st.textContent=css;document.head.appendChild(st);
+ const o=document.createElement("div");o.id="kdo";o.setAttribute("role","dialog");o.setAttribute("aria-modal","true");
+ const faq=FAQ.map((f,i)=>`<div class="o-q${i===0?" open":""}"><button type="button"><span class="n">${i+1}</span><span class="t">${f[0]}</span><span class="a">⌄</span></button><div>${f[1]}</div></div>`).join("");
+ o.innerHTML=`<div class="o-bg"></div><div class="o-top"><div class="o-dots">${P.map((_,i)=>`<i${i?"":' class="on"'}></i>`).join("")}</div><button class="o-skip" type="button">Atla</button></div><div class="o-vw"><div class="o-tr">${P.map(p=>`<section class="o-pg"><div class="o-hd"><div class="o-em">${p.e}</div><h1>${p.t}</h1></div>${p.faq?faq:p.b}</section>`).join("")}</div></div><div class="o-bt"><button class="o-go" type="button">İleri ›</button></div>`;
+ document.body.appendChild(o);
+ const bg=o.querySelector(".o-bg"),tr=o.querySelector(".o-tr"),dots=o.querySelectorAll(".o-dots i"),go=o.querySelector(".o-go"),pgs=o.querySelectorAll(".o-pg");
+ let i=0;
+ const set=n=>{i=Math.max(0,Math.min(P.length-1,n));tr.style.transform="translateX(-"+i*100/3+"%)";bg.style.background=P[i].c;dots.forEach((d,k)=>d.classList.toggle("on",k===i));go.textContent=i===P.length-1?"Hadi Başlayalım 🚀":"İleri ›";pgs[i].scrollTop=0};
+ const fin=()=>{try{localStorage.setItem(OK,"1")}catch(e){}o.classList.add("out");setTimeout(()=>o.remove(),380)};
+ go.onclick=()=>i<P.length-1?set(i+1):fin();
+ o.querySelector(".o-skip").onclick=fin;
+ o.querySelectorAll(".o-q").forEach(q=>{const d=q.lastChild;q.firstChild.onclick=()=>{const op=q.classList.toggle("open");d.style.maxHeight=op?d.scrollHeight+"px":"0"}; if(q.classList.contains("open"))d.style.maxHeight="400px"});
+ let x0=null,y0=0;
+ o.addEventListener("touchstart",e=>{x0=e.touches[0].clientX;y0=e.touches[0].clientY},{passive:true});
+ o.addEventListener("touchend",e=>{if(x0==null)return;const dx=e.changedTouches[0].clientX-x0,dy=e.changedTouches[0].clientY-y0;x0=null;if(Math.abs(dx)>60&&Math.abs(dx)>Math.abs(dy)*1.5)set(i+(dx<0?1:-1))},{passive:true});
+ set(0);
+}
+/* Açılış ekranı ("Başla") kapandıktan sonra göster */
+let tries=0;
+const iv=setInterval(()=>{
+ tries++;
+ const sp=document.getElementById("splash");
+ if(!sp&&document.getElementById("app")&&tries>3){clearInterval(iv);show()}
+ else if(tries>600)clearInterval(iv);
+},250);
 })();
 </script>
