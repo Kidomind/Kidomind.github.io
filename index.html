@@ -18886,3 +18886,66 @@ const iv=setInterval(()=>{
 },250);
 })();
 </script>
+<script>
+// Google Play In-App Purchase (Digital Goods API) Entegrasyonu
+async function satinAl(urunId) {
+  try {
+    // 1. Digital Goods API desteği kontrolü (Play Store TWA ortamında mıyız?)
+    if (!('getDigitalGoodsService' in window)) {
+      alert("Google Play satın alma bağlantısı bu sürümde bulunamadı. Lütfen uygulamayı Play Store'dan yükleyip tekrar dene.");
+      return;
+    }
+
+    // 2. Play Store faturalandırma servisine bağlan
+    const service = await window.getDigitalGoodsService('https://play.google.com/billing');
+    
+    // 3. Ürün detaylarını kontrol et
+    const details = await service.getDetails([urunId]);
+    if (!details || details.length === 0) {
+      alert("Ürün bulunamadı veya henüz aktif değil.");
+      return;
+    }
+
+    // 4. Payment Request ile Google Play ödeme penceresini aç
+    const paymentMethods = [{
+      supportedMethods: 'https://play.google.com/billing',
+      data: {
+        sku: urunId
+      }
+    }];
+
+    const paymentDetails = {
+      total: {
+        label: 'Toplam',
+        amount: { 
+          currency: details[0].price.currency, 
+          value: details[0].price.value 
+        }
+      }
+    };
+
+    const request = new PaymentRequest(paymentMethods, paymentDetails);
+    const paymentResponse = await request.show();
+
+    // 5. Satın alma başarılı, token'ı al ve Google'a onayla
+    const purchaseToken = paymentResponse.details.purchaseToken;
+    
+    // Ömür boyu için consume, abonelikler için acknowledge
+    if (urunId.includes('lifetime')) {
+      await service.consume(purchaseToken); 
+    } else {
+      await service.acknowledge(purchaseToken, 'onboarding'); 
+    }
+
+    await paymentResponse.complete('success');
+    alert("Ödeme başarılı! Premium özellikleriniz aktif edildi.");
+    location.reload();
+
+  } catch (error) {
+    if (error.name !== 'AbortError') {
+      console.error("Satın alma hatası:", error);
+      alert("Ödeme işlemi iptal edildi veya bir hata oluştu: " + error.message);
+    }
+  }
+}
+</script>
