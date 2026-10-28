@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-<script id="kdprem-early">window.__kdPremOK=function(){try{var S=JSON.parse(localStorage.getItem("kdprem-v1")||"{}"),n=Math.max(Date.now(),S.seen||0);if(S.plan&&(S.plan==="lifetime"||(S.until||0)>n))return true;return !!S.trial&&S.trial+2592e5>n}catch(e){return false}};</script>
+<script id="kdprem-early">window.__kdSig=function(S){var s=[S.plan||"",S.until||0,S.trial||0,S.trialEnd||0,S.src||"","kd#9fA2"].join("|"),h=2166136261;for(var i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return(h>>>0).toString(36)};window.__kdPremOK=function(){try{var S=JSON.parse(localStorage.getItem("kdprem-v1")||"{}"),n=Math.max(Date.now(),S.seen||0);if((S.plan||S.trial)&&S.sig!==window.__kdSig(S))return false;if(S.plan&&(S.plan==="lifetime"||(S.until||0)>n))return true;return !!S.trial&&S.trial+2592e5>n}catch(e){return false}};</script>
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -5437,9 +5437,29 @@ class SoundManager{
  playDinoJump(){this._n(420,.09,{type:"triangle",v:.075,to:690});this._n(690,.11,{t:.055,type:"sine",v:.045,to:860})}
  playDinoCrash(){this._n(240,.22,{type:"sawtooth",v:.085,to:95});this._n(115,.18,{t:.07,type:"triangle",v:.07,to:65})}
  playDinoMilestone(){[660,880,1100].forEach((f,i)=>this._n(f,.1,{t:i*.045,type:"square",v:.035}))}
+ /* Mini oyunlara göre kısa, ayırt edilebilir ses paletleri */
+ playMiniSound(game,kind){
+  if(this.isMuted)return;
+  const hit=(f,d=.09,o={})=>this._n(f,d,{v:.065,...o});
+  switch(game){
+   case "zar": hit(360,.07,{type:"triangle"});hit(520,.09,{t:.045,type:"triangle"});if(kind==="win")this.playCorrect();break;
+   case "yilan": if(kind==="ladder"){[523,659,784].forEach((f,i)=>hit(f,.12,{t:i*.055,type:"triangle",v:.06}))}else if(kind==="snake"){hit(420,.14,{type:"sawtooth",to:180,v:.05})}else hit(440+Math.random()*100,.07,{type:"triangle"});break;
+   case "su": hit(540,.15,{type:"sine",to:330,v:.06});hit(760,.13,{t:.06,type:"sine",to:480,v:.04});break;
+   case "renk": hit([392,494,587,784,988,1175][Math.floor(Math.random()*6)],.11,{type:"sine",v:.055});break;
+   case "balon": if(kind==="win"){[660,880,1175].forEach((f,i)=>hit(f,.11,{t:i*.04,type:"sine",v:.07}))}else{hit(250,.045,{type:"sine",v:.045});hit(180,.08,{t:.035,type:"triangle",v:.05})}break;
+   case "piyano": hit([262,294,330,349,392,440,494,523][Math.floor(Math.random()*8)],.18,{type:"triangle",v:.07});break;
+   case "simon": hit([330,392,494,587][Math.floor(Math.random()*4)],.16,{type:"sine",v:.08});break;
+   case "ziplama": if(kind==="win")hit(880,.16,{type:"triangle",to:1320,v:.08});else hit(300,.1,{type:"triangle",to:720,v:.07});break;
+   case "seker": if(kind==="win")[784,988,1175].forEach((f,i)=>hit(f,.12,{t:i*.045,type:"sine",v:.06}));else hit(740,.08,{type:"triangle",to:1040,v:.055});break;
+   case "hafiza": hit([392,494,587,784][Math.floor(Math.random()*4)],.16,{type:"sine",v:.06});break;
+   case "meyve": hit(260,.07,{type:"triangle",to:620,v:.055});break;
+   case "eslestirme": hit(660,.08,{type:"sine",to:990,v:.06});if(kind==="win")this.playCorrect();break;
+   default: this.playClick();
+  }
+ }
 }
 const soundManager=new SoundManager();
-window.kdLbl=function(id,t){try{const b=document.getElementById(id);if(!b)return;const p=b.querySelector(".sx-pill");if(p){p.textContent=t.split(/:\s*/)[1]||t;b.dataset.raw=t}else b.textContent=t}catch(e){}};
+window.kdLbl=function(id,t){try{const b=document.getElementById(id);if(!b)return;const p=b.querySelector(".sx-pill");if(p){const m=String(t).trim().match(/^(\S+)\s+(.*)$/)||[0,"⚙️",String(t).trim()],kv=m[2].split(/:\s*/),ic=b.querySelector(".sx-i"),lb=b.querySelector(".sx-l");if(ic)ic.textContent=m[1];if(lb&&lb.firstChild&&lb.firstChild.nodeType===3)lb.firstChild.textContent=kv[0];p.textContent=kv.length>1?kv.slice(1).join(": "):m[2];b.dataset.raw=t;b.dataset.sxt=b.textContent;b.dataset.sx=b.textContent}else b.textContent=t}catch(e){}};
 window.kdFlip=function(id,on){try{const b=document.getElementById(id);if(!b)return;const sw=b.querySelector(".sx-sw");if(sw){sw.classList.toggle("on",!!on);b.setAttribute("aria-checked",!!on);if(b.dataset.raw)b.dataset.raw=b.dataset.raw.replace(/(Açık|Kapalı)\s*$/,on?"Açık":"Kapalı")}else{b.textContent=b.textContent.replace(/(Açık|Kapalı)\s*$/,on?"Açık":"Kapalı")}}catch(e){}};
 ["touchstart","touchend","pointerdown","click","keydown"].forEach(e=>document.addEventListener(e,()=>soundManager.unlock(),{passive:true,capture:true}));
 document.addEventListener("pointerdown",e=>{const b=e.target.closest&&e.target.closest("button,.card");if(b&&!b.classList.contains("opt")&&!b.classList.contains("kc"))soundManager.playClick()},true);
@@ -5918,8 +5938,8 @@ function qzRun(cfg){
   const seen=new Set([norm(it.a)]),wrong=[];
   (it.o||[]).forEach(v=>{const k=norm(v);if(k&&!seen.has(k)){seen.add(k);wrong.push(v)}});
    if(wrong.length<3){sh([...cfg.items]).forEach(z=>{if(wrong.length>=3||z===it||z.a==null)return;const k=norm(z.a);if(k&&!seen.has(k)){seen.add(k);wrong.push(z.a)}})}
-  const opts=sh([it.a,...wrong.slice(0,3)]);
-  zpCss();app.innerHTML=`<div class="top"><span>${cfg.title}</span><span>${i+1}/${pool.length}</span></div><div class="zp-pr"><i style="width:${Math.round(i/pool.length*100)}%"></i></div><div class="q st" id="kidoQuestionText">${it.q}</div><div class="opts" style="grid-template-columns:1fr">${opts.map((o,oi)=>`<button class="opt qzo" style="font-size:17px;padding:14px 10px" data-l="${"ABCD"[oi]||oi+1}" data-v="${esc(o)}">${esc(o)}</button>`).join("")}</div><div class="fb" id="fb" style="font-size:15px"></div><button class="btn g" id="qx">Çık</button>`;
+   const opts=sh([it.a,...wrong.slice(0,3)]),art=it.art||(window.__kdLessonArt&&window.__kdLessonArt(cfg,it,i))||"";
+   zpCss();app.innerHTML=`<div class="top"><span>${cfg.title}</span><span>${i+1}/${pool.length}</span></div><div class="zp-pr"><i style="width:${Math.round(i/pool.length*100)}%"></i></div><div class="q st" id="kidoQuestionText">${it.q}</div>${art}<div class="opts" style="grid-template-columns:1fr">${opts.map((o,oi)=>`<button class="opt qzo" style="font-size:17px;padding:14px 10px" data-l="${"ABCD"[oi]||oi+1}" data-v="${esc(o)}">${esc(o)}</button>`).join("")}</div><div class="fb" id="fb" style="font-size:15px"></div><button class="btn g" id="qx">Çık</button>`;
   gid("qx").onclick=cfg.back;
   QH(e=>e.dataset.v===it.a,()=>{i++;next()},".opt");QX.back=cfg.back;
   app.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{
@@ -7903,7 +7923,7 @@ function mascotClassPicker(){
     const items=entry.topics.flatMap(t=>Array.isArray(t.L)?t.L:[]).filter(x=>x&&x.q&&x.a!==undefined&&x.a!==null).map(x=>{const a=String(x.a),q=String(x.q),seen=new Set([a,q]),o=[];(Array.isArray(x.o)?x.o:[]).forEach(v=>{v=String(v);if(v.trim()&&!seen.has(v)&&o.length<3){seen.add(v);o.push(v)}});return {q,a,o,e:x.e||''}});
     if(!items.length){toast("Bu sınıfta bu ders için soru bulunamadı.");return}
     if(typeof qzRun!=="function")throw new Error("Test ekranı yüklenemedi");
-    gp();qzRun({title:`🦊 ${g}. Sınıf • ${entry.S.t}`,key:entry.S.p+g+"·Kido",items,n:10,back:()=>renderSubjects(g)});
+     gp();qzRun({title:`🦊 ${g}. Sınıf • ${entry.S.t}`,key:entry.S.p+g+"·Kido",lessonSubject:entry.S.p,items,n:10,back:()=>renderSubjects(g)});
    }catch(err){console.error('[Kido sınıf testi]',err);toast('Ders açılamadı. Sınıf seçimine dönüp tekrar deneyebilirsin.');}
   });
  };
@@ -8465,51 +8485,6 @@ Hangisi bir yazım yanlışıdır?|Herkes|Yanlız|Yalnız|Şoför|Doğrusu yaln�
  const extra8=B8.slice(0,168);
  GRD[8].push(C("Geniş Banka","📚","Kapsamlı Türkçe Soru Bankası","168 yeni soru • çatı • anlatım • paragraf • yazım",()=>extra8));
 }
-/* ===== Kidomind ek soru bankası (konu tablolarından otomatik soru üretir) ===== */
-window.__kdXD=`H|1|xh1a|👂|Duyu Organlarımız|{} ile ne yaparız?|“{}” görevini hangi organımız yapar?|Göz:Görürüz;Kulak:İşitiriz;Burun:Koklarız;Dil:Tadarız;Cilt:Dokunuruz;El:Tutarız
-H|1|xh1b|🍂|Mevsimler|{} mevsiminde ne olur?|“{}” hangi mevsimde yaşanır?|İlkbahar:Ağaçlar çiçek açar;Yaz:Hava çok sıcak olur;Sonbahar:Yapraklar dökülür;Kış:Kar yağar
-H|1|xh1c|👪|Akrabalarım|“{}” için hangi sözcük kullanılır?|“{}” sözcüğü kimi anlatır?|Annemin annesi:Anneanne;Babamın annesi:Babaanne;Babamın kız kardeşi:Hala;Annemin kız kardeşi:Teyze;Babamın erkek kardeşi:Amca;Annemin erkek kardeşi:Dayı
-H|2|xh2a|🥛|Sağlıklı Beslenme|{} için doğru bilgi hangisidir?|Hangi besin için “{}” denir?|Süt:Kemikleri güçlendirir;Meyve:Vitamin kaynağıdır;Yumurta:Protein kaynağıdır;Ekmek:Enerji verir;Su:Susuzluğu giderir;Şeker:Fazlası dişlere zarar verir
-H|2|xh2b|🚨|Acil Durum Numaraları|{} numarası kaçtır?|“{}” numarası hangi hizmete aittir?|İtfaiye:110;Polis:155;Ambulans ve acil çağrı:112;Jandarma:156
-H|2|xh2c|🚗|Taşıtlar|{} taşıtı hangisidir?|“{}” hangi yolda gider?|Kara yolu:Otobüs;Deniz yolu:Gemi;Hava yolu:Uçak;Demir yolu:Tren
-H|3|xh3a|♻️|Geri Dönüşüm|{} atığı hangi renk kutuya atılır?|“{}” hangi atık için kullanılır?|Kâğıt:Mavi kutu;Plastik:Sarı kutu;Cam:Yeşil kutu;Metal:Gri kutu
-H|3|xh3b|🫀|Vücudumuz|{} ne işe yarar?|“{}” görevini hangi organ yapar?|Kalp:Kanı pompalar;Akciğer:Soluk almamızı sağlar;Mide:Besinleri sindirir;Beyin:Vücudu yönetir;Kas:Hareket etmemizi sağlar;Kemik:Vücuda şekil verir
-F|3|xf3a|🧊|Maddenin Halleri|{} ile ilgili doğru ifade hangisidir?|“{}” hangi kavramı anlatır?|Katı:Şekli kendiliğinden değişmez;Sıvı:Bulunduğu kabın şeklini alır;Gaz:Bulunduğu ortamı doldurur;Erime:Katının sıvıya dönüşmesi;Donma:Sıvının katıya dönüşmesi;Buharlaşma:Sıvının gaza dönüşmesi
-F|4|xf4a|🧲|Kuvvet ve Elektrik|{} ile ilgili doğru ifade hangisidir?|“{}” hangi kavramı anlatır?|Sürtünme:Hareketi zorlaştırır;Yerçekimi:Cisimleri Dünya’ya doğru çeker;Mıknatıs:Demiri çeker;Pil:Elektrik enerjisi sağlar;Ampul:Elektrik enerjisini ışığa çevirir;Anahtar:Devreyi açıp kapatır
-F|5|xf5a|🪐|Gezegenler|{} için doğru ifade hangisidir?|“{}” hangi gezegendir?|Merkür:Güneş’e en yakın gezegendir;Venüs:En sıcak gezegendir;Dünya:Yaşamın bilindiği tek gezegendir;Mars:Kızıl gezegen olarak bilinir;Jüpiter:En büyük gezegendir;Satürn:Halkalarıyla tanınır
-F|6|xf6a|🔬|Hücre ve Organelleri|{} ne işe yarar?|“{}” görevini hangi yapı üstlenir?|Çekirdek:Hücreyi yönetir;Mitokondri:Enerji üretir;Hücre zarı:Madde giriş çıkışını denetler;Kloroplast:Fotosentez yapar;Sitoplazma:Organelleri çevreleyen sıvıdır;Koful:Madde depolar
-F|6|xf6b|🫁|Vücut Sistemleri|{} ile ilgili doğru ifade hangisidir?|“{}” hangi sistemin görevidir?|Sindirim sistemi:Besinleri parçalar;Solunum sistemi:Gaz alışverişini sağlar;Dolaşım sistemi:Kanı vücuda taşır;Boşaltım sistemi:Atıkları uzaklaştırır;Sinir sistemi:Uyarıları iletir;Destek ve hareket sistemi:Vücuda şekil verir
-F|7|§xf7a|⚗️|Element Sembolleri|{} sembolü hangi elemente aittir?|“{}” elementinin sembolü nedir?|H:Hidrojen;He:Helyum;C:Karbon;N:Azot;O:Oksijen;Na:Sodyum;Fe:Demir;Ca:Kalsiyum;Au:Altın;Ag:Gümüş
-F|8|§xf8a|🧬|Genetik|{} ile ilgili doğru ifade hangisidir?|“{}” hangi kavramı anlatır?|DNA:Kalıtım materyalidir;Gen:Kalıtsal özelliği belirleyen DNA parçasıdır;Kromozom:DNA’nın paketlenmiş yapısıdır;Mutasyon:Genetik şifredeki kalıcı değişimdir;Mayoz:Üreme hücresi oluşturan bölünmedir;Mitoz:Vücut hücrelerini çoğaltan bölünmedir
-S|4|xs4a|🧭|Bölgeler ve Şehirler|{} bölgesinde hangi şehir vardır?|“{}” şehri hangi bölgededir?|Marmara:İstanbul;Ege:İzmir;Akdeniz:Antalya;Karadeniz:Trabzon;İç Anadolu:Ankara;Doğu Anadolu:Erzurum;Güneydoğu Anadolu:Gaziantep
-S|5|xs5a|🏺|İlk Uygarlıklar|{} ile ilgili doğru bilgi hangisidir?|“{}” hangi uygarlıkla ilgilidir?|Sümerler:Yazıyı kullandı;Lidyalılar:İlk parayı bastı;Hititler:Kadeş Antlaşması’nı yaptı;Mısırlılar:Piramitleri yaptı;Frigler:Gordion kentini kurdu
-S|6|xs6a|🏹|İlk Türk Devletleri|{} ile ilgili doğru bilgi hangisidir?|“{}” hangi devletle ilgilidir?|Göktürkler:Orhun Yazıtları’nı diktirdi;Uygurlar:Yerleşik hayata geçti;Karahanlılar:İlk Müslüman Türk devletidir;Büyük Selçuklular:Malazgirt Zaferi’ni kazandı;Büyük Hun Devleti:Mete Han döneminde güçlendi
-S|7|sb7|👑|Osmanlı Padişahları|{} ile ilgili doğru bilgi hangisidir?|“{}” hangi padişahla ilgilidir?|Fatih Sultan Mehmet:İstanbul’u fethetti;Yavuz Sultan Selim:Mısır’ı fethetti;Kanuni Sultan Süleyman:Osmanlı’nın en güçlü dönemlerinden biri yaşandı;III. Selim:Nizam-ı Cedid’i kurdu;II. Mahmud:Yeniçeri Ocağı’nı kaldırdı;Osman Bey:Devletin kurucusudur
-S|8|sb8|🇹🇷|İnkılap Tarihi Günleri|{} tarihinde ne olmuştur?|“{}” hangi tarihte olmuştur?|23 Nisan 1920:TBMM açıldı;1 Kasım 1922:Saltanat kaldırıldı;24 Temmuz 1923:Lozan Antlaşması imzalandı;29 Ekim 1923:Cumhuriyet ilan edildi;3 Mart 1924:Halifelik kaldırıldı;5 Aralık 1934:Kadınlara seçme ve seçilme hakkı verildi;10 Kasım 1938:Atatürk vefat etti
-D|4|xd4a|🕌|İbadetler|{} ile ilgili doğru bilgi hangisidir?|“{}” hangi ibadeti anlatır?|Namaz:Günde beş vakit kılınır;Oruç:Ramazan ayında tutulur;Zekât:Varlıklı kişinin yardım payıdır;Hac:Mekke’de yapılan ibadettir
-D|4|xd4b|📖|Kutsal Kitaplar|{} hangi peygambere indirilmiştir?|“{}” peygamberine hangi kitap indirilmiştir?|Tevrat:Hz. Musa;Zebur:Hz. Davud;İncil:Hz. İsa;Kur’an-ı Kerim:Hz. Muhammed
-D|5|xd5a|🌙|Dinî Günler ve Geceler|{} ile ilgili doğru bilgi hangisidir?|“{}” hangi gün veya geceyi anlatır?|Ramazan Bayramı:Oruç ayının ardından kutlanır;Kurban Bayramı:Hac mevsiminde kutlanır;Mevlid Kandili:Hz. Muhammed’in doğumu anılır;Kadir Gecesi:Kur’an’ın indirilmeye başlandığı gecedir;Miraç Kandili:İsra ve Miraç olayı anılır
-D|6|xd6a|💖|Güzel Ahlak|{} ne demektir?|“{}” hangi değeri anlatır?|Doğruluk:Söz ve davranışta dürüst olmak;Sabır:Zorluklara dayanabilmek;Merhamet:Şefkat ve iyilik göstermek;Hoşgörü:Farklılıklara saygı göstermek;Cömertlik:Elindekini paylaşmak;Yardımlaşma:İyilikte iş birliği yapmak
-D|7|§xd7a|🕊️|İman Esasları|{} ne anlama gelir?|“{}” hangi iman esasını anlatır?|Allah’a iman:Tek yaratıcıya inanmak;Meleklere iman:Allah’ın yarattığı meleklere inanmak;Kitaplara iman:İlahî kitaplara inanmak;Peygamberlere iman:Allah’ın elçilerine inanmak;Ahirete iman:Ölümden sonraki hayata inanmak;Kadere iman:Her şeyin Allah’ın ilmiyle olduğuna inanmak
-D|8|§xd8a|🌟|Hz. Muhammed’in Hayatı|{} ile ilgili doğru bilgi hangisidir?|“{}” hangi kavramı anlatır?|Mekke:Doğduğu şehirdir;Medine:Hicret edilen şehirdir;Hira Mağarası:İlk vahyin geldiği yerdir;Hicret:Mekke’den Medine’ye göçtür;Veda Hutbesi:Son büyük konuşmasıdır;Hudeybiye:Mekkelilerle yapılan antlaşmadır
-E|1|xe1|🎨|Renkler ve Eşyalar|“{}” Türkçe ne demektir?|“{}” İngilizce nasıl söylenir?|red:kırmızı;blue:mavi;green:yeşil;yellow:sarı;cat:kedi;dog:köpek;apple:elma;book:kitap
-E|2|xe2|👪|Sayılar ve Aile|“{}” Türkçe ne demektir?|“{}” İngilizce nasıl söylenir?|two:iki;three:üç;four:dört;five:beş;mother:anne;father:baba;sister:kız kardeş;brother:erkek kardeş
-E|3|xe3|📅|Günler ve Okul|“{}” Türkçe ne demektir?|“{}” İngilizce nasıl söylenir?|Monday:pazartesi;Tuesday:salı;Friday:cuma;Sunday:pazar;school:okul;teacher:öğretmen;pencil:kurşun kalem;bag:çanta
-E|4|xe4|🍽️|Öğünler ve Mekânlar|“{}” Türkçe ne demektir?|“{}” İngilizce nasıl söylenir?|breakfast:kahvaltı;lunch:öğle yemeği;dinner:akşam yemeği;winter:kış;summer:yaz;hospital:hastane;library:kütüphane;bakery:fırın
-E|5|xe5|⏰|Sıklık ve Zıtlar|“{}” Türkçe ne demektir?|“{}” İngilizce nasıl söylenir?|always:her zaman;never:asla;usually:genellikle;sometimes:bazen;expensive:pahalı;cheap:ucuz;fast:hızlı;slow:yavaş
-E|6|xe6|🌍|Doğa ve Zaman|“{}” Türkçe ne demektir?|“{}” İngilizce nasıl söylenir?|yesterday:dün;tomorrow:yarın;vacation:tatil;mountain:dağ;island:ada;forest:orman;bridge:köprü;weather:hava durumu
-T|1|xt1|↔️|Zıt Anlamlılar|“{}” sözcüğünün zıddı hangisidir?|“{}” sözcüğünün zıddı hangisidir?|büyük:küçük;uzun:kısa;sıcak:soğuk;gece:gündüz;açık:kapalı;ağır:hafif;ince:kalın;hızlı:yavaş
-T|2|xt2|🟰|Eş Anlamlılar|“{}” sözcüğünün eş anlamlısı hangisidir?|“{}” sözcüğünün eş anlamlısı hangisidir?|güzel:hoş;hızlı:çabuk;korkak:ürkek;okul:mektep;yardım:imdat;cevap:yanıt
-T|3|xt3|🗣️|Deyimler|“{}” deyiminin anlamı nedir?|“{}” anlamına gelen deyim hangisidir?|Burnu havada:Kibirli;Eli açık:Cömert;Gözü pek:Korkusuz;Ağzı sıkı:Sır tutan;Yüreği ağzına gelmek:Çok korkmak;Gözden düşmek:Değerini kaybetmek
-T|4|xt4|📜|Atasözleri|“{}” atasözü ne anlatır?|“{}” anlamını taşıyan atasözü hangisidir?|Damlaya damlaya göl olur:Küçük birikimler büyür;Ağaç yaşken eğilir:Eğitim küçük yaşta verilmelidir;Sakla samanı gelir zamanı:Tutumlu olmak gerekir;Bir elin nesi var iki elin sesi var:Birlik güç doğurur;İşleyen demir ışıldar:Çalışan kişi gelişir;Komşu komşunun külüne muhtaçtır:Komşular birbirine ihtiyaç duyar
-T|5|xt5|✍️|Noktalama İşaretleri|{} hangi işaret konur?|“{}” hangi durumda kullanılır?|Cümlenin sonuna:Nokta;Soru cümlesinin sonuna:Soru işareti;Duygu bildiren cümlenin sonuna:Ünlem işareti;Sıralı sözcüklerin arasına:Virgül;Açıklama yapılacak yere:İki nokta
-T|6|xt6|📚|Sözcük Türleri|“{}” sözcüğü hangi türdür?|Hangisi “{}” türünde bir sözcüktür?|kitap:İsim;güzel:Sıfat;koşmak:Fiil;hızlıca:Zarf;ben:Zamir;için:Edat;ve:Bağlaç
-T|7|xt7|🎭|Anlatım Biçimleri|{} anlatımının özelliği hangisidir?|“{}” hangi anlatım biçimini tanımlar?|Betimleme:Varlığı sözcüklerle resmeder;Öyküleme:Olayları sıralı anlatır;Açıklama:Bilgi vermeyi amaçlar;Tartışma:Düşünceyi kanıtlamaya çalışır
-T|8|xt8|📕|Edebî Türler|{} türünün özelliği hangisidir?|“{}” hangi edebî türü anlatır?|Roman:Uzun kurmaca eserdir;Hikâye:Kısa kurmaca anlatıdır;Şiir:Dize ve kıtalarla yazılır;Tiyatro:Sahnede oynanmak üzere yazılır;Fabl:Hayvanların konuştuğu öğretici eserdir;Anı:Yaşanmış olayları anlatır`.split("\n").map(l=>l.split("|"));
-window.__kdQG=(g,pairs,f,r)=>{const P=pairs.split(";").map(x=>{const i=x.indexOf(":");return[x.slice(0,i),x.slice(i+1)]}),sh=a=>{a=[...a];for(let i=a.length;i>1;){const j=Math.random()*i--|0;[a[i],a[j]]=[a[j],a[i]]}return a},B=[...new Set(P.map(x=>x[1]))],A=[...new Set(P.map(x=>x[0]))],mk=(q,a,pool,e)=>({g,q,a,o:sh(pool.filter(x=>x!==a)).slice(0,3),e}),out=[];P.forEach(([a,b])=>{out.push(mk(f.split("{}").join(a),b,B,a+" → "+b));if(r)out.push(mk(r.split("{}").join(b),a,A,b+" → "+a))});return out};
-window.__kdET=(d,lazy)=>{const[s,g,k,e,t,f,r,p]=d,n=p.split(";").length*2,gen=()=>window.__kdQG(+g,p,f,r);return[k,e,t,n+" soru",lazy?gen:gen()]};
-{const GT=window.__kdXD.filter(d=>d[0]==="T");GT.forEach(d=>{if(GRD[+d[1]])GRD[+d[1]].push(window.__kdET(d,1))})}
-
 const GK=[];Object.keys(GRD).forEach(g=>{GK.push("T"+g+"·Karışık");GRD[g].forEach(x=>GK.push("T"+g+"·"+x[0]))});
 PCAT.push(["🎒","Türkçe Sınıf Bankası",GK]);
 const gCnt=g=>GRD[g].reduce((a,x)=>a+x[4]().length,0);
@@ -8518,7 +8493,7 @@ function snfMenu(){zpCss();const gs=Object.keys(GRD),sum=g=>GRD[g].reduce((a,x)=
  gid("bk").onclick=okTr;app.querySelectorAll("[data-g]").forEach(b=>b.onclick=()=>snfTopics(+b.dataset.g))}
 function snfTopics(g){zpCss();const L=[["Karışık","🏦",g+". Sınıf Karışık","Tüm konulardan 20 soru",()=>GRD[g].flatMap(x=>x[4]()),20],...GRD[g]],done=L.slice(1).filter(x=>okzN("T"+g+"·"+x[0])>0).length;
  app.innerHTML=okzHead("🎒 "+g+". Sınıf Türkçe","Bir konu seç","linear-gradient(135deg,"+OKZ[(g-1)%OKZ.length][0]+",#0ea5e9)",g+"",[`🧩 ${done}/${L.length-1} konu denendi`,`✅ ${L.slice(1).reduce((a,x)=>a+okzN("T"+g+"·"+x[0]),0)} doğru`])+`<div class="okz-g">${L.map((x,i)=>`<button class="okz-c${i===0?" wide":""}" data-i="${i}" style="${i===0?"--c:#7c3aed;--c2:#c084fc":okzC(i)}">${i===0?`<div class="okz-s"><div class="okz-i">${x[1]}</div><div><b>${x[2]}</b><small>${x[3]}</small></div></div>`:`<div class="okz-i">${x[1]}</div><b>${x[2]}</b><small>${x[3]}</small>${okzDone(okzN("T"+g+"·"+x[0]))}`}</button>`).join("")}</div><button class="btn g" id="bk" style="margin-top:14px">← Sınıflar</button>`;
- gid("bk").onclick=snfMenu;app.querySelectorAll("[data-i]").forEach(b=>b.onclick=()=>{const x=L[+b.dataset.i];gp();qzRun({title:x[1]+" "+x[2],key:"T"+g+"·"+x[0],items:x[4](),n:x[5]||10,back:()=>snfTopics(g)})})}
+ gid("bk").onclick=snfMenu;app.querySelectorAll("[data-i]").forEach(b=>b.onclick=()=>{const x=L[+b.dataset.i];gp();qzRun({title:x[1]+" "+x[2],key:"T"+g+"·"+x[0],lessonSubject:"Türkçe",items:x[4](),n:x[5]||10,back:()=>snfTopics(g)})})}
 TT.unshift(["Sınıf","🎒","Sınıfa Göre Soru Bankası","1. – 8. sınıf • konu konu",null,0,snfMenu]);
 /* --- Okul Matematiği: Sınıf Bankası (1.–6. sınıf) --- */
 const mk2=(q,a,c,e)=>{if(/^\d+$/.test(S(a))){const n=+a,c2=[...new Set(c.filter(x=>typeof x==="number"?x>=0&&x!==n:true))];let j=1;while(c2.length<3){if(!c2.includes(n+j))c2.push(n+j);j++}return mk(q,a,c2,e)}return mk(q,a,c,e)};
@@ -8587,20 +8562,6 @@ HAC=()=>{const r=R(1,5),h=R(2,10);return mk2(`Yarıçapı ${r} cm, yüksekliği 
 const g7=(g,ks)=>GRM[g].filter(x=>ks.includes(x[0]));
 GRM[7]=[...g7(7,["Tam Sayı","Üslü","Cebir"]),C2("Denklem","⚖️","Denklemler","Parantezli • iki taraflı",gl(DN7,1)),C2("Ters","🔄","Ters Orantı","İşçi • gün problemleri",gl(TO,1,40)),C2("Zam","💯","Yüzde: Zam & İndirim","İlk fiyatı bul",gl(ZAM,1,40)),C2("Eşitsizlik","⚖️","Eşitsizlikler","En küçük tam sayı",gl(ESZ,1,40)),C2("Veri","📊","Aritmetik Ortalama","Veri analizi",gl(ORT,1,40))];
 GRM[8]=[...g7(8,["Üslü","Karekök","Pisagor","Olasılık"]),C2("Özdeşlik","🔤","Özdeşlikler","(a + b)² açılımı",gl(OZD,1,40)),C2("Sistem","🧮","Denklem Sistemleri","İki bilinmeyenli",gl(SIS,1)),C2("Eşitsizlik","⚖️","Eşitsizlikler","En küçük tam sayı",gl(ESZ,1,40)),C2("Bilimsel","🔬","Bilimsel Gösterim","10'un kuvvetleri",gl(BIL,1,40)),C2("Hacim","🥫","Silindir Hacmi","π = 3 alınız",gl(HAC,1,40)),C2("Veri","📊","Aritmetik Ortalama","Veri analizi",gl(ORT,1,40))]}
-/* ===== Ek Matematik konuları (1–8. sınıf) ===== */
-{const f1=x=>(Math.round(x*10)/10).toFixed(1).replace(".",","),
-PAT=L=>{const d=L===1?R(2,5):R(3,12),s=R(1,15),q=[0,1,2,3].map(i=>s+i*d);return mk2(`Örüntüyü tamamla: ${q.join(", ")}, ?`,s+4*d,[s+5*d,s+3*d,s+4*d+1,s+4*d-1],"Sayılar her adımda "+d+" artıyor.")},
-GEO=L=>{if(L===1){const a=R(2,12);return mk2(`Bir kenarı ${a} cm olan karenin çevresi kaç cm'dir?`,4*a,[2*a,a*a,3*a,4*a+2],"Karenin çevresi = 4 × kenar.")}const w=R(3,15),h=R(2,w);return R(0,1)?mk2(`Kısa kenarı ${h} cm, uzun kenarı ${w} cm olan dikdörtgenin alanı kaç cm²'dir?`,w*h,[2*(w+h),w+h,w*h+h,w*h-w],"Alan = kısa kenar × uzun kenar."):mk2(`Kısa kenarı ${h} cm, uzun kenarı ${w} cm olan dikdörtgenin çevresi kaç cm'dir?`,2*(w+h),[w*h,w+h,2*w+h,2*(w+h)+2],"Çevre = 2 × (kısa + uzun kenar).")},
-YUZ=L=>{const p=[10,20,25,50][R(0,3)],n=R(2,20)*20,r=n*p/100;return mk2(`${n} sayısının %${p}'si kaçtır?`,r,[r+5,r+10,r*2,n-r],"Yüzde, 100'de kaç demektir: "+n+" × "+p+" ÷ 100.")},
-ANG=L=>{const a=R(30,80),b=R(30,80);return mk2(`Bir üçgenin iki açısı ${a}° ve ${b}° ise üçüncü açısı kaç derecedir?`,180-a-b,[180-a,180-b,360-a-b,90-a],"Üçgenin iç açıları toplamı 180°'dir.")},
-ON=L=>{const x=R(11,99)/10,y=R(11,99)/10,s=x+y;return mk2(`${f1(x)} + ${f1(y)} = ?`,f1(s),[f1(s+.1),f1(s-.1),f1(s+1),f1(s-1)],"Ondalık sayılarda virgülleri alt alta getirerek topla.")};
-const add=(gs,k,e,t,s,f,L)=>gs.forEach(g=>GRM[g]&&GRM[g].push(C2(k,e,t,s,gl(f,typeof L==="function"?L(g):L,40))));
-add([1,2,3],"EkÖrüntü","🔁","Sayı Örüntüleri","Sıradaki sayıyı bul",PAT,g=>g===1?1:2);
-add([2,3,4,5,6],"EkGeometri","📏","Çevre & Alan","Kare • dikdörtgen",GEO,g=>g<4?1:2);
-add([5,6,7],"EkYüzde","💯","Yüzdeler","Yüzde hesapları",YUZ,1);
-add([4,5,6,7,8],"EkAçı","📐","Üçgenin Açıları","İç açılar toplamı",ANG,1);
-add([4,5,6],"EkOndalık","🔢","Ondalık Sayılar","Toplama",ON,1)}
-
 const makeSnf=(ti,em,GR,pre,back,bg,cnt)=>{const keys=[];Object.keys(GR).forEach(g=>{keys.push(pre+g+"·Karışık");GR[g].forEach(x=>keys.push(pre+g+"·"+x[0]))});
  const menu=()=>{okzCss();const gs=Object.keys(GR),sum=g=>GR[g].reduce((a,x)=>a+okzN(pre+g+"·"+x[0]),0),all=gs.reduce((a,g)=>a+sum(g),0);
   app.innerHTML=okzHead(em+" "+ti,"Sınıfını seç, konu konu çalış","linear-gradient(135deg,#7c3aed,#2563eb 60%,#06b6d4)","🎒 1 2 3",[`✅ ${all} doğru`,`📚 ${gs.length} sınıf`])+`<div class="okz-g">${gs.map((g,i)=>`<button class="okz-c" data-g="${g}" style="${okzC(i)}"><div class="okz-i">${g}</div><b>${g}. Sınıf</b><small>${GR[g].length} konu${cnt?" • "+GR[g].reduce((a,x)=>a+x[4]().length,0)+" soru":" • her seferinde yeni sorular"}</small>${okzDone(sum(g))}</button>`).join("")}</div><button class="btn g" id="bk" style="margin-top:14px">← Geri</button>`;
@@ -8608,7 +8569,7 @@ const makeSnf=(ti,em,GR,pre,back,bg,cnt)=>{const keys=[];Object.keys(GR).forEach
  const top=g=>{const L=[["Karışık","🏦",g+". Sınıf Karışık","Tüm konulardan 20 soru",()=>GR[g].flatMap(x=>x[4]()),20],...GR[g]];
   okzCss();const done=L.slice(1).filter(x=>okzN(pre+g+"·"+x[0])>0).length;
   app.innerHTML=okzHead(em+" "+g+". Sınıf","Bir konu seç","linear-gradient(135deg,"+OKZ[(g-1)%OKZ.length][0]+",#7c3aed)",g+"",[`🧩 ${done}/${L.length-1} konu denendi`,`✅ ${L.slice(1).reduce((a,x)=>a+okzN(pre+g+"·"+x[0]),0)} doğru`])+`<div class="okz-g">${L.map((x,i)=>`<button class="okz-c${i===0?" wide":""}" data-i="${i}" style="${i===0?"--c:#7c3aed;--c2:#c084fc":okzC(i)}">${i===0?`<div class="okz-s"><div class="okz-i">${x[1]}</div><div><b>${x[2]}</b><small>${x[3]}</small></div></div>`:`<div class="okz-i">${x[1]}</div><b>${x[2]}</b><small>${x[3]}</small>${okzDone(okzN(pre+g+"·"+x[0]))}`}</button>`).join("")}</div><button class="btn g" id="bk" style="margin-top:14px">← Sınıflar</button>`;
-  gid("bk").onclick=menu;app.querySelectorAll("[data-i]").forEach(b=>b.onclick=()=>{const x=L[+b.dataset.i];gp();qzRun({title:x[1]+" "+x[2],key:pre+g+"·"+x[0],items:x[4](),n:x[5]||10,back:()=>top(g)})})};
+   gid("bk").onclick=menu;app.querySelectorAll("[data-i]").forEach(b=>b.onclick=()=>{const x=L[+b.dataset.i];gp();qzRun({title:x[1]+" "+x[2],key:pre+g+"·"+x[0],lessonSubject:pre==="M"?"Matematik":"Türkçe",items:x[4](),n:x[5]||10,back:()=>top(g)})})};
  return{menu,top,keys}};
 const SM=makeSnf("Sınıfa Göre Matematik","🎒",GRM,"M",()=>okMat(),()=>BG.m,0);
 PCAT.push(["🎒","Matematik Sınıf Bankası",SM.keys]);
@@ -8644,7 +8605,7 @@ function dMenu(id,e,title,sub,L,g,fn){BKF=hub;gp();okzCss();
  const m=id==="m",grad=m?"linear-gradient(135deg,#f59e0b,#ec4899 60%,#8b5cf6)":"linear-gradient(135deg,#0ea5e9,#10b981 70%,#84cc16)",tot=L.reduce((a,x)=>a+okzN(x[0]),0),tp=L.filter(x=>!x[6]&&okzN(x[0])>0).length,real=L.filter(x=>!x[6]);
  const card=(x,i)=>{const sp=!!x[6];return `<button class="okz-c${sp?" wide":""}" data-i="${i}" style="${sp?"--c:#7c3aed;--c2:#c084fc":okzC(i)}">${sp?`<div class="okz-s"><div class="okz-i">${x[1]}</div><div><b>${x[2]}</b><small>${x[3]}</small><span class="okz-d">Sınıfını seç →</span></div></div>`:`<div class="okz-i">${x[1]}</div><b>${x[2]}</b><small>${x[3]}</small>${okzDone(okzN(x[0]))}`}</button>`};
  app.innerHTML=okzHead(e+" "+title,sub,grad,m?"📐 ➗ %":"📖 ✏️",[`✅ ${tot} doğru`,`🧩 ${tp}/${real.length} konu denendi`])+`<div class="okz-sec">Konular</div><div class="okz-g">${L.map(card).join("")}</div><button class="btn g" id="bk" style="margin-top:14px">← Ana Sayfa</button>`;
- gid("bk").onclick=hub;app.querySelectorAll("[data-i]").forEach(b=>b.onclick=()=>{const x=L[+b.dataset.i];if(x[6])return x[6]();gp();qzRun({title:x[1]+" "+x[2],key:x[0],items:x[4](),n:x[5]||10,back:fn,done:()=>{if(id==="m")planTick("m")}})})}
+  gid("bk").onclick=hub;app.querySelectorAll("[data-i]").forEach(b=>b.onclick=()=>{const x=L[+b.dataset.i];if(x[6])return x[6]();gp();qzRun({title:x[1]+" "+x[2],key:x[0],lessonSubject:id==="m"?"Matematik":"Türkçe",items:x[4](),n:x[5]||10,back:fn,done:()=>{if(id==="m")planTick("m")}})})}
 const okMat=()=>dMenu("m","📐","Okul Matematiği","Kesir • Geometri • Yüzde • Ondalık • Ölçü • Denklem",MT,BG.m,okMat),okTr=()=>dMenu("t","📖","Türkçe Dersi","Soru Bankası • Anlam • Yazım • Dil Bilgisi • Atasözü",TT,BG.t,okTr);
 PCAT.push(["📐","Okul Matematiği",MT.map(x=>x[0])],["📖","Türkçe Dersi",TT.map(x=>x[0])]);
 const cnt=L=>L.reduce((a,x)=>a+(((meta.st||{})[x[0]])||{}).c||0,0);
@@ -10287,9 +10248,6 @@ XT(HAYAT,4,`1|Aşağıdakilerden hangisi 23 nisanı kutlamak ile ilgilidir?|Çoc
 3|Aşağıdakilerden hangisi saltanatın kaldırılmasını anlamak ile ilgilidir? (örnek 4)|Milli egemenlik sürecini kavramaya yardımcı olur|Tek kişilik yönetimi güçlendirir|Tarihi unutturur|Egemenliği azaltır|Milli egemenlik sürecini kavramaya yardımcı olur.
 3|Cumhuriyet yönetimini anlamak konusunda doğru ifade hangisidir? (örnek 4)|Milli egemenliği kavramaya yardımcı olur|Yönetimi tek kişiye verir|Halkı dışlar|Egemenliği yok sayar|Milli egemenliği kavramaya yardımcı olur.
 3|Barış ilkesini tanımak yapmanın temel yararı hangisidir? (örnek 4)|Barışçı ilişkilerin önemini kavratır|Savaşı destekler|Çatışmayı artırır|Uzlaşmayı engeller|Barışçı ilişkilerin önemini kavratır.`);
-/* ===== Ek konu bankalarını derslere ekle (Hayat • Fen • Sosyal • DKAB • İngilizce) ===== */
-{const M={H:HAYAT,F:FEN,S:SOS,D:DKAB,E:ENGL};window.__kdXD.forEach(d=>{const B=M[d[0]];if(B)B.push(window.__kdET(d,0))})}
-
 const SUB=[
  {p:"Fen",id:"okf",e:"🔬",t:"Fen Bilimleri",sub:"Canlılar • Madde • Kuvvet • Uzay • Vücut • Işık & Ses",bg:BGF,T:FEN,min:3,max:8},
  {p:"Sosyal",id:"oks",e:"🗺️",t:"Sosyal Bilgiler",sub:"Atatürk • Harita • Bölgeler • Tarih • Vatandaşlık",bg:BGS,T:SOS,min:4,max:8},
@@ -11788,8 +11746,8 @@ function menu(S){BKF=hub;gp();
  gid("bk").onclick=hub;
  app.querySelectorAll("[data-i]").forEach(b=>b.onclick=()=>{const i=+b.dataset.i;
   if(i===0)return snf(S);gp();
-  if(i===1)return qzRun({title:"🏦 "+S.t+" Karışık",key:S.p+"·Karışık",items:clone((window.__kdUniq||(v=>v))(S.T.flatMap(t=>t[4]))),n:20,back:()=>menu(S)});
-  const t=S.T[i-2];qzRun({title:t[1]+" "+t[2],key:S.p+"·"+t[0],items:clone(t[4]),n:10,back:()=>menu(S)})})}
+  if(i===1)return qzRun({title:"🏦 "+S.t+" Karışık",key:S.p+"·Karışık",lessonSubject:S.p,items:clone((window.__kdUniq||(v=>v))(S.T.flatMap(t=>t[4]))),n:20,back:()=>menu(S)});
+  const t=S.T[i-2];qzRun({title:t[1]+" "+t[2],key:S.p+"·"+t[0],lessonSubject:S.p,items:clone(t[4]),n:10,back:()=>menu(S)})})}
 function snf(S){
  const G=[];for(let g=S.min;g<=S.max;g++)G.push(g);
  app.innerHTML=`<h1>🎒 ${S.t}</h1><p class="sub">Sınıfını seç</p><div class="grid">${G.map(g=>{const T=topicsFor(S,g);return card(S.bg,g,g,g+". Sınıf",T.length+" konu • "+T.reduce((a,x)=>a+x.L.length,0)+" soru")}).join("")}</div><button class="btn g" id="bk" style="margin-top:14px">← ${S.t}</button>`;
@@ -11798,7 +11756,7 @@ function top(S,g){
  const T=topicsFor(S,g),L=[{k:"Karışık",e:"🏦",n:g+". Sınıf Karışık",s:"Tüm konulardan 20 soru",L:(window.__kdUniq||(v=>v))(T.flatMap(x=>x.L)),c:20},...T];
  app.innerHTML=`<h1>${S.e} ${g}. Sınıf ${S.t}</h1><p class="sub">Bir konu seç</p><div class="grid">${L.map((x,i)=>card(S.bg,i,x.e,x.n,x.s)).join("")}</div><button class="btn g" id="bk" style="margin-top:14px">← Sınıflar</button>`;
  gid("bk").onclick=()=>snf(S);
- app.querySelectorAll("[data-i]").forEach(b=>b.onclick=()=>{const x=L[+b.dataset.i];gp();qzRun({title:x.e+" "+x.n,key:S.p+g+"·"+x.k,items:clone(x.L),n:x.c||10,back:()=>top(S,g)})})}
+ app.querySelectorAll("[data-i]").forEach(b=>b.onclick=()=>{const x=L[+b.dataset.i];gp();qzRun({title:x.e+" "+x.n,key:S.p+g+"·"+x.k,lessonSubject:S.p,items:clone(x.L),n:x.c||10,back:()=>top(S,g)})})}
 
 (function(){
  const COL=["#f43f5e","#f59e0b","#3b82f6","#10b981","#8b5cf6","#ec4899","#06b6d4","#84cc16"];
@@ -12607,7 +12565,7 @@ function yanExam(){const L=meta.wr||[];if(L.length<3){toast("Önce birkaç soru 
   setTimeout(()=>{const b=gid("rt");if(!b)return;b.insertAdjacentHTML("beforebegin",`<div class="rulec" style="margin:10px 0;text-align:center"><div style="font-size:42px;font-weight:800">${pu}<span style="font-size:18px;color:var(--mu)"> puan</span></div><p>${sc} soruyu düzelttin 🎉 Defterde kalan: <b>${(meta.wr||[]).length}</b> soru</p></div>`)},0)}})}
 function exam(g,bk){
  const parts=EXS.map(([n,e,f])=>[n,e,f(g)]).filter(p=>p[2].length>=4),items=[];
- parts.forEach(([n,e,L])=>items.push(...sh([...L]).slice(0,10).map(x=>({...x,o:x.o&&[...x.o],k:"Deneme·"+n,t:"📝 "+g+". Sınıf Deneme • "+n}))));
+  parts.forEach(([n,e,L])=>items.push(...sh([...L]).slice(0,10).map(x=>({...x,o:x.o&&[...x.o],k:"Deneme·"+n,t:"📝 "+g+". Sınıf Deneme • "+n,lessonSubject:n}))));
  const snap=()=>JSON.parse(JSON.stringify(meta.st||{}));let before=snap();
  qzRun({title:"📝 "+g+". Sınıf Deneme",key:"Deneme·"+g,items,n:items.length,back:bk||examMenu,done:(sc,n)=>{
   const now=snap(),R=parts.map(([nm,e])=>{const a=now["Deneme·"+nm]||{c:0,w:0},b=before["Deneme·"+nm]||{c:0,w:0},c=a.c-b.c;return{nm,e,c,t:c+a.w-b.w}});before=now;
@@ -12639,7 +12597,7 @@ function lgsMenu(){
  app.querySelectorAll(".lgt").forEach(x=>x.onclick=()=>{LGTAB=x.dataset.t;lgsMenu()});
  const on=app.querySelector(".lgt.on");if(on&&on.scrollIntoView){try{on.scrollIntoView({inline:"center",block:"nearest"})}catch(e){}}
 }
-function lgsMk(nm,x,k,t){let o=x[1],a=x[2];if(x[3]){const ix=sh(o.map((_,i)=>i));o=ix.map(i=>x[1][i]);a=ix.indexOf(x[2])}return {q:esc(x[0]).replace(/\n/g,"<br>"),opts:o,ai:a,a:o[a],k,t}}
+function lgsMk(nm,x,k,t){let o=x[1],a=x[2];if(x[3]){const ix=sh(o.map((_,i)=>i));o=ix.map(i=>x[1][i]);a=ix.indexOf(x[2])}return {q:esc(x[0]).replace(/\n/g,"<br>"),opts:o,ai:a,a:o[a],k,t,lessonSubject:nm}}
 function lgsStart(k){
  const T=LGST.find(t=>t[0]===k);if(!T)return;
  const mk=(s,x)=>lgsMk(s[1],x,"LGS·"+s[1],"🎓 LGS • "+s[1]);
@@ -12663,7 +12621,8 @@ function lgsRun(k,T,items,op){
  const next=()=>{
   if(i>=N)return end();
   const it=items[i];zpCss();
-  app.innerHTML=`<div class="top"><span>${cfg.title}</span><span>${i+1}/${N}</span></div><div class="zp-pr"><i style="width:${Math.round(i/N*100)}%"></i></div><div class="q st" id="kidoQuestionText">${it.q}</div><div class="opts" style="grid-template-columns:1fr">${it.opts.map((o,oi)=>`<button class="opt qzo" style="font-size:16px;padding:13px 12px;text-align:left" data-l="${"ABCD"[oi]}" data-i="${oi}">${esc(o)}</button>`).join("")}</div><div class="fb" id="fb" style="font-size:15px"></div><button class="btn g" id="qx">Çık</button>`;
+   const art=window.__kdLessonArt?window.__kdLessonArt({lessonSubject:it.lessonSubject||T[1]},it,i):"";
+   app.innerHTML=`<div class="top"><span>${cfg.title}</span><span>${i+1}/${N}</span></div><div class="zp-pr"><i style="width:${Math.round(i/N*100)}%"></i></div><div class="q st" id="kidoQuestionText">${it.q}</div>${art}<div class="opts" style="grid-template-columns:1fr">${it.opts.map((o,oi)=>`<button class="opt qzo" style="font-size:16px;padding:13px 12px;text-align:left" data-l="${"ABCD"[oi]}" data-i="${oi}">${esc(o)}</button>`).join("")}</div><div class="fb" id="fb" style="font-size:15px"></div><button class="btn g" id="qx">Çık</button>`;
   gid("qx").onclick=back;
   QH(e=>+e.dataset.i===it.ai,()=>{i++;next()},".opt");QX.back=back;
   app.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{
@@ -12829,7 +12788,8 @@ const CATS=[
 {id:"bix",n:"Bilişim ve Yazılım",e:"💻",c:"#6366f1",k:["bix"]},
 {id:"gsx",n:"Görsel Sanatlar",e:"🎨",c:"#ec4899",k:["gsx"]},
 {id:"muzx",n:"Müzik",e:"🎵",c:"#8b5cf6",k:["muzx"]},
-{id:"bex",n:"Beden Eğitimi ve Spor",e:"⚽",c:"#22a06b",k:["bex"]},
+ {id:"bex",n:"Beden Eğitimi ve Spor",e:"⚽",c:"#22a06b",k:["bex"]},
+ {id:"bilsem",n:"Bilsem Hazırlık",e:"🧠",c:"#8b5cf6",k:[]},
 {id:"hb",n:"Hayat Bilgisi",e:"🌱",c:"#22a06b",k:["health","kids","safe","eco","famc","behc","schc","anic","fgh","ysc","bq","trivia","stdc"]},
 {id:"bz",n:"Beyin & Zeka",e:"🧠",c:"#a855f7",k:["lab","k","lpc","logic","col","rbc"]},
 {id:"oy",n:"Oyunlar",e:"🎮",c:"#f59e0b",k:["arc","arena"]}];
@@ -12917,7 +12877,47 @@ function home(v){
   dl=["Pazar günü biraz eğlen, biraz öğren! 🎈","Yeni haftaya güçlü bir başlangıç yapalım! 💪","Her gün biraz daha ileri! 🚀","Merak et, sor, keşfet! 🔎","Bugün kendine bir hedef koy! 🎯","Hafta sonuna az kaldı, devam! ✨","Hafta sonu keşif zamanı! 🗺️"][now.getDay()],
   dt=now.toLocaleDateString("tr-TR",{weekday:"long",day:"numeric",month:"long"});
  let sk="🦊",stk=0;try{sk=skin().b||"🦊"}catch(e){}try{stk=streakNow()||0}catch(e){}
- v.insertAdjacentHTML("beforeend",`<header class="kdgr kdgr-${per}"><span class="kdgr-orb">${G[1]}</span><div class="kdgr-top"><div class="kdgr-av">${sk}</div><div class="kdgr-tx"><small>${G[0]} ${G[1]} • ${dt}</small><h1>Merhaba${nm?", "+esc(nm):", Küçük Kaşif"} <i class="kdgr-wave">👋</i></h1><p>${dl}</p></div></div><div class="kdgr-pills"><span>⭐ Seviye ${lv}</span><span>🔥 ${stk} gün</span><span>🌟 ${totalStars()}</span></div><div class="kdgr-bar" title="Sonraki seviyeye ${hi-P0} puan"><i style="width:${pc}%"></i></div><small class="kdgr-nx">Sonraki seviyeye ${hi-P0} puan kaldı</small></header>`);
+  v.insertAdjacentHTML("beforeend",`<header class="kdgr kdgr-${per}"><span class="kdgr-orb">${G[1]}</span><div class="kdgr-top"><div class="kdgr-av">${sk}</div><div class="kdgr-tx"><small>${G[0]} ${G[1]} • ${dt}</small><h1>Merhaba${nm?", "+esc(nm):", Küçük Kaşif"} <i class="kdgr-wave">👋</i></h1><p>${dl}</p></div></div><div class="kdgr-pills"><span>⭐ Seviye ${lv}</span><span>🔥 ${stk} gün</span><span>🌟 ${totalStars()}</span></div><div class="kdgr-bar" title="Sonraki seviyeye ${hi-P0} puan"><i style="width:${pc}%"></i></div><small class="kdgr-nx">Sonraki seviyeye ${hi-P0} puan kaldı</small></header>`);
+  if(!document.getElementById("kdhome-boost-css")){const s=document.createElement("style");s.id="kdhome-boost-css";s.textContent=`
+  .kdhf{position:relative;overflow:hidden;margin:8px 0 12px;padding:14px;border:1px solid color-mix(in srgb,var(--c) 28%,var(--bd));border-radius:22px;background:linear-gradient(115deg,color-mix(in srgb,var(--c) 17%,var(--card)),var(--card) 72%);box-shadow:0 10px 22px -16px var(--c)}
+  .kdhf:after{content:"";position:absolute;right:-28px;top:-38px;width:120px;height:120px;border-radius:50%;background:color-mix(in srgb,var(--c) 13%,transparent);pointer-events:none}
+  .kdhf-top{position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;gap:10px}.kdhf-copy{min-width:0}
+  .kdhf-tag{display:block;font-size:10px;font-weight:900;letter-spacing:.06em;color:var(--c)}
+  .kdhf h2{margin:4px 0 2px;font-size:19px;line-height:1.2;color:var(--tx);text-align:left}
+  .kdhf p{margin:0;color:var(--mu);font-size:12px;line-height:1.35}
+  .kdhf-mark{flex:none;width:54px;height:54px;border-radius:18px;display:grid;place-items:center;font-size:30px;background:color-mix(in srgb,var(--c) 15%,var(--card));box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--c) 24%,transparent)}
+  .kdhf-actions{position:relative;z-index:1;display:flex;gap:8px;margin-top:11px}
+  .kdhf-actions button{min-height:38px;border:0;border-radius:13px;padding:8px 12px;font-family:inherit;font-weight:800;font-size:12px;line-height:1.2;cursor:pointer}
+  .kdhf-start{background:var(--c);color:#fff;box-shadow:0 6px 13px -7px var(--c);flex:1;text-align:left}
+  .kdhf-plan{background:var(--card);color:var(--tx);border:1px solid var(--bd)!important}
+  .kdhf-courses{margin:6px 0 14px}
+  .kdhf-courses-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 2px 8px}
+  .kdhf-courses-head b{font-size:15px;color:var(--tx)}
+  .kdhf-all{border:0;background:none;color:var(--pr);font-family:inherit;font-weight:800;font-size:11.5px;cursor:pointer;padding:5px 2px;white-space:nowrap}
+  .kdhf-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+  .kdhf-course{min-width:0;min-height:78px;padding:9px 4px 8px;border:1px solid color-mix(in srgb,var(--c) 30%,var(--bd));border-radius:17px;background:linear-gradient(155deg,color-mix(in srgb,var(--c) 13%,var(--card)),var(--card) 78%);color:var(--tx);font:inherit;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;box-shadow:0 7px 14px -13px var(--c);transition:transform .14s,box-shadow .14s}
+  .kdhf-course:active{transform:scale(.95);box-shadow:0 3px 8px -5px var(--c)}
+  .kdhf-course .e{width:36px;height:36px;border-radius:13px;display:grid;place-items:center;background:color-mix(in srgb,var(--c) 19%,var(--card));font-size:22px}
+  .kdhf-course b{font-size:10.5px;line-height:1.1;text-align:center;overflow-wrap:anywhere}
+  @media(max-width:350px){.kdhf{padding:12px}.kdhf h2{font-size:17px}.kdhf-course{min-height:73px}.kdhf-course b{font-size:9.5px}}
+  @media(prefers-reduced-motion:reduce){.kdhf-course{transition:none}}
+  `;document.head.appendChild(s)}
+  const hcats=["mat","tr","en","fen","sos","dkab","hbl","dnm","lgs","tdx","bix","gsx","muzx","bex","bilsem"].map(id=>CATS.find(c=>c.id===id)).filter(Boolean),
+   hrec=hcats[Math.floor(Date.now()/864e5)%hcats.length]||CATS[0],
+   hshort=[["mat","🧮","Matematik","#3b82f6"],["tr","📖","Türkçe","#ef4444"],["fen","🔬","Fen","#14b8a6"],["bilsem","🧠","Bilsem","#8b5cf6"]],
+   hkeys={mat:"okm",tr:"okt",en:"oke",fen:"okf",sos:"oks",dkab:"okd",hbl:"okh",dnm:"okx",lgs:"lgsx",tdx:"tdx",bix:"bix",gsx:"gsx",muzx:"muzx",bex:"bex"};
+  v.insertAdjacentHTML("beforeend",`<section class="kdhf" style="--c:${hrec.c}"><div class="kdhf-top"><div class="kdhf-copy"><small class="kdhf-tag">🎯 BUGÜNÜN ÖNERİSİ</small><h2>${hrec.e} ${hrec.n}</h2><p>${LDESC[hrec.id]||"Merak et, keşfet ve öğren"} • 10 dakikalık mini çalışma</p></div><span class="kdhf-mark">${hrec.e}</span></div><div class="kdhf-actions"><button class="kdhf-start" id="kdhf-start">Bu derse geç <span aria-hidden="true">→</span></button><button class="kdhf-plan" id="kdhf-plan">🗺️ Planım</button></div></section><section class="kdhf-courses"><div class="kdhf-courses-head"><b>⚡ Hızlı ders seç</b><button class="kdhf-all" id="kdhf-all">Tüm dersler ›</button></div><div class="kdhf-grid">${hshort.map(([id,e,n,c])=>`<button type="button" class="kdhf-course" data-home-course="${id}" style="--c:${c}" aria-label="${n} dersini aç"><span class="e">${e}</span><b>${n}</b></button>`).join("")}</div></section>`);
+  const openHomeCourse=id=>{
+   if(id==="bilsem"){bilsemGrades(()=>{KD.tab="home";KD.cat=null;hub()});return}
+   const direct={mat:window.__kdOkMat,tr:window.__kdOkTr,fen:window.__okFen,sos:window.__okSos,lgs:window.__kidoLGS};
+   if(typeof direct[id]==="function"){direct[id]();return}
+   const b=hkeys[id]&&card(hkeys[id]);if(b){b.click();return}
+   KD.tab="lessons";KD.cat=id;hub()
+  };
+  v.querySelector("#kdhf-start").onclick=()=>openHomeCourse(hrec.id);
+  v.querySelector("#kdhf-plan").onclick=()=>{if(typeof kdV7Recommendations==="function")kdV7Recommendations();else openHomeCourse(hrec.id)};
+  v.querySelector("#kdhf-all").onclick=()=>{KD.tab="lessons";KD.cat=null;hub()};
+  v.querySelectorAll("[data-home-course]").forEach(b=>b.onclick=()=>openHomeCourse(b.dataset.homeCourse));
  const m=$("#mcard");if(m)v.appendChild(m);
  let L=null;try{L=JSON.parse(localStorage.getItem("mat-kd-last"))}catch(e){}
  const ok=L&&card(L.k);
@@ -13230,71 +13230,330 @@ const KID_STORIES=[
    wrong:{e:"💡",title:"Daha İyi Bir Fikir",text:"Roko yanlış yönlendirilince durdun. Emin olmadığın zaman doğru bilgiyi bilen birinden yardım istemenin daha iyi olduğunu fark ettin.",
     choices:[["🧑‍🏫 Öğretmene sor","map"]]},
    finish:{e:"🎉",title:"Yeni Arkadaşlık!",text:"Roko sınıfına ulaştı. İlk gününde yeni bir arkadaş edindi ve birlikte keşfetmeye başladınız."}
-  }}
-];
+  }},
 
+ {id:"library",e:"📚",t:"Kütüphanedeki Gizli Harita",d:"Eski bir kitabın içinden çıkan harita, Ece'yi okulun geçmişine götürüyor.",
+  scenes:{
+   start:{e:"📚",title:"Kitabın Arasındaki Kâğıt",text:"Yağmurlu bir öğleden sonra Ece, okul kütüphanesinde sunumu için eski şehir haritalarını araştırıyordu. Rafın en altındaki kalın kitabı çekince içinden katlanmış, sararmış bir kâğıt yere süzüldü. Kâğıtta okulun bahçesinin yıllar önceki çizimi ve küçük bir mavi yıldız vardı. Ece çok heyecanlandı; ama değerli olabilecek bir şeyi izinsiz almanın doğru olmayacağını da düşündü. Sence ilk ne yapmalı?",choices:[["🧑‍🏫 Kâğıdı kütüphaneciye gösterip izin istemek","adult"],["🗺️ Haritayı gizlice takip etmek","alone"]]},
+   adult:{e:"🧑‍🏫",title:"Birlikte Araştırma",text:"Kütüphaneci Nermin Hanım haritayı dikkatle inceledi. Kâğıdın okulun ilk açıldığı yıllardan kalmış olabileceğini söyledi. Ece'ye haritayı birlikte araştırabileceklerini, ancak eski eşyaları korumaları gerektiğini anlattı. Mavi yıldız, okul bahçesindeki büyük çınar ağacının yanına konmuştu. İkisi de dışarı çıkmadan önce öğretmene haber verdi ve yağmurun hafiflemesini bekledi. Bahçeye vardıklarında yıldızın gösterdiği yerde küçük bir taş basamak gördüler. Şimdi ne yapsınlar?",choices:[["🔎 Basamağı ve çevresini dikkatle incelemek","inspect"],["⛏️ Taşı hemen yerinden sökmek","rough"]]},
+   alone:{e:"⚠️",title:"Durup Düşünmek",text:"Ece haritayı tek başına izlemeye başladı; fakat bahçenin kapısı kilitliydi ve yağmur şiddetleniyordu. Islanınca kâğıdın zarar görebileceğini fark etti. Gizemli bir şeyi araştırırken güvenliği ve eşyaları korumayı unutmaması gerektiğini anladı. Kütüphaneye geri dönüp Nermin Hanım'a durumu anlattı. Nermin Hanım onu azarlamadı; birlikte araştırmanın daha güvenli ve eğlenceli olduğunu söyledi. Yağmur dinince ikisi öğretmene haber verip bahçeye gittiler. Haritadaki yıldızın altında küçük bir taş basamak vardı. Ne yapmalılar?",choices:[["🔎 Basamağı dikkatlice incelemek","inspect"],["🪨 Taşı zorlayarak kaldırmak","rough"]]},
+   inspect:{e:"🔍",title:"Taşın Altındaki İz",text:"Ece basamağın çevresinde toprağa çizilmiş küçük bir ok fark etti. Oku takip edince, çınarın yanındaki bankın altında metal bir kutu gördüler. Kutunun üzerinde 'Okulumuzu kuranların anısına' yazıyordu. Nermin Hanım kutuyu açmadan önce okul müdürüne haber verdi. Müdür de yanlarına geldi. Kutunun içinde eski bir sınıf fotoğrafı, birkaç mektup ve okulun ilk öğrencilerinin isimlerinin yazılı olduğu bir defter vardı. Ece, haritanın aslında bir hazineyi değil, okulun anılarını bulmalarına yardım ettiğini düşündü. Sence kutuyu şimdi nasıl incelemeliler?",choices:[["🧤 Yetişkinlerle birlikte dikkatlice açıp kayıt altına almak","care"],["📦 Eşyaları hemen eve götürmek","take"]]},
+   rough:{e:"🌱",title:"Nazikçe Yeniden Dene",text:"Taşı zorlamak yerine Ece durdu; çünkü hem kendisine zarar verebilir hem de eski basamağı kırabilirdi. Öğretmen, çevredeki işareti fark etti ve onları bankın altındaki metal kutuya yönlendirdi. Kutuda eski mektuplar ve okulun ilk öğrencilerinin fotoğrafı vardı. Ece merakını sabırla kullanmanın, acele etmekten daha iyi sonuç verdiğini gördü. Kutunun içindekiler geçmiş hakkında önemli bilgiler taşıyor olabilirdi. Eşyaları korumak için nasıl davranmalılar?",choices:[["🧤 Yetişkinlerle birlikte dikkatlice incelemek","care"],["📦 Hatıraları alıp götürmek","take"]]},
+   care:{e:"✨",title:"Geçmişten Gelen Mesaj",text:"Müdür eldiven getirdi; Nermin Hanım da defterdeki sayfaları tek tek fotoğrafladı. Bir mektupta okulun ilk öğrencilerinin bahçeye ağaç diktikleri ve herkesin birlikte öğrenebilmesi için bir kütüphane kurmak istedikleri yazıyordu. Ece, kendi sunumunda bu hikâyeyi anlatmaya karar verdi. Buldukları eşyalar okula ait olduğu için güvenli biçimde arşive kaldırıldı. Ece araştırmasının sonunda şunu fark etti: Bazen en değerli hazine, insanların birlikte yaptığı güzel işler ve geride bıraktığı anılardır. Merak, izin istemek ve dikkatli davranmak gizemi çözmelerine yardım etmişti."},
+   take:{e:"💡",title:"Emanete Saygı",text:"Ece kutudaki eşyaları eve götürmenin doğru olmadığını anladı. Bunlar okulun ortak geçmişine aitti ve herkesin onları görebilmesi için korunmalıydı. Müdür ile Nermin Hanım kutuyu güvenli biçimde arşive kaldırdı. Ece mektupları fotoğrafladı ve sunumunda okulun ilk öğrencilerinin dayanışmasını anlattı. Böylece hem gizemi çözdü hem de başkalarına ait anılara saygı göstermeyi öğrendi."}
+  },questions:[{q:"Ece haritayı bulduğunda neden kütüphaneciye gösterdi?",a:"Haritanın eski ve değerli olabileceğini düşündüğü için",o:["Haritayı çöpe atmak istediği için","Kitabı eve götürmek için"]},{q:"Haritadaki mavi yıldız onları nereye yönlendirdi?",a:"Okul bahçesindeki çınar ağacının yanına",o:["Spor salonuna","Şehir meydanına"]},{q:"Kutudaki mektupta okulun ilk öğrencileri ne yapmak istiyordu?",a:"Birlikte öğrenmek için kütüphane kurmak",o:["Okulu kapatmak","Bahçedeki ağaçları kesmek"]},{q:"Hikâyede Ece'nin öğrendiği önemli ders hangisidir?",a:"Merak ederken izin istemek ve ortak eşyaları korumak",o:["Gizemleri tek başına ve aceleyle çözmek","Bulduğu her şeyi eve götürmek"]}]},
+ {id:"coast",e:"🐢",t:"Deniz Kaplumbağasının Yolculuğu",d:"Mina ve arkadaşları sahilde küçük bir kaplumbağaya yardım etmeyi öğreniyor.",
+  scenes:{
+   start:{e:"🏖️",title:"Sabah Sahilinde",text:"Mina, yaz tatilinde dedesiyle sahilde yürürken kumların üzerinde denize doğru ilerleyen minicik bir kaplumbağa gördü. Yakınlarda birkaç plastik parçası ve kalabalık bir piknik alanı vardı. Mina kaplumbağayı çok sevimli buldu ve onu eline alıp suya taşımak istedi. Dedesi, yaban hayvanlarına dokunmadan önce uzmanlardan yardım istemenin daha güvenli olduğunu söyledi. Mina kaplumbağanın yolunu açmak için ne yapmalı?",choices:[["🧑‍🔬 Sahil görevlisine haber vermek ve uzaktan izlemek","adult"],["🐢 Kaplumbağayı hemen kucağına almak","touch"]]},
+   adult:{e:"🧑‍🔬",title:"Uzmanlardan Öğreniyoruz",text:"Sahil görevlisi, yavru kaplumbağanın kendi başına denize ulaşmasının önemli olduğunu anlattı. İnsanlar yaklaşırsa yavru korkup yönünü şaşırabilirdi. Mina ve dedesi güvenli bir mesafede durdu. Görevli çevredeki plastik parçaları topladı ve diğer ziyaretçilerden yavrunun yolunu boş bırakmalarını rica etti. Mina, yardım etmenin her zaman dokunmak anlamına gelmediğini fark etti. Görevli ayrıca sahili temiz tutmanın kaplumbağalar ve diğer canlılar için neden önemli olduğunu açıkladı. Mina şimdi arkadaşlarına nasıl yardım edebilir?",choices:[["🧹 Yetişkinlerle birlikte çevredeki çöpleri toplamak","clean"],["📸 Kaplumbağayı yakından çekmek için önüne geçmek","block"]]},
+   touch:{e:"🌿",title:"Doğaya Alan Açmak",text:"Mina kaplumbağayı tutmanın ona zarar verebileceğini fark edince elini geri çekti. Dedesi sahil görevlisini çağırdı. Görevli, yavrunun kendi yolunu bulmasına fırsat vermeleri gerektiğini söyledi. Mina geriye çekildi ve plastik parçaların hayvanlar için tehlikeli olabileceğini öğrendi. Görevli çevreyi güvenli hâle getirirken Mina da arkadaşlarına sahile çöp bırakmamalarını hatırlatmak istedi. En iyi yardım hangisi olabilir?",choices:[["🧹 Çöpleri yetişkinlerle birlikte toplamak","clean"],["🐢 Yavruyu izlemek için çevresini sarmak","block"]]},
+   block:{e:"📵",title:"Sessizce İzlemek",text:"Mina fotoğraf çekmek için kaplumbağaya yaklaşınca görevli nazikçe durmasını istedi. Yakından yaklaşmak yavruyu korkutabilir ve yönünü değiştirebilirdi. Mina geri çekilip uzaktan izledi. Sahildeki plastiklerin de canlılar için tehlike oluşturduğunu öğrendi. Yetişkinler çöpleri toplarken Mina, arkadaşlarına sahili temiz tutmanın neden önemli olduğunu anlattı. Kaplumbağanın yolunu açık bırakmak için ne yapabilirler?",choices:[["🧹 Çöpleri güvenli biçimde toplamak ve yolu boş tutmak","block"]]},
+   clean:{e:"♻️",title:"Temiz Bir Sahil",text:"Mina, dedesi ve sahil görevlisi eldiven takarak plastikleri topladı. Mina arkadaşlarına da çöpleri doğaya bırakmamalarını söyledi; ancak kimsenin tek başına tehlikeli bir atığa dokunmaması gerektiğini ekledi. Sahil temizlenince yavru kaplumbağanın denize giden yolu açıldı. Herkes sessizce geride durdu. Mina kaplumbağanın küçük adımlarla ilerleyişini izlerken, doğaya yardım etmenin bazen ona alan tanımak ve yaşadığı yeri temiz tutmak olduğunu anladı. Görevli, sahili korumak için bu davranışların her gün sürmesi gerektiğini hatırlattı."}
+  },questions:[{q:"Görevli, yavru kaplumbağaya neden dokunmamalarını söyledi?",a:"Korkup yönünü şaşırabileceği için",o:["Yüzmeyi bilmediği için","Kabuk rengi değişeceği için"]},{q:"Mina sahildeki plastikleri toplarken nasıl davrandı?",a:"Yetişkinlerle ve güvenli şekilde topladı",o:["Tek başına tehlikeli atıklara dokundu","Çöpleri denize attı"]},{q:"Kaplumbağaya yardım etmenin en uygun yolu neydi?",a:"Yolunu açık bırakıp uzaktan izlemek",o:["Onu kucağa alıp taşımak","Etrafında kalabalık oluşturmak"]},{q:"Hikâyenin ana düşüncesi nedir?",a:"Doğayı korumak için canlılara alan tanımak ve çevreyi temiz tutmak",o:["Sahildeki hayvanları eve götürmek","Çöpleri görünmez yere saklamak"]}]},
+ {id:"garden",e:"🌱",t:"Okulun Minik Bahçesi",d:"Bir sınıf, susuz kalan bahçeyi birlikte canlandırmak için plan yapıyor.",
+  scenes:{
+   start:{e:"🌼",title:"Solan Yapraklar",text:"Okulun bahçesindeki küçük sebze ve çiçek yatakları yaz sıcağında solmaya başlamıştı. Öğretmen, sınıfa bahçeyi nasıl koruyabileceklerini sordu. Arda hemen her bitkiye bol bol su dökmeyi önerdi. Elif ise önce toprağın ne kadar kuru olduğunu kontrol etmeyi ve suyu dikkatli kullanmayı düşündü. Bahçede ayrıca yağmur suyu biriktirmek için boş bir varil vardı. Sınıf hangi planla başlamalı?",choices:[["🪴 Toprağı inceleyip görevleri paylaşmak","plan"],["🚿 Bütün suyu hemen kullanmak","waste"]]},
+   plan:{e:"📝",title:"Birlikte Plan Yapmak",text:"Çocuklar bahçeyi küçük bölümlere ayırdı. Elif ve Arda toprağı kontrol etti; bazı yatakların nemli, bazılarının kuru olduğunu gördüler. Öğretmen, her bitkinin aynı miktarda suya ihtiyaç duymadığını anlattı. Sınıf yağmur suyu varilini kontrol etti ve sulama için bir sıra listesi hazırladı. Bir grup yabani otları ayıracak, diğeri bitkilerin yanındaki toprağı gevşetecekti. Arda bütün işleri tek başına yapmak istedi ama arkadaşlarının farklı fikirleri vardı. Şimdi ne yapsın?",choices:[["🤝 Görevleri paylaşarak herkesin fikrini dinlemek","alone"],["🏃 Her şeyi tek başına bitirmeye çalışmak","tired"]]},
+   waste:{e:"💧",title:"Suyu Akıllıca Kullanmak",text:"Musluktan bolca su akıtınca varilin çabucak boşaldığını fark ettiler. Öğretmen suyun sınırlı bir kaynak olduğunu ve bitkilerin ihtiyacı kadar sulanması gerektiğini anlattı. Çocuklar toprağı kontrol edip plan yapmaya karar verdi. Böylece nemli bölümlere gereksiz yere su dökmeyeceklerdi. Ayrıca işleri paylaşınca herkesin katkısı olabileceğini gördüler. Bahçeyi birlikte canlandırmak için nasıl çalışmalılar?",choices:[["📝 Görevleri planlayıp paylaşmak","plan"]]},
+   alone:{e:"💬",title:"Fikirleri Birleştirmek",text:"Arda tek başına çalışmaya başlayınca kısa sürede yoruldu ve bazı bitkileri unutmuş oldu. Elif ona yardım teklif etti. Öğretmen, ekipte herkesin farklı bir katkısı olabileceğini söyledi. Arda arkadaşlarının önerilerini dinledi; biri sulama çizelgesi hazırladı, biri de bitkilerin etiketlerini yeniledi. İşler paylaşılınca bahçe daha düzenli ilerledi. Çocuklar şimdi toprağı korumak için ne ekleyebilir?",choices:[["🍂 Bitki diplerine kuru yaprak serip nemi korumak","leaves"],["🧴 Toprağa plastik parçalar gömmek","plastic"]]},
+   tired:{e:"🌱",title:"Yardım İstemek Güçtür",text:"Arda her şeyi tek başına yapmaya çalışırken yoruldu. Arkadaşları ona yardım edebileceklerini söyledi. Görevleri paylaşınca iş hem daha hızlı hem de daha dikkatli yapıldı. Öğretmen, birlikte çalışmanın herkesin güçlü yanını kullanmaya yardım ettiğini anlattı. Çocuklar toprağın nemini korumak için kuru yaprakların işe yarayabileceğini öğrendi. Bahçeye nasıl katkı sağlarlar?",choices:[["🍂 Bitki diplerine kuru yaprak koymak","leaves"]]},
+   leaves:{e:"🌻",title:"Bahçe Yeniden Canlanıyor",text:"Çocuklar bitkilerin diplerine kuru yapraklardan ince bir tabaka koydu. Öğretmen bunun toprağın nemini daha uzun süre korumaya yardımcı olabileceğini söyledi. Sulama çizelgesine herkesin adı yazıldı; böylece bitkiler ne susuz kaldı ne de gereğinden fazla sulandı. Birkaç hafta sonra yeni yapraklar ve küçük çiçekler çıktı. Arda, başta tek başına her şeyi çözmeye çalıştığını ama plan yapıp yardım isteyince daha iyi sonuç aldıklarını fark etti. Sınıf bahçeyi dönem boyunca birlikte korumaya karar verdi."},
+   plastic:{e:"♻️",title:"Toprağı Temiz Tutalım",text:"Çocuklar plastik parçaların toprağa karışmasının iyi olmayacağını anladı. Öğretmen, bahçeyi temiz tutup doğal malzemeler kullanabileceklerini anlattı. Kuru yaprakları bitkilerin çevresine serdiler ve sulama görevlerini sıraya koydular. Birkaç hafta içinde bitkiler güçlendi. Arda, bahçeyi korumanın dikkat, planlama ve ekip çalışması gerektirdiğini öğrendi."}
+  },questions:[{q:"Sınıf neden önce toprağı kontrol etti?",a:"Bitkilerin gerçekten ne kadar suya ihtiyacı olduğunu anlamak için",o:["Bahçeyi kapatmak için","Toprağın rengini değiştirmek için"]},{q:"Çocuklar suyu nasıl daha dikkatli kullandı?",a:"Sulama çizelgesi hazırlayıp yalnızca gereken yerlere su verdi",o:["Musluğu açık bıraktı","Yağmur varilini boşalttı"]},{q:"Kuru yapraklar bitkilere nasıl yardımcı oldu?",a:"Toprağın nemini korumaya yardımcı oldu",o:["Bitkilerin ışığını kapattı","Toprağı plastikle doldurdu"]},{q:"Arda'nın öğrendiği ders hangisidir?",a:"İşleri paylaşmak ve yardım istemek daha iyi sonuç verir",o:["Her işi tek başına yapmak gerekir","Plan yapmak zaman kaybıdır"]}]},
+ {id:"mountain",e:"🏔️",t:"Bulutların Üstündeki İz",d:"Lina ve Can, yürüyüşte kaybolan patikayı güvenli biçimde bulmaya çalışıyor.",
+  scenes:{
+   start:{e:"🥾",title:"Sisli Patika",text:"Lina ve Can aileleriyle birlikte işaretli bir doğa yürüyüşü parkurundaydı. Bir virajdan sonra sis yoğunlaştı ve yerdeki yön okları görünmez oldu. Can, kestirme olsun diye ağaçların arasındaki dar bir yola girmek istedi. Lina ise gruptan ayrılmamaları ve yetişkinlere haber vermeleri gerektiğini hatırladı. Hava soğumaya başlamıştı. İkisi ne yapmalı?",choices:[["🧭 Oldukları yerde kalıp gruba haber vermek","shortcut"],["🌲 Tek başına kestirme yola sapmak","alone"]]},
+   shortcut:{e:"📍",title:"Güvenli Noktada Beklemek",text:"Lina ve Can ailelerine seslendi ve patikanın işaretini göremediklerini anlattı. Babaları kısa süre içinde yanlarına geldi. Herkes birlikte haritaya baktı; sis nedeniyle bir işaretin devrildiğini fark ettiler. Yetişkinler, parkur görevlisini arayıp konumlarını bildirdi. Beklerken çocuklar kuru ve güvenli bir noktada kaldı, birbirlerini sıcak tutmak için yan yana oturdu. Görevli geldiğinde hangi bilgileri paylaşmaları yararlı olur?",choices:[["🗺️ Son gördükleri işareti ve bulundukları yeri anlatmak","📱 Telefonu kapatıp saklanmak","👣 Herkesin farklı yöne gitmesi"]]},
+   alone:{e:"⚠️",title:"Grup Bir Arada Kalmalı",text:"Can ağaçların arasına birkaç adım gitti, fakat sis içinde patika daha da belirsizleşti. Lina onu çağırdı; ikisi güvenli biçimde geri dönüp ailelerinin yanında kaldı. Babaları, yürüyüşlerde gruptan ayrılmamanın ve yön kaybolduğunda durup haber vermenin önemini anlattı. Herkes haritayı birlikte inceledi ve parkur görevlisinden yardım istedi. Görevli gelene kadar çocuklar güvenli noktada bekledi. Görevliye ne anlatmaları gerekir?",choices:[["🗺️ Son gördükleri işareti tarif etmek","🧭 Tek başına yeni yol aramak","🤫 Hiçbir şey söylememek"]]},
+   clue:{e:"🗺️",title:"Haritadaki İşaret",text:"Lina, en son gördükleri mavi oku ve yanındaki küçük dereyi hatırladı. Can da parkur tabelasının yanında beklediklerini söyledi. Bu ayrıntılar görevlinin onları bulmasını kolaylaştırdı. Görevli, işaretin rüzgârda devrildiğini doğruladı ve tabelayı geçici olarak güvenli bir yere aldı. Sis biraz dağılınca aileye açık ve güvenli rotayı gösterdi. Can, kestirme aramak yerine durup bilgi paylaşmanın neden daha iyi olduğunu düşünüyordu. Ekip şimdi nasıl ilerlemeli?",choices:[["🚶 Yetişkin ve görevliyle işaretli rotadan yürümek","🏃 Hızla önden koşmak"]]},
+   safe:{e:"🌤️",title:"Birlikte Güvenle",text:"Aile, parkur görevlisinin gösterdiği işaretli rotadan yavaşça ilerledi. Sis dağılınca dağların arasından güneş ışığı göründü. Can, merak ettiği kestirme yolun güvenli olmayabileceğini anladı. Lina ise son gördükleri işareti hatırlamasının ekibe yardım ettiğini fark etti. Yürüyüşün sonunda herkes, doğada hazırlıklı olmanın; gruptan ayrılmamak, hava durumuna dikkat etmek ve gerektiğinde yardım istemek anlamına geldiğini konuştu. Bir sonraki yürüyüş için yanlarına harita ve su almayı planladılar."}
+  },questions:[{q:"Sis yoğunlaşınca Lina hangi güvenli davranışı önerdi?",a:"Gruptan ayrılmadan durup yetişkinlere haber vermek",o:["Kestirme yola tek başına girmek","Hızla koşup uzaklaşmak"]},{q:"Görevlinin aileyi bulmasına hangi bilgi yardım etti?",a:"Son görülen mavi ok ve dereyi tarif etmeleri",o:["En sevdikleri yemek","Evlerinin rengi"]},{q:"Aile parkurda nasıl ilerledi?",a:"Görevlinin gösterdiği işaretli rotadan birlikte",o:["Herkes farklı yönden","Sis içinde koşarak"]},{q:"Hikâyenin verdiği güvenlik mesajı nedir?",a:"Doğada grupta kalmak, hazırlıklı olmak ve yardım istemek",o:["İşaretli yoldan ayrılmak","Hava durumunu önemsememek"]}]}
+
+];
 function interactiveStories(){
  const renderList=()=>{
   app.innerHTML=`<button class="kdback" id="istBack">‹ Öğren</button>
   <header class="kdhd"><div><small>🎬 Kidomind Öğren</small><h1>İnteraktif Çizgi Hikâyeler</h1></div></header>
-  <div class="rulec" style="margin-top:8px;background:linear-gradient(135deg,#f0fdf4,#dcfce7);border-color:#86efac">
-   <div style="font-size:48px;text-align:center">🎬✨</div>
-   <h2 style="text-align:center;margin:4px 0">Hikâyeyi sen yönet!</h2>
-   <p class="sub" style="text-align:center;margin:0">Bir hikâye seç, kararlarını ver ve maceranın nasıl ilerleyeceğini keşfet.</p>
-  </div>
-  <div class="grid" id="storyList" style="margin-top:14px"></div>`;
+  <div class="rulec" style="margin-top:8px;background:linear-gradient(135deg,#312e81,#1d4ed8,#ea580c);color:#fff;border-color:#ffffff20;text-align:center">
+   <div style="font-size:46px">📖✨</div><h2 style="margin:4px 0">Oku, seç, keşfet!</h2>
+   <p style="margin:0;color:#edf2ff">Uzun maceralara katıl, kararlarını ver ve sonunda hikâyeden ne anladığını dene.</p>
+   <div style="margin-top:9px;font-size:12px;font-weight:800">${KID_STORIES.length} HİKÂYE • SEÇİMLİ MACERA • OKUDUĞUNU ANLAMA</div>
+  </div><div class="grid" id="storyList" style="margin-top:14px"></div>`;
   gid("istBack").onclick=()=>hub();
   const box=gid("storyList");
-  KID_STORIES.forEach(s=>{
-   const b=document.createElement("button");
-   b.className="card";
-   b.innerHTML=`<div class="s" style="font-size:38px">${s.e}</div><b>${s.t}</b><small>${s.d}</small><span style="display:inline-block;margin-top:8px;font-weight:800;color:#15803d">▶ Hikâyeye Başla</span>`;
-   b.onclick=()=>playStory(s.id);
-   box.appendChild(b);
-  });
+  KID_STORIES.forEach(s=>{const b=document.createElement("button");b.className="card";b.innerHTML=`<div class="s" style="font-size:38px">${s.e}</div><b>${s.t}</b><small>${s.d}</small><span style="display:inline-block;margin-top:8px;font-weight:800;color:#22c55e">▶ Uzun hikâyeyi oku</span>`;b.onclick=()=>playStory(s.id);box.appendChild(b)});
  };
- const playStory=(id)=>{
-  const s=KID_STORIES.find(x=>x.id===id);
-  let key="start",step=0;
+ const fallbackQuestions={
+  forest:[{q:"Bobo gizemli sesi duyduğunda en güvenli yaklaşım neydi?",a:"Arkadaşlarından veya yetişkinden yardım istemek",o:["Tek başına bilinmeyene koşmak","Sesi yok sayıp tehlikeye yaklaşmak"]},{q:"Bobo kulübede ne buldu?",a:"Yaralı bir kuş ve ona yardım eden görevliyi",o:["Bir hazine sandığını","Kaybolmuş bir robotu"]},{q:"Hikâyede öne çıkan düşünce hangisidir?",a:"Merak ederken güvenliği unutmamak",o:["Her şeyi aceleyle yapmak","Yardım istemekten kaçınmak"]}],
+  space:[{q:"Ada alarm duyunca ne yaptı?",a:"Önce görevliye haber verdi",o:["Rastgele düğmelere bastı","Gemiden tek başına çıktı"]},{q:"Alarmın nedeni neydi?",a:"Küçük bir sensör uyarısı",o:["Yaklaşan bir göktaşı","Bozulan motor"]},{q:"Ada bu macerada ne öğrendi?",a:"Ekip çalışması ve güvenlik kuralları önemlidir",o:["Alarmları görmezden gelmek gerekir","Her işi tek başına yapmak gerekir"]}],
+  museum:[{q:"Deniz yerde ne buldu?",a:"Yıldız şeklinde küçük bir kâğıt ipucu",o:["Bir uzay taşı","Bir oyuncak anahtar"]},{q:"Madalya neredeydi?",a:"Güvenli bir kutuya kaldırılmıştı",o:["Bahçedeki ağacın tepesindeydi","Deniz'in çantasındaydı"]},{q:"İyi bir dedektif nasıl davranır?",a:"Dikkatle gözlem yapar ve gerektiğinde yardım ister",o:["Müzede koşar","İpuçlarını saklar"]}],
+  robot:[{q:"Roko neden sınıfını bulamıyordu?",a:"Haritası çalışmıyordu",o:["Okul kapalıydı","Sınıfı okulun dışındaydı"]},{q:"Çocuklar doğru yönü nasıl buldu?",a:"Haritayı öğretmenle kontrol ederek",o:["Rastgele yön göstererek","Roko'yu yalnız bırakarak"]},{q:"Hikâyenin mesajı nedir?",a:"Emin olmadığında doğru kişiden yardım istemek",o:["Tahmin ederek yön göstermek","Yeni arkadaşları görmezden gelmek"]}]
+ };
+ const playStory=id=>{
+  const s=KID_STORIES.find(x=>x.id===id);let key="start",step=0,qi=0,score=0,answers=[];
+  const questions=s.questions||fallbackQuestions[s.id]||[{q:"Hikâyedeki karakter sorunu çözmek için ne yaptı?",a:"Düşünüp güvenli bir seçim yaptı",o:["Hiçbir şeyi değerlendirmedi","Herkesten uzaklaştı"]}];
   const draw=()=>{
-   const sc=s.scenes[key];
-   const finished=!sc.choices;
-   app.innerHTML=`<button class="kdback" id="storyBack">‹ Hikâyeler</button>
-   <header class="kdhd"><div><small>🎬 İnteraktif Hikâye</small><h1>${s.t}</h1></div><div class="kdch"><span>📖 Sahne ${step+1}</span></div></header>
-   <div class="rulec" style="margin-top:12px;text-align:center;background:linear-gradient(135deg,#f8fafc,#ecfdf5);border-color:#bbf7d0">
-    <div style="font-size:76px;line-height:1.1">${sc.e}</div>
-    <h2 style="margin:8px 0 6px">${sc.title}</h2>
-    <p style="font-size:17px;line-height:1.6;margin:0;font-weight:650">${sc.text}</p>
-   </div>
-   ${finished
-     ? `<div class="rulec" style="margin-top:12px;text-align:center"><div style="font-size:44px">🏆</div><h2>Hikâye tamamlandı!</h2><p class="sub">Senin seçimlerinle macera sona erdi.</p><button class="btn g" id="storyAgain">🔄 Aynı Hikâyeyi Yeniden Oyna</button><button class="btn" id="storyChoose" style="margin-top:8px">📚 Başka Hikâye Seç</button></div>`
-     : `<div class="rulec" style="margin-top:12px"><h3 style="margin:0 0 10px;text-align:center">🤔 Sen olsaydın ne yapardın?</h3><div class="opts" style="grid-template-columns:1fr">${sc.choices.map((c,i)=>`<button class="opt storyChoice" data-next="${c[1]}" style="text-align:left;font-size:18px">${String.fromCharCode(65+i)}) ${c[0]}</button>`).join("")}</div></div>`}`;
+   const sc=s.scenes[key],finished=!sc.choices;
+   app.innerHTML=`<style>.story-reading{background:linear-gradient(145deg,#202845,#171e36);border:1px solid #ffffff18;border-radius:22px;padding:17px 16px;margin-top:12px;box-shadow:0 8px 22px #0002}.story-reading p{font-size:16px;line-height:1.8;letter-spacing:.08px;margin:0;color:#f2f5ff;text-align:left}.story-reading h2{text-align:left;margin:7px 0 12px;font-size:21px}.story-label{font-size:11px;font-weight:800;letter-spacing:.6px;color:#94a3ff}</style>
+   <button class="kdback" id="storyBack">‹ Hikâyeler</button><header class="kdhd"><div><small>🎬 İnteraktif Hikâye</small><h1>${s.t}</h1></div><div class="kdch"><span>📖 Bölüm ${step+1}</span></div></header>
+   <div class="story-reading"><div class="story-label">${sc.e} MACERANIN İÇİNDE</div><h2>${sc.title}</h2><p>${sc.text}</p></div>
+   ${finished?`<div class="rulec" style="margin-top:12px;text-align:center"><div style="font-size:42px">🏁📚</div><h2>Hikâye tamamlandı!</h2><p class="sub">Şimdi okuduklarından neler hatırladığını görelim.</p><button class="btn" id="storyQuizStart">🧠 Anlama sorularına geç</button><button class="btn g" id="storyAgain" style="margin-top:8px">🔄 Hikâyeyi yeniden oku</button><button class="btn g" id="storyChoose" style="margin-top:8px">📚 Başka hikâye seç</button></div>`:`<div class="rulec" style="margin-top:12px"><h3 style="margin:0 0 10px;text-align:center">🤔 Sen olsaydın ne yapardın?</h3><div class="opts" style="grid-template-columns:1fr">${sc.choices.map((c,i)=>`<button class="opt storyChoice" data-next="${c[1]}" style="text-align:left;font-size:16px;line-height:1.45">${String.fromCharCode(65+i)}) ${c[0]}</button>`).join("")}</div></div>`}`;
    gid("storyBack").onclick=renderList;
-   if(finished){
-    gid("storyAgain").onclick=()=>{key="start";step=0;draw()};
-    gid("storyChoose").onclick=renderList;
-   }else{
-    app.querySelectorAll(".storyChoice").forEach(b=>b.onclick=()=>{key=b.dataset.next;step++;draw()});
-   }
+   if(finished){gid("storyQuizStart").onclick=()=>quiz();gid("storyAgain").onclick=()=>{key="start";step=0;qi=0;score=0;answers=[];draw()};gid("storyChoose").onclick=renderList}
+   else app.querySelectorAll(".storyChoice").forEach(b=>b.onclick=()=>{key=b.dataset.next;step++;draw()});
   };
+  const quiz=()=>{
+   if(qi>=questions.length){result();return}
+   const q=questions[qi],options=[q.a,...q.o].sort(()=>Math.random()-.5),correct=options.indexOf(q.a);
+   app.innerHTML=`<button class="kdback" id="quizBack">‹ Hikâyeye dön</button><header class="kdhd"><div><small>🧠 OKUDUĞUNU ANLAMA</small><h1>${s.t}</h1></div></header><div style="margin:12px 0 8px"><div style="height:8px;background:#ffffff20;border-radius:9px;overflow:hidden"><i style="display:block;width:${Math.round(qi/questions.length*100)}%;height:100%;background:linear-gradient(90deg,#34d399,#60a5fa)"></i></div><small class="sub">Soru ${qi+1} / ${questions.length}</small></div><div class="story-reading"><div class="story-label">HATIRLA VE DÜŞÜN</div><h2>${q.q}</h2></div><div class="opts" style="grid-template-columns:1fr;margin-top:12px">${options.map((o,i)=>`<button class="opt" data-answer="${i}" style="text-align:left;font-size:16px;line-height:1.45">${String.fromCharCode(65+i)}) ${o}</button>`).join("")}</div>`;
+   gid("quizBack").onclick=draw;app.querySelectorAll("[data-answer]").forEach(b=>b.onclick=()=>{const ok=+b.dataset.answer===correct;if(ok)score++;answers.push(ok);const msg=ok?"🎉 Evet, doğru hatırladın!":`🌱 Güzel deneme! Doğru cevap: ${q.a}`;app.innerHTML=`<h1>${ok?"Harika!":"Birlikte hatırlayalım"}</h1><div class="rulec" style="text-align:center"><div style="font-size:48px">${ok?"⭐":"💡"}</div><p>${msg}</p></div><button class="btn" id="nextQ">${qi+1<questions.length?"Sonraki soru →":"Sonucu gör →"}</button>`;gid("nextQ").onclick=()=>{qi++;quiz()}});
+  };
+  const result=()=>{const pct=Math.round(score/questions.length*100),msg=pct===100?"Harika bir dikkat! Hikâyenin ayrıntılarını çok iyi hatırladın.":pct>=60?"Çok güzel! Hikâyenin önemli noktalarını yakaladın.":"Güzel başlangıç! İstersen hikâyeyi yeniden okuyup yeni şeyler fark edebilirsin.";app.innerHTML=`<button class="kdback" id="resultBack">‹ Hikâyeler</button><div class="rulec" style="margin-top:14px;text-align:center;background:linear-gradient(140deg,#252b4b,#172c3e)"><div style="font-size:58px">${pct>=80?"🏆":"🌱"}</div><h2>${pct>=80?"Hikâye Dedektifi!":"Okuma tamamlandı!"}</h2><div style="font-size:28px;font-weight:900;margin:8px">${score} / ${questions.length} doğru</div><p class="sub">${msg}</p><div style="height:9px;background:#ffffff20;border-radius:9px;overflow:hidden;margin:12px 0"><i style="display:block;width:${pct}%;height:100%;background:linear-gradient(90deg,#34d399,#60a5fa)"></i></div></div><button class="btn" id="resultAgain">🔄 Bu hikâyeyi yeniden oku</button><button class="btn g" id="resultChoose" style="margin-top:8px">📚 Başka hikâye seç</button>`;gid("resultBack").onclick=renderList;gid("resultAgain").onclick=()=>{key="start";step=0;qi=0;score=0;answers=[];draw()};gid("resultChoose").onclick=renderList};
   draw();
  };
  renderList();
 }
 /* ===== /İNTERAKTİF ÇİZGİ HİKÂYELER ===== */
 
-const LDESC={mat:"Sayılar • Dört işlem • Problemler",tr:"Okuma • Kelime • Dil bilgisi",en:"Kelime • Cümle • Konuşma",fen:"Canlılar • Doğa • Keşif",sos:"Harita • Toplum • Kültür",dkab:"Değerler • Güzel ahlak",hbl:"Günlük yaşam • Sağlık • Güvenlik",dnm:"Karışık sorular • Süreli test",lgs:"MEB soruları • 6 ders • 30 karışık",tdx:"Ergonomi • İnovasyon • Patent",bix:"Algoritma • Scratch • Güvenlik",gsx:"Renk • Perspektif • Sanat tarihi",muzx:"Nota • Çalgılar • Türk müziği",bex:"Oyun kuralları • Sağlık • İlk yardım"};
+const bq=(q,a,o,e)=>({q,a:String(a),o:o.map(String),e:e||"Sorudaki ilişkiyi ve verilen ipuçlarını dikkatlice karşılaştır."});
+const bSvgEsc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const bIcon=v=>{v=String(v||"").toLocaleLowerCase("tr-TR");const M=[["güneş gözlüğü","🕶️"],["köpek balığı","🦈"],["pazartesi","📅"],["çarşamba","📅"],["perşembe","📅"],["pazar","📅"],["şemsiye","☂️"],["termometre","🌡️"],["kitap","📚"],["sözlük","📖"],["harita","🗺️"],["anahtar","🔑"],["kilit","🔒"],["şifre","🔐"],["kalem","✏️"],["makas","✂️"],["eldiven","🧤"],["ayakkabı","👟"],["kuş","🐦"],["arı","🐝"],["kovan","🍯"],["yuva","🪺"],["balık","🐟"],["tavşan","🐰"],["kedi","🐱"],["köpek","🐶"],["ördek","🦆"],["tavuk","🐔"],["inek","🐄"],["koyun","🐑"],["balina","🐋"],["yunus","🐬"],["elma","🍎"],["armut","🍐"],["kiraz","🍒"],["havuç","🥕"],["çilek","🍓"],["muz","🍌"],["gül","🌹"],["çam","🌲"],["meşe","🌳"],["güneş","☀️"],["ay","🌙"],["yıldız","⭐"],["bulut","☁️"],["yağmur","🌧️"],["tren","🚆"],["otobüs","🚌"],["uçak","✈️"],["bisiklet","🚲"],["araba","🚗"],["gitar","🎸"],["keman","🎻"],["flüt","🪈"],["davul","🥁"],["masa","🪑"],["sandalye","🪑"],["çanta","🎒"],["boncuk","📿"],["oyuncak","🧸"],["kurabiye","🍪"],["balon","🎈"],["çocuk","🧒"],["kalp","❤️"],["kitap","📚"],["top","⚽"],["renk","🎨"],["kırmızı","🔴"],["mavi","🔵"],["sarı","🟡"],["yeşil","🟢"]];const x=M.find(([k])=>v.includes(k));return x?x[1]:/^\d+$/.test(v)?"🔢":"🧩"};
+const bTile=(x,y,w,h,label,icon,color)=>{const short=String(label).length>13?String(label).slice(0,12)+"…":String(label);return `<g><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="12" fill="${color}" stroke="#d8def0" stroke-width="1.5"/><text x="${x+w/2}" y="${y+34}" text-anchor="middle" font-size="27" font-family="Apple Color Emoji,Segoe UI Emoji,sans-serif">${bSvgEsc(icon)}</text><text x="${x+w/2}" y="${y+h-10}" text-anchor="middle" font-size="11.5" font-weight="700" fill="#334155" font-family="system-ui,sans-serif">${bSvgEsc(short)}</text></g>`};
+const bIllustration=(kind,it,index)=>{
+ const C=["#e0f2fe","#ede9fe","#dcfce7","#fef3c7","#ffe4e6","#cffafe"];
+ const frame=(body,label)=>`<svg xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${bSvgEsc(label)}" viewBox="0 0 360 132" style="width:100%;max-width:380px;height:auto;display:block;margin:8px auto 14px;border-radius:16px"><rect x="1" y="1" width="358" height="130" rx="16" fill="#f8fafc" stroke="#dbe3f0" stroke-width="2"/>${body}</svg>`;
+ const label=it.q||"Soru görseli";
+ if(kind==="oruntu"){
+   const nums=(label.match(/\d+/g)||[]).slice(-5),vals=[...nums,"?"],gap=328/vals.length,w=Math.min(52,gap-5),body=vals.map((v,i)=>{const x=16+i*gap+(gap-w)/2,c=i===vals.length-1?"#fde68a":C[(index+i)%C.length];return `<g><rect x="${x}" y="34" width="${w}" height="58" rx="12" fill="${c}" stroke="#cbd5e1"/><text x="${x+w/2}" y="71" text-anchor="middle" font-size="21" font-weight="900" fill="#27324b" font-family="system-ui,sans-serif">${bSvgEsc(v)}</text></g>`}).join("");
+  return frame(`<text x="180" y="22" text-anchor="middle" font-size="12" font-weight="800" fill="#64748b" font-family="system-ui,sans-serif">ÖRÜNTÜYÜ TAMAMLA</text>${body}`,"Sayı örüntüsü görseli");
+ }
+ if(kind==="iliski"){
+  const sides=label.split("="),left=(sides[0]||"").split(":").map(x=>x.trim()),right=(sides[1]||"").split(":").map(x=>x.trim()),vals=[left.at(-2)||"?",left.at(-1)||"?",right[0]||"?", "?"];let body="";
+  vals.forEach((v,i)=>{const x=12+i*87;body+=bTile(x,30,76,80,v,v==="?"?"❔":bIcon(v),C[(index+i)%C.length]);if(i===1)body+='<text x="178" y="74" text-anchor="middle" font-size="19" font-weight="900" fill="#64748b">=</text>';else if(i===0||i===2)body+=`<text x="${x+80}" y="74" text-anchor="middle" font-size="17" font-weight="900" fill="#64748b">→</text>`});
+  return frame(body,"Sözel ilişki görseli");
+ }
+ if(kind==="gruplama"){
+  const tail=(label.split("?").pop()||"").split(/[.!?]/)[0],vals=tail.split(",").map(x=>x.trim()).filter(Boolean).slice(0,4),body=vals.map((v,i)=>bTile(14+i*84,27,74,82,v,bIcon(v),C[(index+i)%C.length])).join("");
+  return frame(body||bTile(42,27,74,82,"İpucu","🧩",C[index%C.length])+bTile(126,27,74,82,"İpucu","🔎",C[(index+1)%C.length]),"Gruplama ve sınıflama görseli");
+ }
+ if(kind==="sekil"){
+  const syms=(label.match(/[↑↓←→●○▲■★☆]/g)||[]).slice(0,6);
+  if(syms.length>=3){const gap=328/syms.length,w=Math.min(48,gap-5),body=syms.map((v,i)=>{const x=16+i*gap+(gap-w)/2;return `<g><rect x="${x}" y="35" width="${w}" height="56" rx="12" fill="${C[(index+i)%C.length]}" stroke="#cbd5e1"/><text x="${x+w/2}" y="73" text-anchor="middle" font-size="30" font-weight="800" fill="#334155" font-family="Apple Color Emoji,Segoe UI Emoji,sans-serif">${bSvgEsc(v)}</text></g>`}).join("");return frame(body,"Şekil ve yön örüntüsü görseli")}
+  const shapes=[["▲","3 köşe"],["■","4 köşe"],["⬟","5 köşe"],["⬡","?" ]],body=shapes.map((x,i)=>bTile(16+i*84,27,74,82,x[1],x[0],i===3?"#fde68a":C[(index+i)%C.length])).join("");
+  return frame(body,"Geometrik şekil görseli");
+ }
+ if(kind==="mantik"){
+  const nodes=[["İPUCU","💭"],["İLİŞKİ","🔗"],["SONUÇ","❔"]],body=nodes.map((n,i)=>{const x=18+i*114;return bTile(x,30,92,78,n[0],n[1],C[(index+i)%C.length])+(i<2?`<text x="${x+103}" y="75" text-anchor="middle" font-size="20" font-weight="900" fill="#64748b">›</text>`:"")}).join("");
+  return frame(`<text x="180" y="20" text-anchor="middle" font-size="12" font-weight="800" fill="#64748b" font-family="system-ui,sans-serif">İPUÇLARINI TAKİP ET</text>${body}`,"Mantık yürütme görseli");
+ }
+ if(kind==="sayi"){
+   const raw=(label.match(/\d+/g)||[]).slice(0,2),words=[["bir",1],["iki",2],["üç",3],["dört",4],["beş",5],["altı",6],["yedi",7],["sekiz",8],["dokuz",9],["on",10]],wordNums=words.filter(([w])=>new RegExp("\\b"+w+"\\b","i").test(label)).map(x=>x[1]),nums=raw.length?raw:wordNums,op=/eşit paylaştır/i.test(label)?"÷":/çarp|her kutuda|her pakette/i.test(label)?"×":/indi|uçtu|harcan|yenildi|okudu/i.test(label)?"−":"+";
+  const icon=bIcon(label),left=nums[0]||"?",right=nums[1]||"?",body=`${bTile(24,31,84,78,left,icon,C[index%C.length])}<text x="126" y="79" text-anchor="middle" font-size="24" font-weight="900" fill="#64748b">${op}</text>${bTile(150,31,84,78,right,icon,C[(index+1)%C.length])}<text x="252" y="79" text-anchor="middle" font-size="22" font-weight="900" fill="#64748b">=</text>${bTile(270,31,64,78,"?","❔","#fde68a")}`;
+  return frame(body,"Sayı problemi görseli");
+ }
+ const raw=(label.match(/\d+/g)||label.match(/[A-ZÇĞİÖŞÜ]{1,3}/g)||[]).slice(0,6),tokens=raw.length?raw:["●","▲","●","■","?","★"],gap=328/tokens.length,w=Math.min(48,gap-5),body=tokens.map((v,i)=>{const x=16+i*gap+(gap-w)/2;return `<g><rect x="${x}" y="35" width="${w}" height="56" rx="11" fill="${i===index%tokens.length?"#fde68a":C[(i+index)%C.length]}" stroke="#cbd5e1"/><text x="${x+w/2}" y="71" text-anchor="middle" font-size="18" font-weight="900" fill="#334155" font-family="system-ui,sans-serif">${bSvgEsc(v)}</text></g>`}).join("");
+ return frame(`<circle cx="33" cy="29" r="11" fill="none" stroke="#8b5cf6" stroke-width="4"/><path d="M41 37l9 9" stroke="#8b5cf6" stroke-width="4" stroke-linecap="round"/>${body}`,"Dikkat ve karşılaştırma görseli");
+};
+const bSubjectIllustration=(subject,it,index)=>{
+ const raw=String(subject||"").toLocaleLowerCase("tr-TR"),q=String(it.q||""),low=q.toLocaleLowerCase("tr-TR");
+ const frame=(body,label)=>`<svg xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${bSvgEsc(label)}" viewBox="0 0 360 132" style="width:100%;max-width:380px;height:auto;display:block;margin:8px auto 14px;border-radius:16px"><rect x="1" y="1" width="358" height="130" rx="16" fill="#f8fafc" stroke="#dbe3f0" stroke-width="2"/>${body}</svg>`;
+ const R=[
+  {test:/matem|^m$/.test(raw),title:"MATEMATİK",e:"🧮",c:"#3b82f6",terms:[["kesir","🍕"],["payda","🔢"],["çarp","✖️"],["böl","➗"],["toplam","➕"],["çıkar","➖"],["üçgen","🔺"],["kare","⬛"],["dikdörtgen","▭"],["çevre","📏"],["alan","📐"],["açı","📐"],["kesir","🍕"],["saat","🕒"],["uzunluk","📏"],["ölçü","📏"],["para","🪙"],["sayı","🔢"]],sets:[["Sayı","🔢","İşlem","➕","Şekil","🔷"],["Ölçü","📏","Problem","🧩","Çözüm","❔"],["Rakam","🔢","İlişki","🔗","Kural","❔"]]},
+  {test:/türkçe|^tr$|^t$/.test(raw),title:"TÜRKÇE",e:"📖",c:"#ef4444",terms:[["noktalama","❕"],["atasözü","🗣️"],["eş anlam","🔁"],["zıt anlam","↔️"],["cümle","💬"],["kelime","🔤"],["sözcük","🔤"],["harf","🔠"],["metin","📄"],["şiir","📜"],["hikâye","📚"],["özne","👤"],["yüklem","➡️"],["fiil","🏃"],["yazım","✏️"],["anlam","💡"],["okuma","📖"]],sets:[["Kelime","🔤","Cümle","💬","Anlam","💡"],["Metin","📄","Harf","🔠","Kitap","📚"],["Oku","📖","Düşün","🧠","Yaz","✏️"]]},
+  {test:/fen|bilim/.test(raw),title:"FEN BİLİMLERİ",e:"🔬",c:"#14b8a6",terms:[["gezegen","🪐"],["dünya","🌍"],["güneş","☀️"],["ay","🌙"],["yıldız","⭐"],["fotosentez","🌿"],["bitki","🌱"],["çiçek","🌼"],["tohum","🌰"],["hücre","🧫"],["kalp","❤️"],["akciğer","🫁"],["solunum","🫁"],["mıknatıs","🧲"],["elektrik","⚡"],["kuvvet","💪"],["ışık","💡"],["ses","🔊"],["su","💧"],["buz","🧊"],["ısı","🌡️"],["madde","🧪"],["hayvan","🐾"],["canlı","🦋"],["uzay","🚀"],["vücut","🧍"]],sets:[["Canlı","🦋","Doğa","🌱","Keşif","🔬"],["Uzay","🚀","Madde","🧪","Deney","🧫"],["Işık","💡","Kuvvet","💪","Gözlem","🔎"]]},
+  {test:/hayat/.test(raw),title:"HAYAT BİLGİSİ",e:"🌱",c:"#22a06b",terms:[["aile","👨‍👩‍👧"],["okul","🏫"],["arkadaş","🧑‍🤝‍🧑"],["trafik","🚦"],["kask","⛑️"],["sağlık","🩺"],["doktor","🩺"],["diş","🦷"],["temizlik","🧼"],["güvenlik","🛡️"],["ev","🏠"],["doğa","🌳"],["ağaç","🌳"],["su","💧"],["hayvan","🐾"],["Atatürk","🇹🇷"],["paylaş","🤝"],["yardım","💚"]],sets:[["Ailem","👨‍👩‍👧","Okulum","🏫","Arkadaşım","🧑‍🤝‍🧑"],["Sağlık","🩺","Güvenlik","🛡️","Doğa","🌱"],["Ev","🏠","Yol","🚦","Yardım","🤝"]]},
+  {test:/sosyal|inkılap|inkilap/.test(raw),title:"SOSYAL BİLGİLER",e:"🗺️",c:"#f97316",terms:[["harita","🗺️"],["Atatürk","🇹🇷"],["Cumhuriyet","🇹🇷"],["Türkiye","🇹🇷"],["Ankara","🏛️"],["bayrak","🇹🇷"],["vatandaş","🤝"],["tarih","🏺"],["bölge","🗺️"],["kültür","🎭"],["yön","🧭"],["iklim","🌦️"],["şehir","🏙️"],["göç","🧳"],["hak","⚖️"],["sorumluluk","🤝"]],sets:[["Harita","🗺️","Yön","🧭","Yer","📍"],["Geçmiş","🏺","Toplum","🤝","Kültür","🎭"],["Türkiye","🇹🇷","Şehir","🏙️","Vatandaş","🤝"]]},
+  {test:/d kab|dkab|din kültürü|^din/.test(raw),title:"DİN KÜLTÜRÜ",e:"🕌",c:"#8b5cf6",terms:[["namaz","🕌"],["oruç","🌙"],["cami","🕌"],["Kur'an","📖"],["dua","🤲"],["peygamber","🕊️"],["iyilik","💚"],["yardımlaş","🤝"],["zekat","🎁"],["zekât","🎁"],["bayram","🌙"],["ahlak","💛"],["sabır","🌿"],["selam","👋"]],sets:[["İyilik","💚","Paylaşma","🤝","Saygı","🌟"],["Dua","🤲","Kitap","📖","Güzel Ahlak","💛"],["İbadet","🕌","Sabır","🌿","Sevgi","❤️"]]},
+  {test:/^ing|ingilizce|english/.test(raw),title:"İNGİLİZCE",e:"🇬🇧",c:"#0ea5e9",terms:[["school","🏫"],["family","👨‍👩‍👧"],["friend","🧑‍🤝‍🧑"],["animal","🐾"],["cat","🐱"],["dog","🐶"],["sun","☀️"],["moon","🌙"],["book","📚"],["apple","🍎"],["water","💧"],["colour","🎨"],["color","🎨"],["weather","🌦️"],["food","🍎"],["house","🏠"],["teacher","👩‍🏫"],["hospital","🏥"],["environment","🌍"],["holiday","🏖️"]],sets:[["Word","🔤","Picture","🖼️","Meaning","💡"],["Listen","🎧","Speak","💬","Learn","📚"],["English","🇬🇧","New Word","🔤","Try","⭐"]]},
+  {test:/teknoloji/.test(raw),title:"TEKNOLOJİ VE TASARIM",e:"🛠️",c:"#0ea5e9",terms:[["tasarım","✏️"],["prototip","🧩"],["ergonomi","🪑"],["patent","📜"],["inovasyon","💡"],["geri dönüşüm","♻️"],["malzeme","🧱"],["problem","🧩"],["ürün","🛠️"]],sets:[["Fikir","💡","Çizim","✏️","Prototip","🧩"],["Problem","🧩","Tasarım","🛠️","Deneme","🔎"],["Doğa","🌱","Malzeme","🧱","Yenilik","✨"]]},
+  {test:/bilişim|yazılım/.test(raw),title:"BİLİŞİM",e:"💻",c:"#6366f1",terms:[["algoritma","🧩"],["kod","💻"],["bilgisayar","🖥️"],["internet","🌐"],["şifre","🔐"],["güvenlik","🛡️"],["veri","💾"],["klavye","⌨️"],["robot","🤖"],["scratch","🐱"]],sets:[["Kod","💻","Algoritma","🧩","Sonuç","❔"],["Güvenlik","🛡️","Şifre","🔐","Veri","💾"],["Bilgisayar","🖥️","Ağ","🌐","Fikir","💡"]]},
+  {test:/görsel/.test(raw),title:"GÖRSEL SANATLAR",e:"🎨",c:"#ec4899",terms:[["renk","🎨"],["çizgi","🖍️"],["perspektif","🏙️"],["resim","🖼️"],["tablo","🖼️"],["sanat","🎨"],["fırça","🖌️"],["heykel","🗿"],["şekil","🔷"]],sets:[["Renk","🎨","Çizgi","🖍️","Biçim","🔷"],["Fırça","🖌️","Tablo","🖼️","Hayal","💭"],["Sanat","🎨","Doku","🧵","Bakış","👀"]]},
+  {test:/müzik/.test(raw),title:"MÜZİK",e:"🎵",c:"#8b5cf6",terms:[["nota","🎼"],["ritim","🥁"],["şarkı","🎤"],["keman","🎻"],["gitar","🎸"],["piyano","🎹"],["davul","🥁"],["flüt","🪈"],["ses","🔊"],["tempo","⏱️"]],sets:[["Nota","🎼","Ritim","🥁","Melodi","🎵"],["Dinle","🎧","Söyle","🎤","Çal","🎹"],["Ses","🔊","Tempo","⏱️","Müzik","🎶"]]},
+  {test:/beden|spor/.test(raw),title:"BEDEN EĞİTİMİ",e:"⚽",c:"#22a06b",terms:[["futbol","⚽"],["basketbol","🏀"],["voleybol","🏐"],["yüzme","🏊"],["koşu","🏃"],["spor","🏅"],["antrenör","🏅"],["sağlık","💚"],["ısınma","🤸"],["hakem","🟨"]],sets:[["Hareket","🏃","Sağlık","💚","Oyun","🎯"],["Isınma","🤸","Spor","🏅","Takım","🧑‍🤝‍🧑"],["Koş","🏃","Denge","⚖️","Güç","💪"]]}
+ ];
+ const cfg=R.find(x=>x.test),pal=cfg||{title:"DERS",e:"📚",c:"#6366f1",terms:[],sets:[["Oku","📖","Düşün","🧠","Keşfet","🔎"]]};if(!cfg)return "";
+ const chosen=[];pal.terms.forEach(([k,icon])=>{if(chosen.length<3&&low.includes(k)&&!chosen.some(x=>x[0]===k))chosen.push([k,icon])});
+ const fallback=pal.sets[index%pal.sets.length];while(chosen.length<3)chosen.push([fallback[chosen.length*2],fallback[chosen.length*2+1]]);
+ let body="";
+ if(cfg.title==="MATEMATİK"&&/örüntü|dizisinde/.test(low))return bIllustration("oruntu",it,index);
+ if(cfg.title==="MATEMATİK"&&(/kesir|payda|payı/.test(low))){body=`<circle cx="72" cy="76" r="31" fill="#dbeafe" stroke="#3b82f6" stroke-width="3"/><path d="M72 45v62M41 76h62" stroke="#fff" stroke-width="3"/>${bTile(132,40,82,72,"Parça","🍕","#ede9fe")}${bTile(230,40,98,72,"Bütün","🔵","#dcfce7")}`;return frame(`<text x="180" y="24" text-anchor="middle" font-size="12" font-weight="800" fill="#64748b">KESİR MODELİ</text>${body}`,"Matematik kesir modeli")}
+ if(cfg.title==="MATEMATİK"&&(/\d/.test(q))){const nums=(q.match(/\d+/g)||[]).slice(0,3),w=72,gap=96,start=36;body=nums.map((n,i)=>bTile(start+i*gap,40,w,72,n,i===0?"🔢":"🧮",["#dbeafe","#ede9fe","#dcfce7"][i])).join("")+bTile(start+nums.length*gap,40,w,72,"?","❔","#fef3c7");return frame(`<text x="180" y="24" text-anchor="middle" font-size="12" font-weight="800" fill="#64748b">SAYILARI İNCELE</text>${body}`,"Matematik soru görseli")}
+ const xs=[18,132,246];chosen.forEach((x,i)=>{body+=bTile(xs[i],39,96,76,x[0],x[1],["#e0f2fe","#ede9fe","#dcfce7"][i]);if(i<2)body+=`<text x="${xs[i]+105}" y="83" text-anchor="middle" font-size="18" font-weight="900" fill="${pal.c}">›</text>`});
+ const extra=cfg.title==="TÜRKÇE"?'<path d="M20 120h320" stroke="#dbe3f0" stroke-width="2"/><text x="180" y="126" text-anchor="middle" font-size="10" font-weight="800" fill="#64748b">OKU • ANLA • YORUMLA</text>':"";
+ return frame(`<text x="180" y="22" text-anchor="middle" font-size="12" font-weight="900" fill="${pal.c}" font-family="system-ui,sans-serif">${pal.e} ${pal.title}</text>${body}${extra}`,pal.title+" soru görseli");
+};
+window.__kdLessonArt=(cfg,it,index)=>{const s=String(it.lessonSubject||cfg.lessonSubject||"").toLocaleLowerCase("tr-TR");return s?bSubjectIllustration(s,it,index):""};
+const bGroup=(id,n,e,s,rows)=>({id,n,e,s,items:rows.map((r,i)=>{const x=Array.isArray(r)?bq(r[0],r[1],r[2],r[3]):r;return {...x,art:bIllustration(id,x,i)}})});
+const bPattern=(g)=>{
+ const seqs={
+  1:[[1,2,3,4,5],[2,4,6,8,10],[3,5,7,9,11],[5,8,11,14,17],[10,12,14,16,18],[4,8,12,16,20],[2,7,12,17,22],[6,9,12,15,18],[10,15,20,25,30]],
+  2:[[1,4,7,10,13],[3,6,9,12,15],[1,6,11,16,21],[5,10,15,20,25],[10,13,16,19,22],[6,12,18,24,30],[7,11,15,19,23],[8,13,18,23,28],[12,18,24,30,36]],
+  3:[[2,4,8,16,32],[3,6,12,24,48],[1,3,9,27,81],[2,4,7,11,16],[3,5,8,12,17],[4,8,13,19,26],[2,7,4,9,6,11],[5,12,8,15,11,18],[10,14,11,15,12,16]]
+ };
+ return seqs[g].map(s=>{const a=s[s.length-1],d=Math.max(1,Math.abs(s[s.length-1]-s[s.length-2]));return bq("Sayı örüntüsünde soru işaretinin yerine hangi sayı gelir? "+s.slice(0,-1).join(", ")+", ?",a,[a+d,a-d,a+2*d],"Önce sayılar arasındaki artış veya azalış kuralını bul.")})
+};
+const BILSEM_BANK={
+1:[
+ bGroup("oruntu","Sayı Örüntüleri","🔢","Sayıların ilerleyiş kuralını bul",bPattern(1)),
+ bGroup("iliski","Sözel İlişkiler","🔗","Kelimeler arasındaki bağı keşfet",[
+  ["Kuş : yuva = arı : ?","kovan",["deniz","tüy","kanat"]],["Ayakkabı : ayak = eldiven : ?","el",["baş","diz","kulak"]],
+  ["Kalem : yazmak = makas : ?","kesmek",["boyamak","silmek","koşmak"]],["Gündüz : aydınlık = gece : ?","karanlık",["sıcak","hızlı","sessiz"]],
+  ["Balık : su = kuş : ?","hava",["toprak","yuva","dal"]],["Doktor : hastane = öğretmen : ?","okul",["market","park","fırın"]],
+  ["Süt : inek = yumurta : ?","tavuk",["kedi","balık","at"]],["Şemsiye : yağmur = güneş gözlüğü : ?","güneş",["kar","rüzgâr","bulut"]],
+  ["Büyük : küçük = sıcak : ?","soğuk",["ılık","parlak","yüksek"]]
+ ]),
+ bGroup("gruplama","Gruplama ve Sınıflama","🧺","Farklı olanı ayırt et",[
+  ["Hangisi diğerlerinden farklıdır? Elma, armut, kiraz, havuç","havuç",["elma","armut","kiraz"]],["Hangisi diğerlerinden farklıdır? Kedi, köpek, tavşan, sandalye","sandalye",["kedi","köpek","tavşan"]],
+  ["Hangisi diğerlerinden farklıdır? Otobüs, tren, uçak, çilek","çilek",["otobüs","tren","uçak"]],["Hangisi diğerlerinden farklıdır? Kırmızı, mavi, sarı, masa","masa",["kırmızı","mavi","sarı"]],
+  ["Hangisi diğerlerinden farklıdır? Çorap, eldiven, şapka, tabak","tabak",["çorap","eldiven","şapka"]],["Hangisi diğerlerinden farklıdır? Davul, flüt, gitar, yastık","yastık",["davul","flüt","gitar"]],
+  ["Hangisi diğerlerinden farklıdır? Kaşık, çatal, tabak, kalem","kalem",["kaşık","çatal","tabak"]],["Hangisi diğerlerinden farklıdır? Doktor, aşçı, pilot, muz","muz",["doktor","aşçı","pilot"]],
+  ["Hangisi diğerlerinden farklıdır? Pazartesi, salı, cuma, nisan","nisan",["pazartesi","salı","cuma"]]
+ ]),
+ bGroup("sekil","Şekil ve Yön","🔷","Görsel dizileri zihninde tamamla",[
+  ["Dizide sıradaki şekil hangisidir? ●, ▲, ●, ▲, ●, ?","▲",["●","■","★"]],["Ok her adımda sağa dönüyor: ↑, →, ↓, ?","←",["↑","→","↓"]],
+  ["Dizide sıradaki şekil hangisidir? ■, ■, ○, ■, ■, ?","○",["■","▲","★"]],["Bir ok yukarı bakıyor. Saat yönünde çeyrek tur dönerse hangi yönü gösterir?","sağ",["sol","yukarı","aşağı"]],
+  ["Dizide sıradaki renk hangisidir? 🔴, 🔵, 🟡, 🔴, 🔵, ?","🟡",["🔴","🔵","🟢"]],["Bir kareyi iki eş parçaya bölen dikey çizgi, kareyi kaç parçaya ayırır?","2",["1","3","4"]],
+  ["Dizide sıradaki şekil hangisidir? ★, ☆, ★, ☆, ?","★",["☆","●","▲"]],["Ok aşağı bakıyor. Saat yönünün tersine çeyrek tur dönerse hangi yönü gösterir?","sağ",["sol","yukarı","aşağı"]],
+  ["Dizide her adımda bir nokta ekleniyor: ●, ●●, ●●●, ?","●●●●",["●●","●●●","●●●●●"]]
+ ]),
+ bGroup("mantik","Mantık Soruları","🧠","İpuçlarından sonuca ulaş",[
+  ["Ece, Ali'den uzun. Ali de Mert'ten uzun. En kısa kimdir?","Mert",["Ece","Ali","Bilinemez"]],["Sepette 2 elma var. Bir elma daha konuyor. Sepette kaç elma olur?","3",["2","4","5"]],
+  ["Mavi kutu kırmızı kutudan büyük. Kırmızı kutu sarı kutudan büyük. En küçük kutu hangisi?","Sarı",["Mavi","Kırmızı","Bilinemez"]],["Bir yarışta Ada, Efe'nin önünde; Efe de Can'ın önündedir. Son sırada kim vardır?","Can",["Ada","Efe","Bilinemez"]],
+  ["Kedi, köpekten önce; kuş, kediden sonra geliyor. İlk sırada hangi hayvan var?","Kedi",["Köpek","Kuş","Bilinemez"]],["Bugün salıysa yarın hangi gündür?","Çarşamba",["Pazartesi","Perşembe","Cuma"]],
+  ["Ali'nin 1 erkek kardeşi ve 1 kız kardeşi var. Ali dâhil kaç çocuk var?","3",["2","4","5"]],["Üç balonun ikisi kırmızı, biri sarı. Sarı olmayan balon kaç tanedir?","2",["1","3","0"]],
+  ["Bir sırada Zeynep, Can'ın arkasında; Can, Ece'nin arkasındadır. Önde kim vardır?","Ece",["Can","Zeynep","Bilinemez"]]
+ ]),
+ bGroup("sayi","Sayı ve Günlük Problemler","🧮","Küçük problemleri çöz",[
+  ["Mina'nın 4 kalemi var. 2 kalem daha alıyor. Kaç kalemi olur?","6",["5","7","8"]],["Tabakta 9 kurabiye vardı, 3'ü yenildi. Kaç kurabiye kaldı?","6",["5","7","12"]],
+  ["Her kutuda 2 oyuncak var. 3 kutuda toplam kaç oyuncak vardır?","6",["5","8","9"]],["Bir ördek ile iki tavşanın toplam kaç ayağı vardır?","10",["8","6","12"]],
+  ["Saat 3'ü gösteriyor. 2 saat sonra saat kaç olur?","5",["4","6","7"]],["Bir sırada 5 çocuk var. Sıraya 2 çocuk daha katılıyor. Toplam kaç çocuk olur?","7",["6","8","9"]],
+  ["8 boncuk 2 çocuğa eşit paylaştırılırsa her çocuk kaç boncuk alır?","4",["2","3","6"]],["Kırmızı çantada 3, mavi çantada 4 kitap var. Toplam kaç kitap vardır?","7",["6","8","9"]],
+  ["Bir ağaçta 6 kuş vardı. 2 kuş uçtu, sonra 1 kuş geldi. Ağaçta kaç kuş oldu?","5",["4","6","7"]]
+ ]),
+ bGroup("dikkat","Dikkat ve Karşılaştırma","👀","Ayrıntıları dikkatle incele",[
+  ["A A K A A dizisinde K harfi kaç kez geçer?","1",["2","3","4"]],["4, 7, 2, 9 sayılarının en küçüğü hangisidir?","2",["4","7","9"]],
+  ["Mavi, kırmızı, mavi, sarı, mavi dizisinde 'mavi' kaç kez geçer?","3",["1","2","4"]],["Hangi kelimede 'a' harfi iki kez bulunur?","masa",["elma","kedi","okul"]],
+  ["1, 3, 5, 7 sayıları küçükten büyüğe sıralı. Baştan üçüncü sayı hangisidir?","5",["3","7","1"]],["Bir kutuda 2 kırmızı ve 1 mavi top var. Kırmızı olmayan kaç top vardır?","1",["2","3","0"]],
+  ["Aşağıdaki yönlerden hangisi diğerlerinden farklıdır? ↑, ↑, →, ↑","→",["↑","↓","←"]],["Lale, gül, lale, papatya, lale dizisinde en çok hangisi vardır?","lale",["gül","papatya","hepsi eşit"]],
+  ["Sayı dizisinde 5'ten büyük kaç sayı vardır? 2, 6, 4, 8, 5","2",["1","3","4"]]
+ ])
+],
+2:[
+ bGroup("oruntu","Sayı Örüntüleri","🔢","Sayıların ilerleyiş kuralını bul",bPattern(2)),
+ bGroup("iliski","Sözel İlişkiler","🔗","Kelimeler arasındaki bağı keşfet",[
+  ["Anahtar : kilit = şifre : ?","kasa",["kapı","pencere","perde"]],["Fırça : boyamak = makas : ?","kesmek",["ölçmek","yapıştırmak","çizmek"]],
+  ["Saat : zaman = termometre : ?","sıcaklık",["uzaklık","ağırlık","ses"]],["Yazar : kitap = besteci : ?","müzik",["resim","bina","harita"]],
+  ["Tohum : bitki = yumurta : ?","civciv",["yuva","tüy","kanat"]],["Kış : soğuk = yaz : ?","sıcak",["yağmur","karanlık","serin"]],
+  ["Arı : bal = inek : ?","süt",["yün","yumurta","peynir"]],["Pusula : yön = takvim : ?","tarih",["ağırlık","renk","uzaklık"]],
+  ["Soru : cevap = bilmece : ?","çözüm",["kitap","kalem","sınıf"]]
+ ]),
+ bGroup("gruplama","Gruplama ve Sınıflama","🧺","Farklı olanı ayırt et",[
+  ["Hangisi diğerlerinden farklıdır? Üçgen, kare, dikdörtgen, küre","küre",["üçgen","kare","dikdörtgen"]],["Hangisi diğerlerinden farklıdır? Gitar, keman, flüt, bisiklet","bisiklet",["gitar","keman","flüt"]],
+  ["Hangisi diğerlerinden farklıdır? Kilogram, metre, litre, salı","salı",["kilogram","metre","litre"]],["Hangisi diğerlerinden farklıdır? Çam, meşe, gül, çınar","gül",["çam","meşe","çınar"]],
+  ["Hangisi diğerlerinden farklıdır? Ocak, mart, cuma, temmuz","cuma",["ocak","mart","temmuz"]],["Hangisi diğerlerinden farklıdır? Tiyatro, sinema, konser, cetvel","cetvel",["tiyatro","sinema","konser"]],
+  ["Hangisi diğerlerinden farklıdır? Balina, yunus, köpek balığı, fok","köpek balığı",["balina","yunus","fok"]],["Hangisi diğerlerinden farklıdır? 12, 18, 24, 25","25",["12","18","24"]],
+  ["Hangisi diğerlerinden farklıdır? Dikdörtgen, kare, üçgen, küp","küp",["dikdörtgen","kare","üçgen"]]
+ ]),
+ bGroup("sekil","Şekil ve Yön","🔷","Görsel dizileri zihninde tamamla",[
+  ["Dizide sıradaki şekil hangisidir? ▲, ▲, ○, ▲, ▲, ○, ?","▲",["○","■","★"]],["Ok her adımda saat yönünde çeyrek tur dönüyor: ↑, →, ↓, ?","←",["↑","→","↓"]],
+  ["Bir şekil 180 derece döndürülüyor. Yukarı bakan ok hangi yönü gösterir?","aşağı",["sağ","sol","yukarı"]],["Sıradaki sayı kadar kenarı olan şekil hangisi? 3, 4, 5, ?","6 kenarlı şekil",["3 kenarlı şekil","4 kenarlı şekil","5 kenarlı şekil"]],
+  ["Dizide sıradaki renk hangisidir? 🔵, 🔵, 🔴, 🔴, 🔵, 🔵, ?","🔴",["🔵","🟡","🟢"]],["Bir karede sol üst köşedeki noktanın tam karşı köşesi hangisidir?","sağ alt",["sol alt","sağ üst","ortası"]],
+  ["Dizide oklar sırayla yukarı ve aşağı bakıyor: ↑, ↓, ↑, ↓, ?","↑",["↓","→","←"]],["Bir üçgenin bir köşesi kesilirse şeklin kaç köşesi olur?","4",["2","3","5"]],
+  ["Bir ok sola bakıyor. İki çeyrek tur saat yönünde dönerse hangi yönü gösterir?","sağ",["yukarı","aşağı","sol"]]
+ ]),
+ bGroup("mantik","Mantık Soruları","🧠","İpuçlarından sonuca ulaş",[
+  ["Duru, Ekin'den önce; Ekin, Fırat'tan önce bitirdi. Son bitiren kimdir?","Fırat",["Duru","Ekin","Bilinemez"]],["Kırmızı kalem mavi kalemden kısa. Mavi kalem sarı kalemden kısa. En uzun kalem hangisi?","Sarı",["Kırmızı","Mavi","Bilinemez"]],
+  ["Bir kutuda sadece kırmızı ve yeşil küpler var. Gözün kapalıyken kesin aynı renkten iki küp almak için en az kaç küp çekmelisin?","3",["2","4","5"]],["Pazartesiden 2 gün sonra hangi gündür?","Çarşamba",["Salı","Perşembe","Cuma"]],
+  ["Mert, Selin'den yaşça küçük; Selin, Bora'dan küçüktür. En büyük kimdir?","Bora",["Mert","Selin","Bilinemez"]],["Bir rafta kitap, top ve kutu var. Top kitabın sağında, kutu topun sağında. Soldan ilk hangisi gelir?","Kitap",["Top","Kutu","Bilinemez"]],
+  ["Her yıldız bir şekildir. Elimizde bir yıldız var. Bunun için hangisi kesin doğrudur?","Bir şeklimiz vardır",["Bir dairedir","Mavidir","İki yıldızdır"]],["Üç arkadaşın her birinin birer kalemi var. İki kalem daha eklenince toplam 5 oluyor. Başta kaç kalem vardı?","3",["2","4","5"]],
+  ["Bir yarışta Nil, Arda'nın önünde; Arda, Suna'nın önündedir. Ortada kim vardır?","Arda",["Nil","Suna","Bilinemez"]]
+ ]),
+ bGroup("sayi","Sayı ve Günlük Problemler","🧮","Küçük problemleri çöz",[
+  ["Her pakette 4 çıkartma var. 3 pakette kaç çıkartma vardır?","12",["7","9","16"]],["24 boncuk 4 çocuğa eşit paylaştırılırsa bir çocuk kaç boncuk alır?","6",["4","8","12"]],
+  ["Bir otobüste 18 yolcu vardı. 5 kişi indi, 3 kişi bindi. Kaç yolcu oldu?","16",["13","15","20"]],["Bir kitap 30 sayfa. Ece 12 sayfa okudu. Kaç sayfa kaldı?","18",["16","20","22"]],
+  ["Bir çiftlikte 4 tavuk var. Tavukların toplam kaç ayağı vardır?","8",["4","6","12"]],["Saat 2.30'u gösteriyor. Yarım saat sonra saat kaç olur?","3.00",["2.00","2.45","3.30"]],
+  ["Bir sırada 5 sıra ve her sırada 3 sandalye var. Toplam kaç sandalye vardır?","15",["8","10","20"]],["40 TL'nin 15 TL'si harcanıyor. Geriye kaç TL kalır?","25",["20","30","35"]],
+  ["Bir sayı 6'nın iki katıdır. Bu sayı kaçtır?","12",["10","8","18"]]
+ ]),
+ bGroup("dikkat","Dikkat ve Karşılaştırma","👀","Ayrıntıları dikkatle incele",[
+  ["Dizide kaç sayı 5'ten büyüktür? 2, 6, 4, 9, 5, 7","3",["2","4","5"]],["Kırmızı, mavi, kırmızı, sarı, mavi, kırmızı dizisinde kırmızı kaç kez geçer?","3",["2","4","5"]],
+  ["Hangi sözcük alfabetik sırada önce gelir? masa, kalem, çanta","çanta",["kalem","masa","hepsi aynı"]],["Aşağıdaki sayı çiftlerinden hangisi eşittir?","17 ve 17",["17 ve 71","12 ve 21","8 ve 6"]],
+  ["KARE sözcüğündeki harflerden hangisi iki kez kullanılmıştır?","Hiçbiri",["K","A","E"]],["2, 4, 6, 8, 10 dizisinde ortadaki sayı hangisidir?","6",["4","8","10"]],
+  ["Hangi şekil diğerlerinden farklıdır? ●, ●, ▲, ●","▲",["ilk ●","ikinci ●","son ●"]],["Bir kelimedeki harfleri sondan başa okursak KEDİ nasıl başlar?","İ",["K","E","D"]],
+  ["4, 9, 1, 7 sayılarının en büyüğü hangisidir?","9",["4","1","7"]]
+ ])
+],
+3:[
+ bGroup("oruntu","Sayı Örüntüleri","🔢","Sayıların ilerleyiş kuralını bul",bPattern(3)),
+ bGroup("iliski","Sözel İlişkiler","🔗","Kelimeler arasındaki bağı keşfet",[
+  ["Harita : yer = sözlük : ?","kelime",["sayı","renk","yön"]],["Heykeltıraş : heykel = ressam : ?","resim",["nota","roman","bina"]],
+  ["Dakika : saat = ay : ?","yıl",["hafta","gün","mevsim"]],["Kök : ağaç = temel : ?","bina",["pencere","çatı","kapı"]],
+  ["Göz : görmek = burun : ?","koklamak",["duymak","dokunmak","tatmak"]],["Termometre : sıcaklık = terazi : ?","ağırlık",["uzunluk","zaman","hız"]],
+  ["Kaptan : gemi = pilot : ?","uçak",["tren","bisiklet","otobüs"]],["Cesur : korkak = cömert : ?","cimri",["nazik","neşeli","dikkatli"]],
+  ["Roman : yazar = beste : ?","besteci",["ressam","oyuncu","terzi"]]
+ ]),
+ bGroup("gruplama","Gruplama ve Sınıflama","🧺","Farklı olanı ayırt et",[
+  ["Hangisi diğerlerinden farklıdır? 16, 25, 36, 40","40",["16","25","36"]],["Hangisi diğerlerinden farklıdır? Kuzey, güney, doğu, yukarı","yukarı",["kuzey","güney","doğu"]],
+  ["Hangisi diğerlerinden farklıdır? Bakır, demir, altın, tahta","tahta",["bakır","demir","altın"]],["Hangisi diğerlerinden farklıdır? Roman, şiir, masal, fırça","fırça",["roman","şiir","masal"]],
+  ["Hangisi diğerlerinden farklıdır? 3, 6, 9, 14","14",["3","6","9"]],["Hangisi diğerlerinden farklıdır? Üçgen, beşgen, altıgen, daire","daire",["üçgen","beşgen","altıgen"]],
+  ["Hangisi diğerlerinden farklıdır? Göz, kulak, burun, dirsek","dirsek",["göz","kulak","burun"]],["Hangisi diğerlerinden farklıdır? İlkbahar, yaz, sonbahar, ocak","ocak",["ilkbahar","yaz","sonbahar"]],
+  ["Hangisi diğerlerinden farklıdır? 2, 4, 8, 11","11",["2","4","8"]]
+ ]),
+ bGroup("sekil","Şekil ve Yön","🔷","Görsel dizileri zihninde tamamla",[
+  ["Şekil örüntüsünde üçgen, kare ve beşgenin ardından hangi şekil gelir?","altıgen",["daire","üçgen","kare"]],["Bir ok kuzeyi gösteriyor. Saat yönünde 3 çeyrek tur dönerse hangi yönü gösterir?","batı",["doğu","güney","kuzey"]],
+  ["Bir şeklin dikey aynadaki görüntüsünde sağ ve sol yer değiştirir. Sağ elini kaldıran kişi aynada hangi elini kaldırmış görünür?","sol elini",["sağ elini","iki elini","elini kaldırmaz"]],["Dizide sıradaki şekil hangisidir? ▲, ■, ▲▲, ■■, ▲▲▲, ?","■■■",["▲▲▲▲","■■","▲▲"]],
+  ["Bir kare saat yönünde çeyrek tur döndürülürse şeklin köşe sayısı kaç olur?","4",["3","5","8"]],["Bir ok doğuyu gösteriyor. Saat yönünün tersine yarım tur dönerse hangi yönü gösterir?","batı",["kuzey","güney","doğu"]],
+  ["Küçük karelerden oluşan bir sırada 2, 4, 6, 8 kare varsa sıradaki şekil kaç kareden oluşur?","10",["9","11","12"]],["Bir dikdörtgenin karşılıklı kenarları nasıldır?","Eşit uzunluktadır",["Hepsi farklı uzunluktadır","Yalnız bir kenarı vardır","Üç kenarı vardır"]],
+  ["Dizide her adımda yön 90 derece saat yönünde dönüyor: ←, ↑, →, ?","↓",["←","↑","→"]]
+ ]),
+ bGroup("mantik","Mantık Soruları","🧠","İpuçlarından sonuca ulaş",[
+  ["Deniz, Aras'tan önce; Aras da Eylül'den önce geliyor. Üçü arasında ortada kim vardır?","Aras",["Deniz","Eylül","Bilinemez"]],["A, B'den ağır; B, C'den hafif. En ağır olan kesin olarak kimdir?","Kesin belirlenemez",["A","B","C"]],
+  ["Üç kutudan yalnız birinde yıldız var. Kırmızı kutuda değil, mavi kutuda değil. Yıldız hangi kutudadır?","Üçüncü kutuda",["Kırmızı kutuda","Mavi kutuda","Hiçbirinde"]],["Bir toplantı perşembe günü. Toplantıdan 3 gün önce hangi gündür?","Pazartesi",["Salı","Çarşamba","Pazar"]],
+  ["Bütün güller çiçektir. Bahçedeki bir bitki güldür. Bu bitki için hangisi kesindir?","Çiçektir",["Ağaçtır","Kırmızıdır","Kokusu yoktur"]],["Nehir, Sarp'tan önce başladı. Eylül, Nehir'den sonra ama Sarp'tan önce başladı. İlk kim başladı?","Nehir",["Sarp","Eylül","Bilinemez"]],
+  ["Bir sayı 10'dan büyük, 15'ten küçük ve çifttir. Hangisi olabilir?","12",["11","13","15"]],["Bir odada 4 köşe var. Her köşede bir kedi oturuyor. Odada kaç kedi vardır?","4",["3","7","12"]],
+  ["Bir şifre 3 rakamdan oluşuyor. İlk rakam 2, son rakam 7. Ortadaki rakam 2'den büyük ve 7'den küçüktür. Hangisi mümkün?","5",["1","8","9"]]
+ ]),
+ bGroup("sayi","Sayı ve Günlük Problemler","🧮","Küçük problemleri çöz",[
+  ["Bir kitap 84 sayfa. İlk gün 26, ikinci gün 18 sayfa okunuyor. Kaç sayfa kalır?","40",["38","42","48"]],["6 kutunun her birinde 7 bilye var. Toplam kaç bilye vardır?","42",["36","40","48"]],
+  ["72 kalem 8 sınıfa eşit paylaştırılıyor. Her sınıfa kaç kalem düşer?","9",["8","10","12"]],["Bir yürüyüş 35 dakika sürüyor. Saat 10.20'de başlayan yürüyüş kaçta biter?","10.55",["10.45","11.05","11.15"]],
+  ["Bir dikdörtgenin kenarları 6 cm ve 4 cm. Çevresi kaç cm'dir?","20",["10","18","24"]],["Bir sınıfta 28 öğrenci var. Öğrencilerin yarısı kız. Erkek öğrenci sayısı kaçtır?","14",["12","16","18"]],
+  ["Bir sayı 4 ile çarpılınca 36 oluyor. Bu sayı kaçtır?","9",["8","10","12"]],["Kumbarada 50 TL vardı. 18 TL harcandı, 12 TL eklendi. Son durumda kaç TL vardır?","44",["38","40","56"]],
+  ["Bir çiftlikte 5 koyun ve 3 tavuk var. Hayvanların toplam kaç ayağı vardır?","26",["16","22","30"]]
+ ]),
+ bGroup("dikkat","Dikkat ve Karşılaştırma","👀","Ayrıntıları dikkatle incele",[
+  ["Aşağıdaki dizide kaç tane 3 rakamı vardır? 3, 8, 3, 5, 3, 3, 9","4",["3","5","6"]],["Hangi sözcükte harfler alfabetik sıraya göre dizilmiştir?","ABC",["ACB","BAC","CAB"]],
+  ["Sayılar küçükten büyüğe sıralanıyor. Ortadaki sayı hangisidir? 12, 4, 9, 7, 15","9",["7","12","15"]],["Bir kelime dizisinde hangisi iki kez geçiyor? kiraz, erik, kiraz, üzüm, elma","kiraz",["erik","üzüm","elma"]],
+  ["Hangi sayı hem 3'ten büyük hem de 8'den küçüktür?","6",["2","8","10"]],["Bir kodda her harf bir sonrakine dönüşüyor: A→B, B→C. C→?","D",["A","B","E"]],
+  ["Aşağıdaki işlemlerin sonuçları için hangisi doğrudur? 2×3, 3×2, 1+5, 2+4","Hepsi aynı değeri verir",["Yalnız 2×3 farklıdır","Yalnız 3×2 farklıdır","Yalnız 1+5 farklıdır"]],["Bir listede 4 daire, 2 üçgen ve 3 kare var. Üçgen olmayan şekil sayısı kaçtır?","7",["5","6","9"]],
+  ["Bir sözcükteki harf sayısı kadar nokta var. BİLSEM sözcüğünün yanında kaç nokta olur?","6",["5","7","8"]]
+ ])
+]
+};
+function bilsemGrades(back){
+ app.innerHTML=`<div class="top"><button class="btn g" id="bsback">← Dersler</button><span>🧠 Bilsem Hazırlık</span></div><h1>Bilsem Hazırlık</h1><p class="sub">Sınıfını seç; sana uygun özgün akıl yürütme sorularını çöz.</p><div class="grid">${[1,2,3].map(g=>`<button class="card" data-bg="${g}" style="background:linear-gradient(135deg,#ede9fe,#ddd6fe);color:#1d2340;border-color:transparent"><div class="s">🎒</div><b>${g}. Sınıf</b><small style="color:#4b5563">${BILSEM_BANK[g].reduce((n,x)=>n+x.items.length,0)} özgün soru • 7 alan</small></button>`).join("")}</div><p class="sub" style="margin-top:12px">Bu soru havuzu Bilsem sınav sorularının kopyası değil; sınıf düzeyine uygun özgün düşünme alıştırmalarıdır.</p>`;
+ gid("bsback").onclick=back;
+ app.querySelectorAll("[data-bg]").forEach(b=>b.onclick=()=>bilsemGrade(Number(b.dataset.bg),back));
+}
+function bilsemGrade(g,back){
+ const cats=BILSEM_BANK[g],all=cats.flatMap(x=>x.items);
+  app.innerHTML=`<div class="top"><button class="btn g" id="bsgback">← Sınıflar</button><span>🎒 ${g}. Sınıf</span></div><h1>🧠 ${g}. Sınıf Bilsem Hazırlık</h1><p class="sub">${all.length} özgün soru • Örüntü, sözel ilişki, şekil, mantık ve dikkat</p><div class="grid"><button class="card" data-bmix="1" style="grid-column:1/-1;background:linear-gradient(135deg,#ddd6fe,#c4b5fd);color:#1d2340;border-color:transparent"><div class="s">🎲</div><b>Karışık Test</b><small style="color:#4b5563">Soru havuzundan 20 soru</small></button><button class="card" data-ball="1" style="grid-column:1/-1;background:linear-gradient(135deg,#fef3c7,#fde68a);color:#1d2340;border-color:transparent"><div class="s">📚</div><b>Tüm ${all.length} Soruyu Çöz</b><small style="color:#4b5563">Bu sınıfın soru havuzunun tamamı</small></button>${cats.map(x=>`<button class="card" data-bcat="${x.id}" style="background:linear-gradient(135deg,#f5f3ff,#e0e7ff);color:#1d2340;border-color:transparent"><div class="s">${x.e}</div><b>${x.n}</b><small style="color:#4b5563">${x.items.length} soru • ${x.s}</small></button>`).join("")}</div>`;
+ gid("bsgback").onclick=()=>bilsemGrades(back);
+  app.querySelector("[data-bmix]").onclick=()=>qzRun({title:`🧠 ${g}. Sınıf • Karışık Bilsem`,key:`Bilsem${g}·Karışık`,items:all,n:20,back:()=>bilsemGrade(g,back)});
+  app.querySelector("[data-ball]").onclick=()=>qzRun({title:`🧠 ${g}. Sınıf • Tüm Bilsem Soruları`,key:`Bilsem${g}·Tümü`,items:all,n:all.length,back:()=>bilsemGrade(g,back)});
+  app.querySelectorAll("[data-bcat]").forEach(b=>b.onclick=()=>{const c=cats.find(x=>x.id===b.dataset.bcat);if(c)qzRun({title:`${c.e} ${g}. Sınıf • ${c.n}`,key:`Bilsem${g}·${c.id}`,items:c.items,n:c.items.length,back:()=>bilsemGrade(g,back)})});
+}
+const LDESC={mat:"Sayılar • Dört işlem • Problemler",tr:"Okuma • Kelime • Dil bilgisi",en:"Kelime • Cümle • Konuşma",fen:"Canlılar • Doğa • Keşif",sos:"Harita • Toplum • Kültür",dkab:"Değerler • Güzel ahlak",hbl:"Günlük yaşam • Sağlık • Güvenlik",dnm:"Karışık sorular • Süreli test",lgs:"MEB soruları • 6 ders • 30 karışık",tdx:"Ergonomi • İnovasyon • Patent",bix:"Algoritma • Scratch • Güvenlik",gsx:"Renk • Perspektif • Sanat tarihi",muzx:"Nota • Çalgılar • Türk müziği",bex:"Oyun kuralları • Sağlık • İlk yardım",bilsem:"Akıl yürütme • Şekil örüntüleri • Dikkat"};
 function learn(v,T){
- T=T||"learn";const L=T==="lessons",ids=L?["mat","tr","en","fen","sos","dkab","hbl","dnm","lgs","tdx","bix","gsx","muzx","bex"]:[],ttl=L?"Dersler":"Öğren";
+  T=T||"learn";const L=T==="lessons",ids=L?["mat","tr","en","fen","sos","dkab","hbl","dnm","lgs","tdx","bix","gsx","muzx","bex","bilsem"]:[],ttl=L?"Dersler":"Öğren";
  if(KD.cat){const c=CATS.find(x=>x.id===KD.cat);
   v.insertAdjacentHTML("beforeend",`<button class="kdback" id="kdbk">‹ ${ttl}</button><div class="kdcb" style="--c:${c.c}"><span class="kdi">${c.e}</span><div><small>${LDESC[c.id]||"Etkinlikler"}</small><h2>${c.n}</h2><small>${c.k.filter(k=>card(k)).length} etkinlik seni bekliyor</small></div></div>`);
   gid("kdbk").onclick=()=>{KD.cat=null;hub()};
   grid(v,"",c.k.map(k=>take(k,c.c)),c.c);{const qs=v.lastElementChild;if(qs)qs.classList.add("kdact3")}return}
  const LC=L?CATS.filter(c=>ids.includes(c.id)):[],tot=LC.reduce((n,c)=>n+c.k.filter(k=>card(k)).length,0),rc=L?LC[Math.floor(Date.now()/864e5)%LC.length]:null;
  let LL=null;try{LL=JSON.parse(localStorage.getItem("mat-kd-last"))}catch(e){}const lok=!!(L&&LL&&card(LL.k));
- v.insertAdjacentHTML("beforeend",`<header class="kdhd"><div><small>${L?"Hangi dersi çalışalım?":"Ne öğrenmek istersin?"}</small><h1>${ttl}</h1></div>${chips()}</header>${L?`<div class="kdls-hero" style="--c:${rc.c}"><small>✨ BUGÜNÜN ÖNERİSİ</small><h2>${rc.e} ${rc.n}</h2><p>${LDESC[rc.id]}. Bugün bu derse 10 dakika ayır, serini koru! 🔥</p><div class="kdls-btns"><button class="a" id="kdlr">Derse Başla ▶</button>${lok?`<button class="b" id="kdlc">${esc(LL.e)} ${esc(LL.n)}</button>`:""}</div></div><div class="kdls-stats"><div><b>${LC.length}</b>ders</div><div><b>${tot}</b>etkinlik</div><div><b>🔥 ${streakNow()}</b>gün seri</div></div>`:""}${ids.length?`<div class="kdcats">${LC.map(c=>`<button class="kdcat" data-c="${c.id}" style="--c:${c.c}"><span class="kdi">${c.e}</span><b>${c.n}</b><span class="kdd">${LDESC[c.id]||""}</span><small>${c.k.filter(k=>card(k)).length} etkinlik</small></button>`).join("")}</div>`:""}`);
- if(L){gid("kdlr").onclick=()=>{KD.cat=rc.id;hub()};const lc=gid("kdlc");if(lc)lc.onclick=()=>card(LL.k).click()}
- v.querySelectorAll(".kdcat").forEach(b=>b.onclick=()=>{KD.cat=b.dataset.c;hub()});
+  v.insertAdjacentHTML("beforeend",`<header class="kdhd"><div><small>${L?"Hangi dersi çalışalım?":"Ne öğrenmek istersin?"}</small><h1>${ttl}</h1></div>${chips()}</header>${L?`<div class="kdls-hero" style="--c:${rc.c}"><small>✨ BUGÜNÜN ÖNERİSİ</small><h2>${rc.e} ${rc.n}</h2><p>${LDESC[rc.id]}. Bugün bu derse 10 dakika ayır, serini koru! 🔥</p><div class="kdls-btns"><button class="a" id="kdlr">Derse Başla ▶</button>${lok?`<button class="b" id="kdlc">${esc(LL.e)} ${esc(LL.n)}</button>`:""}</div></div><div class="kdls-stats"><div><b>${LC.length}</b>ders</div><div><b>${tot}</b>etkinlik</div><div><b>🔥 ${streakNow()}</b>gün seri</div></div>`:""}${ids.length?`<div class="kdcats">${LC.map(c=>`<button class="kdcat" data-c="${c.id}" style="--c:${c.c}"><span class="kdi">${c.e}</span><b>${c.n}</b><span class="kdd">${LDESC[c.id]||""}</span><small>${c.id==="bilsem"?"1.–3. sınıf • 63 soru/sınıf":c.k.filter(k=>card(k)).length+" etkinlik"}</small></button>`).join("")}</div>`:""}`);
+  if(L){gid("kdlr").onclick=()=>{if(rc.id==="bilsem")return bilsemGrades(()=>{KD.cat=null;hub()});KD.cat=rc.id;hub()};const lc=gid("kdlc");if(lc)lc.onclick=()=>card(LL.k).click()}
+  v.querySelectorAll(".kdcat").forEach(b=>b.onclick=()=>{if(b.dataset.c==="bilsem")return bilsemGrades(()=>{KD.cat=null;hub()});KD.cat=b.dataset.c;hub()});
  if(!L){
   /* Öğren > Keşfet: kullanıcının önceki sürümde kullandığı kartların tamamını geri getir.
      Arama özelliği bunları artık değiştiremez/silemez. */
@@ -14682,7 +14941,7 @@ async function kdNewRecSave(){const c=kdCode();par().rec=await kdMake(c.replace(
 function kdShow(o,code,done){kdScr(o,'<div class="big">📝</div><h2>Kurtarma Kodun</h2><div class="rulec" style="font-size:32px;letter-spacing:.08em">'+code+'</div><p class="sub">Bu kodu bir kâğıda yaz ve çocuğun bulamayacağı bir yere koy. PIN\'ini unutursan tek yol budur. <b>Bir daha gösterilmeyecek.</b></p><button class="btn" id="kdone">✅ Yazdım, devam et</button>');o.querySelector("#kdone").onclick=done}
 async function kdNewRec(){const o=ovl("");kdShow(o,await kdNewRecSave(),()=>o.close())}
 function kdSetup(cb,reset,o0){const P=par(),o=o0||ovl(""),a=R(12,19),b=R(12,19),c=R(10,40),IN='class="pi" type="password" inputmode="numeric" maxlength="6" autocomplete="off" style="max-width:200px;margin-bottom:8px"';
- const pinStep=()=>{kdScr(o,'<h2>🔐 '+(reset?"Yeni PIN":"Ebeveyn PIN'i Belirle")+'</h2><p class="sub">4-6 rakam • çocuğun tahmin edemeyeceği bir PIN seç</p><input id="n1" '+IN+' placeholder="PIN"><input id="n2" '+IN+' placeholder="PIN tekrar"><div class="fb" id="nm"></div><button class="btn" id="nok">Kaydet</button>'+(reset?"":'<button class="btn g" id="ncn">Vazgeç</button>'));
+  const pinStep=()=>{const title=reset?(P.pin?"Yeni PIN":"Ebeveyn Şifresi Oluştur"):"Ebeveyn PIN'i Belirle";kdScr(o,'<h2>🔐 '+title+'</h2><p class="sub">4-6 rakam • çocuğun tahmin edemeyeceği bir PIN seç</p><input id="n1" '+IN+' placeholder="PIN"><input id="n2" '+IN+' placeholder="PIN tekrar"><div class="fb" id="nm"></div><button class="btn" id="nok">Kaydet</button>'+(reset?"":'<button class="btn g" id="ncn">Vazgeç</button>'));
   const n1=o.querySelector("#n1"),n2=o.querySelector("#n2"),nm=o.querySelector("#nm"),cn=o.querySelector("#ncn");if(cn)cn.onclick=()=>o.close();
   o.querySelector("#nok").onclick=async()=>{const v=n1.value.trim();
    if(!/^\d{4,6}$/.test(v)){nm.textContent="PIN 4-6 rakam olmalı";return}
@@ -14707,7 +14966,13 @@ function kdGate(cb,grace){if(grace&&Date.now()<gateUntil)return cb();
    try{soundManager.playWrong()}catch(e){}kdBad();kdShake(o);const w2=kdWt();gm.textContent=w2?kdWtx(w2):"Yanlış PIN"};
   o.querySelector("#gok").onclick=go;gi.onkeydown=e=>{if(e.key==="Enter")go()}};
  ask()}
-parentGate=kdGate;
+ parentGate=kdGate;
+ /* Premium satın alma karşılamasından ebeveyn paneli kurulumuna geçiş:
+    ilk PIN'de yetişkin matematik adımını atla; var olan PIN'i sıfırlama. */
+ window.kdPremiumParentSetup=function(){
+  const open=()=>{try{if(typeof window.parentPanel==="function")window.parentPanel();else if(typeof window.hub==="function")window.hub()}catch(e){console.error("parent setup:",e)}};
+  try{if(!par().pin){kdSetup(open,1);return}kdGate(open,true)}catch(e){console.error("parent setup:",e);open()}
+ };
 /* Ebeveyn panelindeki "PIN Kaydet" ve "Yeni Kurtarma Kodu" butonları bu işlevlere dışarıdan erişir */
 window.kdMake=kdMake;window.kdNewRec=kdNewRec;
 function kdParChoose(){if(!window.kd2On()){kdParOpen("kid");return}document.body.classList.remove("kd-home");const s=kdNames();
@@ -15877,12 +16142,27 @@ cocuk=function(){_cOk.apply(this,arguments);try{if(gid("okc0"))return;
   ];
   function kendimi(){
     if(typeof BKF!=='undefined'){ const f=()=>{if(typeof hub==='function')hub()}; f.ck=1; BKF=f; }
-    app.innerHTML=`<button class="kdback" id="ktbk">‹ Öğren</button><header class="kdhd"><div><small>🌱 Kidomind Öğren</small><h1>🌱 Kendimi Tanıyorum</h1></div></header><div class="rulec" style="margin-top:6px"><h2 style="margin:0 0 5px">Ben kimim?</h2><p class="sub" style="margin:0">Kendini tanı, güçlü yönlerini keşfet, hedeflerini düşün ve kendine güven. 💚</p></div><div class="grid" style="margin-top:12px">`+
-      selfQuestions.map((x,i)=>`<button class="card" data-kt="${i}" style="background:linear-gradient(135deg,#dcfce7,#dbeafe);color:#1d2340;border-color:transparent"><div class="s">${x[0]}</div><b>${x[1]}</b><small style="color:#4b5563">${x[2]}</small></button>`).join('')+
-      `</div><button class="btn" id="kttest" style="margin-top:14px">🎯 Kendimi Tanıyorum Testi</button><button class="btn g" id="ktback2" style="margin-top:8px">← Öğren</button>`;
+    const colors=['#f59e0b','#22c55e','#38bdf8','#a78bfa','#fb7185','#34d399','#f472b6','#60a5fa'];
+    app.innerHTML=`<style>
+      .kt-hero{position:relative;overflow:hidden;padding:22px 20px 20px;border-radius:26px;margin:12px 0;background:linear-gradient(125deg,#3730a3 0%,#2563eb 52%,#38bdf8 100%);color:#fff;box-shadow:0 12px 28px #2563eb38}
+      .kt-hero:before,.kt-hero:after{content:"";position:absolute;border-radius:50%;background:#ffffff13;pointer-events:none}.kt-hero:before{width:190px;height:190px;right:-55px;top:-85px}.kt-hero:after{width:90px;height:90px;right:95px;bottom:-60px}
+      .kt-eyebrow{font-size:13px;font-weight:800;opacity:.88;letter-spacing:.3px}.kt-title{font-size:clamp(25px,7vw,34px);font-weight:900;line-height:1.12;margin:9px 0 8px;letter-spacing:-.7px}.kt-lead{margin:0;max-width:440px;font-size:14px;line-height:1.5;opacity:.93}
+      .kt-intro{padding:16px 17px;border:1px solid #ffffff1c;border-radius:22px;background:linear-gradient(135deg,#252c49,#1c2340);margin:12px 0 16px;text-align:left}.kt-intro h2{font-size:18px;margin:0 0 5px}.kt-intro p{font-size:13px;line-height:1.5;margin:0;color:#c4cbe2}.kt-progress{display:flex;align-items:center;gap:10px;margin-top:13px}.kt-progress-bar{height:7px;flex:1;background:#ffffff1c;border-radius:9px;overflow:hidden}.kt-progress-bar i{display:block;width:0;height:100%;background:linear-gradient(90deg,#34d399,#67e8f9);border-radius:9px}.kt-progress small{font-size:11px;color:#d8def4;font-weight:700;white-space:nowrap}
+      .kt-section-title{display:flex;align-items:end;justify-content:space-between;margin:18px 2px 10px}.kt-section-title b{font-size:17px}.kt-section-title small{font-size:11px;opacity:.65}
+      .kt-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.kt-tile{position:relative;overflow:hidden;min-height:154px;text-align:left;padding:14px 13px;border-radius:21px;border:1px solid #ffffff18;background:linear-gradient(145deg,#252d4a,#1d2440 70%);color:#f5f7ff;box-shadow:0 5px 14px #0002;transition:transform .15s,border-color .15s}.kt-tile:active{transform:scale(.975)}.kt-tile:before{content:"";position:absolute;left:0;right:0;top:0;height:4px;background:var(--kt-accent)}.kt-icon{display:grid;place-items:center;width:48px;height:48px;border-radius:15px;background:color-mix(in srgb,var(--kt-accent) 15%,#202844);border:1px solid color-mix(in srgb,var(--kt-accent) 48%,transparent);font-size:27px;margin-bottom:10px}.kt-tile b{display:block;font-size:14px;line-height:1.25;margin-bottom:5px}.kt-tile small{display:block;color:#c0c8e2;font-size:11px;line-height:1.4}.kt-arrow{position:absolute;right:12px;bottom:12px;color:var(--kt-accent);font-size:17px;font-weight:900}
+      .kt-bottom{padding:13px 15px;border-radius:18px;background:linear-gradient(120deg,#183b48,#20364a);border:1px solid #34d39935;color:#d8f8eb;font-size:12px;line-height:1.45;margin:14px 0 4px}
+      @media(max-width:360px){.kt-tile{min-height:145px;padding:12px 10px}.kt-tile b{font-size:13px}.kt-tile small{font-size:10px}.kt-title{font-size:25px}}
+    </style>
+    <button class="kdback" id="ktbk">‹ Öğren</button>
+    <section class="kt-hero"><div class="kt-eyebrow">🌱 KIDOMIND ÖĞREN • KENDİNİ KEŞFET</div><h1 class="kt-title">Kendimi<br>Tanıyorum ✨</h1><p class="kt-lead">Seni sen yapan güzel özellikleri keşfet. Her cevap, kendinle ilgili yeni bir ipucu! 💚</p></section>
+    <section class="kt-intro"><h2>🪞 Ben kimim?</h2><p>Kendini tanımak bir yolculuk. Güçlü yanlarını fark et, duygularına kulak ver ve kendi hızında ilerle.</p><div class="kt-progress"><div class="kt-progress-bar"><i></i></div><small>8 keşif alanı</small></div></section>
+    <div class="kt-section-title"><b>Keşif alanların</b><small>Birini seç ve başlayalım ›</small></div>
+    <div class="kt-grid">`+
+      selfQuestions.map((x,i)=>`<button class="kt-tile" data-kt="${i}" style="--kt-accent:${colors[i]}"><span class="kt-icon">${x[0]}</span><b>${x[1]}</b><small>${x[2]}</small><span class="kt-arrow">›</span></button>`).join('')+
+      `</div><button class="btn" id="kttest" style="margin-top:14px;background:linear-gradient(100deg,#6d5dfc,#3187f5);box-shadow:0 7px 18px #5366ef40">🎯 Kendimi Tanıyorum Testi <small style="display:block;opacity:.8;font-size:11px;margin-top:3px">6 kısa soruyla öğrendiklerini dene</small></button><div class="kt-bottom">💡 <b>Küçük hatırlatma:</b> Herkesin güçlü yanları ve öğrenme biçimi farklıdır. Burada yanlış cevap yok; kendini keşfetmek var.</div><button class="btn g" id="ktback2" style="margin-top:8px">← Öğren bölümüne dön</button>`;
     const goBack=()=>{if(typeof hub==='function')hub()};
     gid('ktbk').onclick=goBack;gid('ktback2').onclick=goBack;
-    app.querySelectorAll('[data-kt]').forEach(b=>b.onclick=()=>{const x=selfQuestions[+b.dataset.kt];app.innerHTML=`<button class="kdback" id="ktcat">‹ Kendimi Tanıyorum</button><h1>${x[0]} ${x[1]}</h1><div class="q st"><p class="sub" style="margin:0 0 10px;font-size:14px;font-weight:600">${x[2]}</p>${x[3]}</div><div class="opts" style="grid-template-columns:1fr">${x[4].map((o,j)=>`<button class="opt" data-o="${j}" style="text-align:left;font-size:18px">${String.fromCharCode(65+j)}) ${o}</button>`).join('')}</div>`;gid('ktcat').onclick=kendimi;app.querySelectorAll('[data-o]').forEach(o=>o.onclick=()=>{const ok=+o.dataset.o===x[5];app.innerHTML=`<h1>${ok?'🎉 Harika!':'💚 Tekrar Düşünelim'}</h1><div class="rulec" style="text-align:center"><div style="font-size:58px">${ok?'🌟':'🌱'}</div><p>${x[6]}</p></div><button class="btn" id="ktagain">← Kendimi Tanıyorum</button>`;gid('ktagain').onclick=kendimi})});
+    app.querySelectorAll('[data-kt]').forEach(b=>b.onclick=()=>{const x=selfQuestions[+b.dataset.kt];app.innerHTML=`<button class="kdback" id="ktcat">‹ Kendimi Tanıyorum</button><div class="kt-hero" style="padding:18px"><div class="kt-eyebrow">🌱 KEŞİF ALANI</div><h1 class="kt-title" style="margin-bottom:0">${x[0]} ${x[1]}</h1></div><div class="kt-intro"><p>${x[2]}</p></div><div class="q st" style="margin-top:12px">${x[3]}</div><div class="opts" style="grid-template-columns:1fr">${x[4].map((o,j)=>`<button class="opt" data-o="${j}" style="text-align:left;font-size:16px;padding:15px;border-radius:16px">${String.fromCharCode(65+j)}) ${o}</button>`).join('')}</div>`;gid('ktcat').onclick=kendimi;app.querySelectorAll('[data-o]').forEach(o=>o.onclick=()=>{const ok=+o.dataset.o===x[5];app.innerHTML=`<h1>${ok?'🎉 Harika!':'💚 Birlikte düşünelim'}</h1><div class="rulec" style="text-align:center"><div style="font-size:58px">${ok?'🌟':'🌱'}</div><p>${x[6]}</p></div><button class="btn" id="ktagain">← Keşif alanlarına dön</button>`;gid('ktagain').onclick=kendimi})});
     gid('kttest').onclick=()=>{if(typeof qzRun==='function')qzRun({title:'🌱 Kendimi Tanıyorum',key:'kendimi',items:selfQuestions.map(x=>({q:x[3],a:x[4][x[5]],o:x[4].filter((_,i)=>i!==x[5]),e:x[6]})),n:8,back:kendimi});};
   }
   window.kendimi=kendimi;
@@ -17094,7 +17374,7 @@ setInterval(notice,60000);setTimeout(notice,2500);
    seg.classList.add("sx");
    seg.querySelectorAll("button").forEach(b=>{
     if(b.dataset.sx===b.textContent)return;
-    const raw=(b.dataset.raw&&b.dataset.sxt===b.textContent)?b.dataset.raw:b.textContent.trim();
+    const raw=(b.dataset.raw&&b.querySelector(".sx-i"))?b.dataset.raw:b.textContent.trim();
     const m=raw.match(/^(\S+)\s+(.*)$/)||[0,"⚙️",raw];const ic=m[1],rest=m[2];
     const kv=rest.split(/:\s*/);const label=kv[0],st=kv[1];
     const tail=st===undefined?'<span class="sx-ch">›</span>':(st==="Açık"||st==="Kapalı")?'<span class="sx-sw'+(st==="Açık"?" on":"")+'"></span>':'<span class="sx-pill">'+esc(st)+'</span>';
@@ -17395,6 +17675,120 @@ html body #hud{background:color-mix(in srgb,var(--bg) 93%,transparent)!important
 .ov{backdrop-filter:blur(3px)!important;-webkit-backdrop-filter:blur(3px)!important}
 #app *{scroll-behavior:auto}
 </style>
+<style id="kidomind-premium-opening">
+/* Premium açılış — mevcut ekran akışını ve uygulama mantığını korur. */
+#splash.kd2{
+  isolation:isolate;
+  background:
+    radial-gradient(ellipse 78% 46% at 50% 37%,rgba(69,76,196,.34),transparent 74%),
+    radial-gradient(ellipse 62% 45% at 8% 92%,rgba(104,49,174,.22),transparent 72%),
+    linear-gradient(155deg,#050817 0%,#0b1230 48%,#11102f 100%)!important;
+}
+#splash.kd2::before{
+  content:"";position:absolute;inset:12px;border:1px solid rgba(190,205,255,.12);
+  width:auto;height:auto;aspect-ratio:auto;
+  border-radius:clamp(26px,5vw,42px);pointer-events:none;z-index:1;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.035),0 0 0 1px rgba(4,8,28,.3);
+}
+#splash.kd2::after{
+  content:"";position:absolute;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(ellipse 40% 30% at 50% 43%,rgba(111,111,255,.13),transparent 72%),
+    radial-gradient(ellipse 70% 42% at 50% 100%,rgba(38,181,221,.08),transparent 74%);
+}
+#splash.kd2 #spf{position:absolute;inset:0;z-index:1;pointer-events:none}
+#splash.kd2 .sp-blob{
+  display:block!important;position:absolute;width:min(78vw,430px);aspect-ratio:1;
+  border-radius:50%;filter:blur(38px);opacity:.18;pointer-events:none;
+  mix-blend-mode:screen;will-change:transform,opacity;
+  animation:kdGlow 14s ease-in-out infinite alternate!important;
+}
+#splash.kd2 .b1{left:-26%;top:2%;background:#6857ed;animation-delay:-5s!important}
+#splash.kd2 .b2{right:-29%;top:27%;background:#1d9bb8;animation-delay:-10s!important}
+#splash.kd2 .b3{left:10%;bottom:-32%;background:#a34ea8;animation-delay:-2s!important}
+@keyframes kdGlow{
+  0%{transform:translate3d(-2%,1%,0) scale(.91);opacity:.13}
+  100%{transform:translate3d(8%,-5%,0) scale(1.09);opacity:.25}
+}
+#splash.kd2 .fl{z-index:1;color:#c5d3ff;text-shadow:0 0 14px rgba(147,164,255,.34)}
+#splash.kd2 .sp-top{
+  z-index:2;position:relative;padding:9px 15px;border:1px solid rgba(255,255,255,.15);
+  border-radius:999px;background:rgba(255,255,255,.055);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08);
+  -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
+  color:rgba(242,245,255,.88);letter-spacing:.3em;
+}
+#splash.kd2 .sp-top small{color:#b8c5ff}
+#splash.kd2 .sp-logo{z-index:2;position:relative;filter:drop-shadow(0 12px 30px rgba(13,18,72,.38))}
+#splash.kd2 .sp-w{animation:kdLogoFloat 5.5s 2s ease-in-out infinite}
+#splash.kd2 .l{
+  text-shadow:0 0 .22em rgba(88,157,255,.5),0 8px 26px rgba(6,10,39,.4);
+}
+#splash.kd2 .l:nth-child(n+5){
+  text-shadow:0 0 .22em rgba(255,190,59,.5),0 8px 26px rgba(6,10,39,.4);
+}
+#splash.kd2 .l.dt:after{box-shadow:0 0 .45em var(--dc),0 0 1.1em var(--dc)}
+#splash.kd2 .sp-logo::after{
+  content:"✦";position:absolute;right:-.5em;top:.02em;
+  color:#d6e5ff;font-size:.22em;opacity:0;
+  text-shadow:0 0 16px #a9c8ff;animation:kdSpark 2.8s 1.8s ease-in-out infinite;
+}
+@keyframes kdLogoFloat{50%{transform:translateY(-4px)}}
+@keyframes kdSpark{0%,100%{opacity:.25;transform:scale(.8) rotate(-12deg)}50%{opacity:1;transform:scale(1.12) rotate(12deg)}}
+#splash.kd2 .sp-line{
+  height:2px;background:linear-gradient(90deg,transparent,#73a9ff 28%,#c5a7ff 68%,#ffd26e,transparent);
+  box-shadow:0 0 16px rgba(127,147,255,.4);
+}
+#splash.kd2 .sp-tg{z-index:2;color:rgba(235,239,255,.82);letter-spacing:.24em}
+#splash.kd2 .sp-tg em{background:#ffd16b;box-shadow:0 0 10px rgba(255,209,107,.65)}
+#splash.kd2 .sp-go{
+  z-index:2;position:relative;min-width:196px;height:62px;border:1px solid rgba(255,255,255,.32);
+  border-radius:22px;background:linear-gradient(135deg,#fff 0%,#e8ecff 100%);
+  color:#20245b;box-shadow:0 16px 36px rgba(2,7,32,.38),0 0 28px rgba(132,126,255,.18),inset 0 1px 0 #fff;
+  animation:spIn .65s 2.15s forwards,kdButtonBreathe 3.2s 2.9s ease-in-out infinite;
+}
+#splash.kd2 .sp-go:before{
+  animation:kdButtonSheen 5.5s 2.6s ease-in-out infinite!important;
+}
+#splash.kd2 .sp-go svg{transition:transform .22s ease}
+#splash.kd2 .sp-go:hover svg{transform:translateX(4px)}
+#splash.kd2 .sp-go:active{transform:scale(.97);box-shadow:0 8px 20px rgba(2,7,32,.3)}
+@keyframes kdButtonBreathe{50%{transform:translateY(-2px);box-shadow:0 20px 42px rgba(2,7,32,.42),0 0 34px rgba(132,126,255,.25),inset 0 1px 0 #fff}}
+@keyframes kdButtonSheen{0%,72%,100%{transform:translateX(-120%);opacity:0}82%{opacity:.8}94%{transform:translateX(120%);opacity:.5}}
+#splash.kd2 .sp-foot{z-index:2;color:rgba(222,230,255,.72);letter-spacing:.2em}
+@media(max-width:420px){
+  #splash.kd2 .sp-logo{font-size:clamp(52px,16.8vw,72px)}
+  #splash.kd2 .sp-tg{gap:8px;font-size:11px;letter-spacing:.19em}
+  #splash.kd2 .sp-go{min-width:184px;height:58px}
+}
+@media(prefers-reduced-motion:reduce){
+  #splash.kd2 .sp-blob,#splash.kd2 .sp-w,#splash.kd2 .sp-logo::after,
+  #splash.kd2 .sp-go,#splash.kd2 .sp-go:before{animation:none!important}
+  #splash.kd2 .l{animation:none!important;opacity:1;filter:none;transform:none}
+  #splash.kd2 .sp-top,#splash.kd2 .sp-tg span,#splash.kd2 .sp-tg em,
+  #splash.kd2 .sp-line,#splash.kd2 .sp-foot{opacity:1;animation:none!important}
+}
+</style>
+<script>
+/* ===== Oyunlara özel mini ses paleti ===== */
+(function(){
+ const app=document.getElementById("app");if(!app)return;
+ const games=[
+  ["zar matematiği","zar"],["yılan ve merdiven","yilan"],["su sıralama","su"],["renk doldur","renk"],["balon nişan","balon"],["piyano karoları","piyano"],["simon","simon"],["zıpla","ziplama"],["şeker patlat","seker"],["hafıza","hafiza"],["sağlıklı sepet","meyve"],["eşleştirme","eslestirme"]
+ ];
+ let last=0;
+ const gameNow=()=>{const h=app.querySelector("h1");if(!h)return null;const t=(h.textContent||"").toLocaleLowerCase("tr-TR");const hit=games.find(([name])=>t.includes(name));return hit&&hit[1]};
+ app.addEventListener("pointerdown",e=>{
+  const g=gameNow();if(!g||!window.soundManager||soundManager.isMuted)return;
+  const el=e.target.closest("button,canvas,[role=button],.ft,.wtube,.bp");if(!el)return;
+  /* Many games already have programmed success/failure tones; these extra textures are subtle and only accompany direct play actions. */
+  const now=Date.now();if(now-last<65)return;last=now;
+  let kind="tap";if(el.matches("button.opt,.storyChoice"))kind="answer";
+  if(el.id==="roll"||el.id==="zm-roll")kind="win";
+  try{soundManager.playMiniSound(g,kind)}catch(_){ }
+ },{passive:true});
+})();
+</script>
 </body>
 </html>
 
@@ -17972,20 +18366,11 @@ html body #hud{background:color-mix(in srgb,var(--bg) 93%,transparent)!important
 @media(prefers-reduced-motion:reduce){.sp2-gift,.sp2-gift:before,.sp2-gift.open,.sp2-fact,.sp2-fe,.sp2-q,.sp2-o,.sp2-res,.sp2-trophy,.sp2-o.ok,.sp2-o.no{animation:none!important}.sp2-bar i{transition:none}}
 </style>
 <script id="kidomind-minigame-fullscreen">
-/* ===== Mini Oyunlar: tam ekran ===== */
+/* Mini oyunlarda otomatik tam ekranı kullanma: mobil tarayıcı bu geçişte
+   viewport yüksekliğini değiştirip ekran sıçramasına neden olabiliyor. */
 (function(){
 try{
- var de=document.documentElement,css=document.createElement("style");
- css.textContent="body.kdfs #kdnav{display:none!important}"+
-  "body.kdfs #app{min-height:100vh;min-height:100dvh;padding-bottom:16px!important}";
- document.head.appendChild(css);
- var fsEl=function(){return document.fullscreenElement||document.webkitFullscreenElement||null};
- function enterFS(){
-  try{
-   var f=de.requestFullscreen||de.webkitRequestFullscreen||de.msRequestFullscreen;
-   if(f&&!fsEl()){var p=f.call(de,{navigationUI:"hide"});if(p&&p.catch)p.catch(function(){})}
-  }catch(e){}
- }
+  var fsEl=function(){return document.fullscreenElement||document.webkitFullscreenElement||null};
  function leaveFS(){
   document.body.classList.remove("kdfs");
   try{
@@ -17993,21 +18378,12 @@ try{
     if(x){var p=x.call(document);if(p&&p.catch)p.catch(function(){})}}
   }catch(e){}
  }
- /* Mini oyun kartına dokununca (kullanıcı hareketi içinde) tam ekrana geç */
- document.addEventListener("click",function(e){
-  var t=e.target&&e.target.closest?e.target.closest(".grid[data-arc] > .card, .grid[data-arc] > button"):null;
-  if(!t)return;
-  document.body.classList.add("kdfs");
-  enterFS();
- },true);
- /* Oyun listesine dönülünce tam ekrandan çık */
+  /* Eski bir oyun oturumundan dönülüyorsa tam ekranı temizle. */
  var oa=window.arcade;
  if(typeof oa==="function"){
   window.arcade=function(){
    leaveFS();
-   var r=oa.apply(this,arguments);
-   try{var g=document.getElementById("app").querySelector(".grid");if(g)g.setAttribute("data-arc","1")}catch(e){}
-   return r;
+    return oa.apply(this,arguments);
   };
  }
  var oh=window.hub;
@@ -18152,6 +18528,12 @@ body.kdp-open{overflow:hidden}
 .kdp-first i{font-style:normal;font-size:34px;flex:0 0 auto}
 .kdp-first b{display:block;font-size:14.5px;font-weight:900;color:var(--tx,#1d2340)}
 .kdp-first small{display:block;margin-top:2px;font-size:12px;font-weight:700;line-height:1.35;color:var(--mu,#6b7280)}
+.kdp-parent-overview{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 0 12px}
+.kdp-parent-overview>div{display:flex;align-items:flex-start;gap:8px;padding:10px;border:1px solid color-mix(in srgb,#7c3aed 15%,var(--bd,#e4e7f5));border-radius:15px;background:color-mix(in srgb,#7c3aed 5%,var(--card,#fff))}
+.kdp-parent-overview i{font-style:normal;font-size:21px;line-height:1.1}
+.kdp-parent-overview b{display:block;font-size:12px;font-weight:900;color:var(--tx,#1d2340)}
+.kdp-parent-overview small{display:block;margin-top:2px;font-size:10.5px;line-height:1.3;color:var(--mu,#6b7280)}
+.kdp-wl .kdp-foot .kdp-cta{white-space:normal;line-height:1.2}
 @media (prefers-reduced-motion:reduce){.kdp-cf{animation:none;display:none}}
 </style>
 <script id="kidomind-premium">
@@ -18169,15 +18551,25 @@ const CFG={
  TRIAL_DAYS:3,
  MINI_SECONDS:600,                       /* Mini Oyunlar: toplam 10 dakika */
  LIMITS:{home:10,lessons:10,learn:5,games:5,misc:10},
- PRICES:{monthly:"149,90 ₺",yearly:"899,90 ₺",lifetime:"2.699,90 ₺"},
- PRODUCTS:{monthly:"premium-monthly",yearly:"premium-yearly",lifetime:"premium_lifetime"},
- MANAGE_URL:"https://play.google.com/store/account/subscriptions"
+ PRICES:{monthly:"149,90 ₺",yearly:"899,90 ₺",lifetime:"1.599,99 TL"},
+ PRODUCTS:{monthly:"premium-monthly",yearly:"premium-yearly-v2",lifetime:"premium_lifetime"},
+ MANAGE_URL:"https://play.google.com/store/account/subscriptions",
+ /* SUNUCU DOĞRULAMA (isteğe bağlı): iaptic vb. bir makbuz doğrulama servisinin URL'si. Boşsa yalnızca cihazdaki Google Play kaydı kullanılır. */
+ VALIDATOR_URL:"",
+ /* Android uygulamada ücretsiz deneme Google Play'in kendi deneme teklifiyle verilir: hak Google hesabına bağlıdır,
+    veri silme / yeniden yükleme ile tekrarlanamaz. Play Console'da bu aboneliğin base plan'ına 3 günlük
+    "ücretsiz deneme" teklifi eklenmiş olmalı. Tarayıcı / köprüsüz sürümde yerel deneme kullanılır. */
+ TRIAL_PLAN:"yearly"
 };
 const KEY="kdprem-v1";            /* "mat-" ile başlamaz: yedeğe girmez, yedekten geri yüklenemez */
-const DEF={plan:null,until:0,trial:0,trialEnd:0,seen:0,used:{},mini:0};
-let S=(function(){try{const o=JSON.parse(localStorage.getItem(KEY)||"null");return Object.assign({},DEF,o&&typeof o==="object"?o:{},{used:Object.assign({},(o&&o.used)||{})})}catch(e){return Object.assign({},DEF,{used:{}})}})();
+const DEF={plan:null,until:0,trial:0,trialEnd:0,seen:0,used:{},mini:0,src:null,sig:""};
+const SIG=window.__kdSig||function(){return""};
+let S=(function(){try{const o=JSON.parse(localStorage.getItem(KEY)||"null");const s=Object.assign({},DEF,o&&typeof o==="object"?o:{},{used:Object.assign({},(o&&o.used)||{})});
+ /* Elle değiştirilmiş premium/deneme kaydı: imza uyuşmazsa premium kapanır, deneme bitmiş sayılır */
+ if((s.plan||s.trial)&&s.sig!==SIG(s)){s.plan=null;s.until=0;s.src=null;if(s.trial){s.trial=1;s.trialEnd=1}}
+ return s}catch(e){return Object.assign({},DEF,{used:{}})}})();
 let lastSave=0;
-function save(force){const n=Date.now();if(!force&&n-lastSave<1500)return;lastSave=n;try{S.seen=Math.max(S.seen||0,n);localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function save(force){const n=Date.now();if(!force&&n-lastSave<1500)return;lastSave=n;try{S.seen=Math.max(S.seen||0,n);S.sig=SIG(S);localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
 const now=()=>Math.max(Date.now(),S.seen||0);    /* saati geri alıp denemeyi uzatmayı engeller */
 const planActive=()=>!!S.plan&&(S.plan==="lifetime"||(S.until||0)>now());
 const trialLeft=()=>S.trial?Math.max(0,S.trial+CFG.TRIAL_DAYS*864e5-now()):0;
@@ -18433,9 +18825,22 @@ document.addEventListener("visibilitychange",()=>{if(document.hidden)save(true)}
 window.addEventListener("pagehide",()=>save(true));
 
 /* ---------- SATIN ALMA / DENEME ---------- */
-function grant(plan,expiresAt){
- S.plan=plan;S.until=plan==="lifetime"?0:(expiresAt||Date.now()+(plan==="yearly"?366:31)*864e5);save(true);
+function grant(plan,expiresAt,src){
+ S.src=src||null;S.plan=plan;S.until=plan==="lifetime"?0:(expiresAt||Date.now()+(plan==="yearly"?366:31)*864e5);save(true);
  unlockParent();sched();
+}
+async function startTrialFlow(){
+ const B=window.KidomindBilling;
+ if(B&&typeof B.startTrial==="function"){
+  try{
+   const r=await B.startTrial(CFG.PRODUCTS[CFG.TRIAL_PLAN],CFG.TRIAL_PLAN);
+   if(r&&r.ok!==false){grant(CFG.TRIAL_PLAN,r.expiresAt,"store");welcome(CFG.TRIAL_PLAN);return}
+   if(r&&r.error==="deneme-yok"){S.trial=1;S.trialEnd=1;save(true);closePaywall();T("Ücretsiz deneme hakkın daha önce kullanılmış veya şu an sunulmuyor");sched();return}
+   T("Deneme başlatılamadı");
+  }catch(e){T("Deneme başlatılamadı, lütfen tekrar dene")}
+  return;
+ }
+ if(startTrial())welcome("trial");
 }
 function startTrial(){
  if(S.trial)return false;S.trial=Date.now();S.trialEnd=0;save(true);unlockParent();wasPrem=true;sched();return true;
@@ -18443,22 +18848,18 @@ function startTrial(){
 const T=m=>{try{(window.toast||function(){})(m)}catch(e){}};
 async function purchase(plan){
  const B=window.KidomindBilling;
- if(!Object.prototype.hasOwnProperty.call(CFG.PRODUCTS,plan)){T("Paket bilgisi bulunamadı. Lütfen uygulamayı güncelle.");return}
  if(B&&typeof B.purchase==="function"){
-  try{
-   const r=await B.purchase(CFG.PRODUCTS[plan],plan);
-   if(r&&r.ok===true&&r.plan===plan){grant(plan,r.expiresAt);welcome(plan)}
-   else T("Google Play satın alımı tamamlanmadı. Ödeme alınmış görünmüyorsa tekrar deneyebilirsin.");
-  }catch(e){T("Google Play açılamadı. Uygulamanın Play Store'dan yüklenen güncel sürüm olduğundan emin ol.")}
+  try{const r=await B.purchase(CFG.PRODUCTS[plan],plan);if(r&&r.ok!==false){grant(plan,r.expiresAt,"store");welcome(plan)}else T("Satın alma tamamlanmadı")}
+  catch(e){T("Satın alma başarısız oldu, lütfen tekrar dene")}
   return;
  }
  if(CFG.TEST_MODE){grant(plan);welcome(plan,true);return}
- T("Google Play satın alma bağlantısı bu sürümde bulunamadı. Lütfen uygulamayı Play Store'dan yükleyip tekrar dene.");
+ T(S.trial?"Satın alma yakında Google Play üzerinden açılacak 💜":"Satın alma yakında açılacak. Şimdilik 3 gün ücretsiz deneyebilirsin 🎁");
 }
 async function restore(){
  const B=window.KidomindBilling;
  if(B&&typeof B.restore==="function"){
-  try{const r=await B.restore();if(r&&r.plan){grant(r.plan,r.expiresAt);done("✅ Satın alımların geri yüklendi")}else T("Geri yüklenecek satın alım bulunamadı")}
+  try{const r=await B.restore();if(r&&r.plan){grant(r.plan,r.expiresAt,"store");done("✅ Satın alımların geri yüklendi")}else T("Geri yüklenecek satın alım bulunamadı")}
   catch(e){T("Geri yükleme başarısız oldu")}
   return;
  }
@@ -18467,26 +18868,29 @@ async function restore(){
 function done(msg){closePaywall();T(msg);sched()}
 
 /* ---------- SATIN ALMA SONRASI HOŞ GELDİN EKRANI ---------- */
-function childName(){try{const c=JSON.parse(localStorage.getItem("kdprem-child")||"null");return c&&c.name?String(c.name).trim().slice(0,24):""}catch(e){return ""}}
 function welcome(plan,test){
  try{
   closePaywall();
   const ov=document.createElement("div");ov.id="kdp-ov";ov.setAttribute("role","dialog");ov.setAttribute("aria-modal","true");
   ov.innerHTML='<div class="kdp-sheet kdp-wl"></div>';document.body.appendChild(ov);document.body.classList.add("kdp-open");
-  const nm=childName(),sh=ov.firstChild;
+   const sh=ov.firstChild;
   const cf=["🎉","⭐","✨","🎊","💜","🌟","🎉","✨","⭐","🎊"].map((e,i)=>'<i class="kdp-cf" style="left:'+((i*9+4)%92)+'%;animation-delay:-'+((i*0.37)%3).toFixed(2)+'s">'+e+'</i>').join("");
-  const exp=plan==="lifetime"?"Süresiz":new Date(S.until).toLocaleDateString("tr-TR");
-  const expL=plan==="lifetime"?"Süre":"Yenileme";
-  sh.innerHTML='<div class="kdp-hero">'+cf+'<div class="kdp-crown">🦊👑</div><h2>Premium açıldı!</h2><p class="kdp-wl-h">'+(nm?"Hoş geldin, "+esc(nm)+"! 🎉":"Hoş geldin! 🎉")+'</p></div>'
-   +'<div class="kdp-body"><div class="kdp-st"><div><span>Plan</span><b>'+PLAN_N[plan]+(test?" (test)":"")+'</b></div><div><span>'+expL+'</span><b>'+exp+'</b></div></div>'
-   +'<div class="kdp-wl-t">Şunlar artık senin:</div>'
+   const isTrial=plan==="trial",exp=isTrial?new Date(S.trial+CFG.TRIAL_DAYS*864e5).toLocaleDateString("tr-TR"):plan==="lifetime"?"Süresiz":new Date(S.until).toLocaleDateString("tr-TR");
+   const expL=isTrial?"Deneme bitişi":plan==="lifetime"?"Süre":"Yenileme",planText=isTrial?"3 günlük ücretsiz deneme":(PLAN_N[plan]||"Premium");
+   sh.innerHTML='<div class="kdp-hero">'+cf+'<div class="kdp-crown">🦊👑</div><h2>Aramıza hoş geldin!</h2><p class="kdp-wl-h">Kidomind Premium ailen için aktif. Şimdi uygulamadaki yeniliklere göz atalım 🎉</p></div>'
+    +'<div class="kdp-body"><div class="kdp-st"><div><span>Plan</span><b>'+planText+(test?" (test)":"")+'</b></div><div><span>'+expL+'</span><b>'+exp+'</b></div></div>'
+    +'<div class="kdp-wl-t">Premium ile açılan özellikler</div>'
    +'<ul class="kdp-feat">'+FEAT.map(f=>'<li><i>'+f[0]+'</i><span><b>'+f[1]+'</b><small>'+f[2]+'</small></span></li>').join("")+'</ul>'
-   +'<div class="kdp-first"><i>🎬</i><span><b>İlk hediyen hazır!</b><small>İnteraktif Çizgi Hikâyeler: hikâyeyi sen yönet, seçimlerin sonu değiştirir.</small></span></div></div>'
-   +'<div class="kdp-foot"><button class="kdp-cta" type="button" data-a="first">🎬 Hikâyeyi Başlat</button><button class="kdp-link" type="button" data-a="home">Sonra bakarım, ana sayfaya dön</button></div>';
-  const go=()=>{closePaywall();setTimeout(()=>{try{if(typeof window.interactiveStories==="function")window.interactiveStories();else if(typeof window.hub==="function")window.hub()}catch(e){console.error(e)}},60)};
-  ov.addEventListener("click",e=>{if(e.target===ov)closePaywall()});
-  sh.querySelector("[data-a=first]").addEventListener("click",go);
-  sh.querySelector("[data-a=home]").addEventListener("click",closePaywall);
+    +'<div class="kdp-wl-t">Ebeveyn kontrolünde seni neler bekliyor?</div>'
+    +'<div class="kdp-parent-overview">'
+    +'<div><i>⏱️</i><span><b>Süre ve molalar</b><small>Ekran, oyun ve mola sınırlarını yönet.</small></span></div>'
+    +'<div><i>📊</i><span><b>Gelişim raporu</b><small>Ders ve konu başarılarını takip et.</small></span></div>'
+    +'<div><i>👨‍👩‍👧</i><span><b>Çocuk profilleri</b><small>Profilleri ve çocuk şifrelerini düzenle.</small></span></div>'
+    +'<div><i>🔐</i><span><b>Güvenlik ve yedek</b><small>Ebeveyn PIN’i, kurtarma kodu ve yedekleme.</small></span></div></div>'
+    +'<div class="kdp-first"><i>🔑</i><span><b>Önce ebeveyn şifreni oluştur</b><small>İlk kurulumda matematik sorusu olmadan 4–6 haneli şifreni belirle; ardından ebeveyn paneli açılacak.</small></span></div></div>'
+    +'<div class="kdp-foot"><button class="kdp-cta" type="button" data-a="parent">🔐 Şifre Oluştur ve Ebeveyn Kontrolüne Geç</button></div>';
+   const go=()=>{closePaywall();setTimeout(()=>{try{if(typeof window.kdPremiumParentSetup==="function")window.kdPremiumParentSetup();else if(typeof window.parentPanel==="function")window.parentPanel();else if(typeof window.hub==="function")window.hub()}catch(e){console.error("welcome parent:",e)}},60)};
+   sh.querySelector("[data-a=parent]").addEventListener("click",go);
   sched();
  }catch(e){console.error("welcome:",e);done("🎉 Premium aktif! Teşekkürler 💜")}
 }
@@ -18528,13 +18932,13 @@ function render(ov){
  }else{
   const tl=trialLeft(),canTrial=!S.trial;
   const P=CFG.PRICES;
-  const plans=[["monthly","🌙 Aylık","Her ay yenilenir",P.monthly,"/ ay",""],["yearly","🌟 Yıllık","Ayda ≈ 75 ₺ • %50 tasarruf",P.yearly,"/ yıl","EN AVANTAJLI"],["lifetime","💎 Ömür boyu","Tek seferlik ödeme • sınırsız",P.lifetime,"tek sefer","TEK SEFERLİK"]];
+  const plans=[["monthly","🌙 Aylık","Her ay yenilenir",P.monthly,"/ ay",""],["yearly","🌟 Yıllık","Ayda ≈ 75 ₺ • %50 tasarruf",P.yearly,"/ yıl","EN AVANTAJLI"],["lifetime","💎 Ömür boyu","%75 indirimli • Tek seferlik ödeme • sınırsız",P.lifetime,"tek sefer","%75 İNDİRİM"]];
   sh.innerHTML='<div class="kdp-hero">'+x+'<i class="kdp-sp s1">✨</i><i class="kdp-sp s2">⭐</i><i class="kdp-sp s3">✨</i><i class="kdp-sp s4">🌟</i><div class="kdp-crown">🦊👑</div><h2>Kidomind Premium</h2><p class="kdp-rs">'+reasonText(reason,info)+'</p></div><div class="kdp-body">'
    +'<div class="kdp-plans">'+plans.map(p=>'<button type="button" class="kdp-plan'+(sel===p[0]?" on":"")+'" data-p="'+p[0]+'">'+(p[5]?'<span class="kdp-tag">'+p[5]+'</span>':'')+'<span class="r"></span><span class="t"><b>'+p[1]+'</b><small>'+p[2]+'</small></span><span class="p">'+p[3]+'<small>'+p[4]+'</small></span></button>').join("")+'</div>'
    +'<ul class="kdp-feat">'+FEAT.map(f=>'<li><i>'+f[0]+'</i><span><b>'+f[1]+'</b><small>'+f[2]+'</small></span></li>').join("")+'</ul>'
    +'<div class="kdp-trust"><span>🚫 Reklamsız</span><span>📴 Çevrimdışı</span><span>🔒 Google Play ile güvenli ödeme</span></div><p class="kdp-fine">Aylık ve yıllık planlar Google Play hesabın üzerinden otomatik yenilenir; istediğin zaman Play Store › Abonelikler bölümünden iptal edebilirsin. Ömür boyu plan tek seferlik ödemedir. Ödeme Google Play tarafından alınır.</p></div>'
    +'<div class="kdp-foot"><button class="kdp-cta" type="button" data-a="buy">👑 '+PLAN_N[sel]+' Premium Al • '+P[sel]+'</button>'
-   +(tl>0?'<p class="kdp-note">🎁 Ücretsiz deneme aktif • '+fmtLeft(tl)+' kaldı</p>':canTrial?'<button class="kdp-trial" type="button" data-a="trial">🎁 3 Gün Ücretsiz Dene<small>Tüm kilitler 3 gün açılır • bir kez kullanılır</small></button>':'')
+   +(tl>0?'<p class="kdp-note">🎁 Ücretsiz deneme aktif • '+fmtLeft(tl)+' kaldı</p>':canTrial?'<button class="kdp-trial" type="button" data-a="trial">🎁 3 Gün Ücretsiz Dene<small>'+(window.KidomindBilling&&window.KidomindBilling.startTrial?"Google Play ile • deneme bitince "+PLAN_N[CFG.TRIAL_PLAN].toLowerCase()+" plan "+P[CFG.TRIAL_PLAN]+" olarak yenilenir • istediğin zaman iptal et":"Tüm kilitler 3 gün açılır • bir kez kullanılır")+'</small></button>':'')
    +'<button class="kdp-link" type="button" data-a="restore">Satın alımları geri yükle</button></div>';
 
  }
@@ -18544,7 +18948,7 @@ function render(ov){
   const a=b.dataset.a;
   if(a==="close")closePaywall();
   else if(a==="buy")gate(ov,()=>purchase(sel));
-  else if(a==="trial")gate(ov,()=>{if(startTrial()){closePaywall();T("🎉 3 günlük ücretsiz deneme başladı! Tüm kilitler açık")}});
+   else if(a==="trial")gate(ov,()=>startTrialFlow());
   else if(a==="restore")restore();
   else if(a==="manage"){const B=window.KidomindBilling;try{if(B&&B.manage)B.manage();else window.open(CFG.MANAGE_URL,"_blank")}catch(e){}}
  }));
@@ -18571,7 +18975,9 @@ window.KidomindPremium={
  status:()=>({premium:isPremium(),plan:S.plan,until:S.until||0,trialStarted:S.trial||0,trialMsLeft:trialLeft(),used:Object.assign({},S.used),miniSeconds:S.mini||0}),
  openPaywall:(r,i)=>openPaywall(r||"strip",i),
  /* Google Play'den doğrulanmış satın alma geldiğinde çağır: grantFromStore({plan:"yearly",expiresAt:ms}) */
- grantFromStore:o=>{if(o&&PLAN_N[o.plan])grant(o.plan,o.expiresAt)},
+ grantFromStore:o=>{if(o&&PLAN_N[o.plan])grant(o.plan,o.expiresAt,"store")},
+ /* Google Play kaydında artık sahip olunmayan (iptal/iade/süresi dolan) satın alımı kapatır; deneme ve test premium'a dokunmaz */
+ revokeFromStore:()=>{if(S.src==="store"&&S.plan){S.plan=null;S.until=0;S.src=null;save(true);unlockParent();sched();T("Premium aboneliğin sona erdi")}},
  /* Abonelik iptal/bitti ise çağır */
  revoke:()=>{S.plan=null;S.until=0;save(true);sched()},
  /* Test için: tüm sayaçları sıfırla */
@@ -18592,79 +18998,132 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
 </script>
 <script id="kidomind-billing">
 /* ===== KIDOMIND GOOGLE PLAY FATURALANDIRMA KÖPRÜSÜ =====
-   Capacitor + cordova-plugin-purchase (CdvPurchase) gerektirir.
-   Ürün kimlikleri Play Console ile birebir aynı olmalıdır. */
+   Capacitor + "cordova-plugin-purchase" (CdvPurchase). Tarayıcıda hiçbir şey yapmaz.
+   Play Console yapısı: ABONELİK kimliği = kidomind_premium_monthly; içindeki TEMEL PLANLAR = premium-monthly, premium-yearly-v2 (eski premium-yearly devre dışı);
+   TEK SEFERLİK ürün = premium_lifetime. Fiyatlar Play'den okunur (sabit fiyat yalnızca yedektir). */
 (function(){
 "use strict";
 let native=false;
-try{native=!!(window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform())}catch(e){}
+try{native=!!(window.Capacitor&&Capacitor.isNativePlatform&&Capacitor.isNativePlatform())}catch(e){}
 if(!native||window.KidomindBilling)return;
 
-const PRODUCTS={"premium-monthly":"monthly","premium-yearly":"yearly","premium_lifetime":"lifetime"};
-const ORDER=["lifetime","yearly","monthly"];
-const idOf=pl=>Object.keys(PRODUCTS).find(k=>PRODUCTS[k]===pl);
+const SUB="kidomind_premium_monthly",LIFE="premium_lifetime";
+const BASE={monthly:"premium-monthly",yearly:"premium-yearly-v2"};
 const MANAGE_URL="https://play.google.com/store/account/subscriptions";
 let C=null,store=null,initP=null;const pending={};
+const GP=()=>C.Platform.GOOGLE_PLAY;
 
 const waitLib=ms=>new Promise((res,rej)=>{const t0=Date.now();(function chk(){
  if(window.CdvPurchase)return res(window.CdvPurchase);
- if(Date.now()-t0>ms)return rej(new Error("Google Play billing eklentisi bulunamadı"));
+ if(Date.now()-t0>ms)return rej(new Error("purchase plugin yok"));
  setTimeout(chk,300)})()});
-const grant=pl=>{try{window.KidomindPremium&&window.KidomindPremium.grantFromStore({plan:pl})}catch(e){}};
+const grant=(pl,exp)=>{try{window.KidomindPremium&&KidomindPremium.grantFromStore({plan:pl,expiresAt:exp})}catch(e){}};
+const hasTrial=o=>{try{return (o.pricingPhases||[]).some(p=>p.paymentMode===C.PaymentMode.FREE_TRIAL)}catch(e){return false}};
+const offersOf=(prod,pl)=>((prod&&prod.offers)||[]).filter(o=>String((o&&o.id)||"").indexOf(BASE[pl])===0);
+const planFromOfferId=s=>{s=String(s||"");return s.indexOf(BASE.yearly)===0?"yearly":s.indexOf(BASE.monthly)===0?"monthly":null};
+
+/* Abonelikte hangi temel plan (aylık/yıllık) aktif? Önce işlem kayıtlarına bak, yoksa son bilinen plan */
+function subPlan(){
+ try{for(const t of (store.localTransactions||[]))for(const p of (t.products||[]))if(p.id===SUB){const pl=planFromOfferId(p.offerId);if(pl)return pl}}catch(e){}
+ try{const s=window.KidomindPremium&&KidomindPremium.status().plan;if(s==="yearly"||s==="monthly")return s}catch(e){}
+ return "monthly";
+}
+function planOfProd(p){
+ if(p.id===LIFE)return "lifetime";
+ if(p.id!==SUB)return null;
+ return planFromOfferId(p.offerId)||(pending[SUB]&&pending[SUB].plan)||subPlan();
+}
 function ownedPlan(){
- for(const pl of ORDER){try{if(store.owned({id:idOf(pl),platform:C.Platform.GOOGLE_PLAY}))return pl}catch(e){}}
+ try{if(store.owned({id:LIFE,platform:GP()}))return "lifetime"}catch(e){}
+ try{if(store.owned({id:SUB,platform:GP()}))return subPlan()}catch(e){}
  return null;
 }
 function syncOwned(){const pl=ownedPlan();if(pl)grant(pl);return pl}
-function resolveProducts(products){
- (products||[]).forEach(p=>{
-  const id=typeof p==="string"?p:(p&&p.id);
-  const pl=PRODUCTS[id];if(!pl)return;
-  grant(pl);
-  const w=pending[id];if(w){delete pending[id];w.res({ok:true,plan:pl})}
- });
+
+/* Fiyatları Play'den oku (yerel para birimi, Play'deki güncel fiyat) */
+function updatePrices(){
+ try{
+  const cfg=window.KidomindPremium&&KidomindPremium.config;if(!cfg||!cfg.PRICES)return;
+  const sp=store.get(SUB,GP());
+  ["monthly","yearly"].forEach(pl=>{
+   const o=offersOf(sp,pl).find(x=>!hasTrial(x));
+   const ph=o&&(o.pricingPhases||[]).filter(p=>p.paymentMode!==C.PaymentMode.FREE_TRIAL).pop();
+   if(ph&&ph.price)cfg.PRICES[pl]=ph.price;
+  });
+  const lp=store.get(LIFE,GP()),lo=lp&&lp.getOffer&&lp.getOffer(),lph=lo&&lo.pricingPhases&&lo.pricingPhases[0];
+  if(lph&&lph.price)cfg.PRICES.lifetime=lph.price;
+ }catch(e){}
 }
+
+async function order(productId,offer,plan){
+ if(!offer)return{ok:false,error:"urun-bulunamadi"};
+ const done=new Promise(res=>{pending[productId]={res,plan}});
+ const err=await offer.order();
+ if(err){delete pending[productId];return{ok:false,error:err.message||String(err.code)}}
+ const r=await Promise.race([done,new Promise(res=>setTimeout(()=>res(null),90000))]);
+ if(!r){delete pending[productId];return{ok:false,error:"zaman-asimi"}}
+ return{ok:true,plan:r};
+}
+
 function init(){
  if(initP)return initP;
  initP=waitLib(15000).then(async lib=>{
   C=lib;store=lib.store;
-  const G=C.Platform.GOOGLE_PLAY;
+  const G=GP();
   store.register([
-   {id:"premium-monthly",type:C.ProductType.PAID_SUBSCRIPTION,platform:G},
-   {id:"premium-yearly",type:C.ProductType.PAID_SUBSCRIPTION,platform:G},
-   {id:"premium_lifetime",type:C.ProductType.NON_CONSUMABLE,platform:G}
+   {id:SUB,type:C.ProductType.PAID_SUBSCRIPTION,platform:G},
+   {id:LIFE,type:C.ProductType.NON_CONSUMABLE,platform:G}
   ]);
-  /* Önemli: Premium yalnızca doğrulanmış (verified) makbuzdan sonra açılır. */
-  store.when().approved(transaction=>{
-   try{transaction.verify()}catch(e){}
-  });
-  store.when().verified(receipt=>{
-   try{
-    (receipt.transactions||[]).forEach(transaction=>resolveProducts(transaction.products||[]));
-    /* Bazı eklenti sürümlerinde ürünler doğrudan receipt üzerinde bulunur. */
-    if(receipt.products)resolveProducts(receipt.products);
-    receipt.finish();
-   }catch(e){}
-  });
-  store.when().receiptsReady(()=>{syncOwned()});
-  await store.initialize([G]);
-  syncOwned();
+  const vurl=(window.KidomindPremium&&KidomindPremium.config&&KidomindPremium.config.VALIDATOR_URL)||"";
+  const settle=(id,pl)=>{const w=pending[id];if(w){delete pending[id];w.res(pl)}};
+  if(vurl){
+   /* Sunucu doğrulaması açık: önce doğrulat, premium'u yalnızca doğrulanınca ver */
+   store.validator=vurl;
+   store.when().approved(tr=>{try{tr.verify()}catch(e){}});
+   store.when().verified(rc=>{
+    let any=false;
+    try{(rc.collection||[]).forEach(c=>{const pl=planOfProd({id:c.id,offerId:c.offerId});if(!pl)return;any=true;grant(pl,c.expiryDate?+new Date(c.expiryDate):undefined);settle(c.id,pl)})}catch(e){}
+    if(!any)syncOwned();
+    try{rc.finish()}catch(e){}
+   });
+  }else{
+   /* Satın alma onaylanınca: premium'u aç, Google'a "onaylandı (acknowledge)" bildir */
+   store.when().approved(tr=>{
+    (tr.products||[]).forEach(p=>{
+     const pl=planOfProd(p);if(!pl)return;
+     let exp;try{if(tr.expirationDate)exp=+new Date(tr.expirationDate)}catch(e){}
+     grant(pl,exp);settle(p.id,pl);
+    });
+    try{tr.finish()}catch(e){}
+   });
+  }
+  /* İptal/iade/süre bitimi: Play kayıtları hatasız yüklendiyse ve sahip olunan ürün yoksa premium'u kapat */
+  let ready=false,initOK=false;
+  const checkRevoke=()=>{if(!ready||!initOK)return;if(syncOwned())return;try{KidomindPremium.revokeFromStore()}catch(e){}};
+  store.when().receiptsReady(()=>{ready=true;syncOwned();checkRevoke()});
+  store.when().productUpdated(()=>updatePrices());
+  const errs=await store.initialize([G]);
+  initOK=!(Array.isArray(errs)&&errs.length);
+  updatePrices();
+  checkRevoke();
  }).catch(e=>{initP=null;throw e});
  return initP;
 }
+
 window.KidomindBilling={
  async purchase(productId,plan){
   await init();
-  if(PRODUCTS[productId]!==plan)return{ok:false,error:"product-plan-mismatch"};
-  const prod=store.get(productId,C.Platform.GOOGLE_PLAY);
-  const offer=prod&&prod.getOffer&&prod.getOffer();
-  if(!offer)return{ok:false,error:"product-not-available-in-play-console"};
-  const done=new Promise(res=>{pending[productId]={res}});
-  const err=await offer.order();
-  if(err){delete pending[productId];return{ok:false,error:err.message||String(err.code)}}
-  const r=await Promise.race([done,new Promise(res=>setTimeout(()=>res(null),120000))]);
-  if(!r){delete pending[productId];return{ok:false,error:"verification-timeout"}}
-  return r;
+  if(plan==="lifetime"){const lp=store.get(LIFE,GP());return order(LIFE,lp&&lp.getOffer&&lp.getOffer(),"lifetime")}
+  /* Normal satın almada ücretsiz deneme fazı içermeyen teklif seçilir */
+  const offer=offersOf(store.get(SUB,GP()),plan).find(o=>!hasTrial(o));
+  return order(SUB,offer,plan);
+ },
+ async startTrial(productId,plan){
+  await init();
+  /* Google deneme teklifini yalnızca hakkı olan hesaba gösterir; yoksa "deneme-yok" döner */
+  const offer=offersOf(store.get(SUB,GP()),plan).find(hasTrial);
+  if(!offer)return{ok:false,error:"deneme-yok"};
+  return order(SUB,offer,plan);
  },
  async restore(){
   await init();
@@ -18673,10 +19132,12 @@ window.KidomindBilling={
   return pl?{plan:pl}:{plan:null};
  },
  manage(){
-  init().then(()=>store.manageSubscriptions(C.Platform.GOOGLE_PLAY))
+  init().then(()=>store.manageSubscriptions(GP()))
    .catch(()=>{try{window.open(MANAGE_URL,"_blank")}catch(e){}});
  }
 };
+
+/* Uygulama açılınca: Google'da aktif satın alım varsa premium'u yenile */
 setTimeout(()=>{init().catch(()=>{})},1500);
 })();
 </script>
@@ -18885,67 +19346,4 @@ const iv=setInterval(()=>{
  else if(tries>600)clearInterval(iv);
 },250);
 })();
-</script>
-<script>
-// Google Play In-App Purchase (Digital Goods API) Entegrasyonu
-async function satinAl(urunId) {
-  try {
-    // 1. Digital Goods API desteği kontrolü (Play Store TWA ortamında mıyız?)
-    if (!('getDigitalGoodsService' in window)) {
-      alert("Google Play satın alma bağlantısı bu sürümde bulunamadı. Lütfen uygulamayı Play Store'dan yükleyip tekrar dene.");
-      return;
-    }
-
-    // 2. Play Store faturalandırma servisine bağlan
-    const service = await window.getDigitalGoodsService('https://play.google.com/billing');
-    
-    // 3. Ürün detaylarını kontrol et
-    const details = await service.getDetails([urunId]);
-    if (!details || details.length === 0) {
-      alert("Ürün bulunamadı veya henüz aktif değil.");
-      return;
-    }
-
-    // 4. Payment Request ile Google Play ödeme penceresini aç
-    const paymentMethods = [{
-      supportedMethods: 'https://play.google.com/billing',
-      data: {
-        sku: urunId
-      }
-    }];
-
-    const paymentDetails = {
-      total: {
-        label: 'Toplam',
-        amount: { 
-          currency: details[0].price.currency, 
-          value: details[0].price.value 
-        }
-      }
-    };
-
-    const request = new PaymentRequest(paymentMethods, paymentDetails);
-    const paymentResponse = await request.show();
-
-    // 5. Satın alma başarılı, token'ı al ve Google'a onayla
-    const purchaseToken = paymentResponse.details.purchaseToken;
-    
-    // Ömür boyu için consume, abonelikler için acknowledge
-    if (urunId.includes('lifetime')) {
-      await service.consume(purchaseToken); 
-    } else {
-      await service.acknowledge(purchaseToken, 'onboarding'); 
-    }
-
-    await paymentResponse.complete('success');
-    alert("Ödeme başarılı! Premium özellikleriniz aktif edildi.");
-    location.reload();
-
-  } catch (error) {
-    if (error.name !== 'AbortError') {
-      console.error("Satın alma hatası:", error);
-      alert("Ödeme işlemi iptal edildi veya bir hata oluştu: " + error.message);
-    }
-  }
-}
 </script>
