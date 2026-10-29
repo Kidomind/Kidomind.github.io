@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-<script id="kdprem-early">window.__kdSig=function(S){var s=[S.plan||"",S.until||0,S.trial||0,S.trialEnd||0,S.src||"","kd#9fA2"].join("|"),h=2166136261;for(var i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return(h>>>0).toString(36)};window.__kdPremOK=function(){try{var S=JSON.parse(localStorage.getItem("kdprem-v1")||"{}"),n=Math.max(Date.now(),S.seen||0);if((S.plan||S.trial)&&S.sig!==window.__kdSig(S))return false;if(S.plan&&(S.plan==="lifetime"||(S.until||0)>n))return true;return !!S.trial&&S.trial+2592e5>n}catch(e){return false}};</script>
+<script id="kdprem-early">window.__kdPremOK=function(){try{var S=JSON.parse(localStorage.getItem("kdprem-v1")||"{}"),n=Math.max(Date.now(),S.seen||0);if(S.plan&&(S.plan==="lifetime"||(S.until||0)>n))return true;return !!S.trial&&S.trial+2592e5>n}catch(e){return false}};</script>
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -18552,24 +18552,14 @@ const CFG={
  MINI_SECONDS:600,                       /* Mini Oyunlar: toplam 10 dakika */
  LIMITS:{home:10,lessons:10,learn:5,games:5,misc:10},
  PRICES:{monthly:"149,90 ₺",yearly:"899,90 ₺",lifetime:"1.599,99 TL"},
- PRODUCTS:{monthly:"premium-monthly",yearly:"premium-yearly-v2",lifetime:"premium_lifetime"},
- MANAGE_URL:"https://play.google.com/store/account/subscriptions",
- /* SUNUCU DOĞRULAMA (isteğe bağlı): iaptic vb. bir makbuz doğrulama servisinin URL'si. Boşsa yalnızca cihazdaki Google Play kaydı kullanılır. */
- VALIDATOR_URL:"",
- /* Android uygulamada ücretsiz deneme Google Play'in kendi deneme teklifiyle verilir: hak Google hesabına bağlıdır,
-    veri silme / yeniden yükleme ile tekrarlanamaz. Play Console'da bu aboneliğin base plan'ına 3 günlük
-    "ücretsiz deneme" teklifi eklenmiş olmalı. Tarayıcı / köprüsüz sürümde yerel deneme kullanılır. */
- TRIAL_PLAN:"yearly"
+ PRODUCTS:{monthly:"kidomind_premium_monthly",yearly:"kidomind_premium_yearly",lifetime:"premium_lifetime"},
+ MANAGE_URL:"https://play.google.com/store/account/subscriptions"
 };
 const KEY="kdprem-v1";            /* "mat-" ile başlamaz: yedeğe girmez, yedekten geri yüklenemez */
-const DEF={plan:null,until:0,trial:0,trialEnd:0,seen:0,used:{},mini:0,src:null,sig:""};
-const SIG=window.__kdSig||function(){return""};
-let S=(function(){try{const o=JSON.parse(localStorage.getItem(KEY)||"null");const s=Object.assign({},DEF,o&&typeof o==="object"?o:{},{used:Object.assign({},(o&&o.used)||{})});
- /* Elle değiştirilmiş premium/deneme kaydı: imza uyuşmazsa premium kapanır, deneme bitmiş sayılır */
- if((s.plan||s.trial)&&s.sig!==SIG(s)){s.plan=null;s.until=0;s.src=null;if(s.trial){s.trial=1;s.trialEnd=1}}
- return s}catch(e){return Object.assign({},DEF,{used:{}})}})();
+const DEF={plan:null,until:0,trial:0,trialEnd:0,seen:0,used:{},mini:0};
+let S=(function(){try{const o=JSON.parse(localStorage.getItem(KEY)||"null");return Object.assign({},DEF,o&&typeof o==="object"?o:{},{used:Object.assign({},(o&&o.used)||{})})}catch(e){return Object.assign({},DEF,{used:{}})}})();
 let lastSave=0;
-function save(force){const n=Date.now();if(!force&&n-lastSave<1500)return;lastSave=n;try{S.seen=Math.max(S.seen||0,n);S.sig=SIG(S);localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function save(force){const n=Date.now();if(!force&&n-lastSave<1500)return;lastSave=n;try{S.seen=Math.max(S.seen||0,n);localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
 const now=()=>Math.max(Date.now(),S.seen||0);    /* saati geri alıp denemeyi uzatmayı engeller */
 const planActive=()=>!!S.plan&&(S.plan==="lifetime"||(S.until||0)>now());
 const trialLeft=()=>S.trial?Math.max(0,S.trial+CFG.TRIAL_DAYS*864e5-now()):0;
@@ -18825,22 +18815,9 @@ document.addEventListener("visibilitychange",()=>{if(document.hidden)save(true)}
 window.addEventListener("pagehide",()=>save(true));
 
 /* ---------- SATIN ALMA / DENEME ---------- */
-function grant(plan,expiresAt,src){
- S.src=src||null;S.plan=plan;S.until=plan==="lifetime"?0:(expiresAt||Date.now()+(plan==="yearly"?366:31)*864e5);save(true);
+function grant(plan,expiresAt){
+ S.plan=plan;S.until=plan==="lifetime"?0:(expiresAt||Date.now()+(plan==="yearly"?366:31)*864e5);save(true);
  unlockParent();sched();
-}
-async function startTrialFlow(){
- const B=window.KidomindBilling;
- if(B&&typeof B.startTrial==="function"){
-  try{
-   const r=await B.startTrial(CFG.PRODUCTS[CFG.TRIAL_PLAN],CFG.TRIAL_PLAN);
-   if(r&&r.ok!==false){grant(CFG.TRIAL_PLAN,r.expiresAt,"store");welcome(CFG.TRIAL_PLAN);return}
-   if(r&&r.error==="deneme-yok"){S.trial=1;S.trialEnd=1;save(true);closePaywall();T("Ücretsiz deneme hakkın daha önce kullanılmış veya şu an sunulmuyor");sched();return}
-   T("Deneme başlatılamadı");
-  }catch(e){T("Deneme başlatılamadı, lütfen tekrar dene")}
-  return;
- }
- if(startTrial())welcome("trial");
 }
 function startTrial(){
  if(S.trial)return false;S.trial=Date.now();S.trialEnd=0;save(true);unlockParent();wasPrem=true;sched();return true;
@@ -18849,7 +18826,7 @@ const T=m=>{try{(window.toast||function(){})(m)}catch(e){}};
 async function purchase(plan){
  const B=window.KidomindBilling;
  if(B&&typeof B.purchase==="function"){
-  try{const r=await B.purchase(CFG.PRODUCTS[plan],plan);if(r&&r.ok!==false){grant(plan,r.expiresAt,"store");welcome(plan)}else T("Satın alma tamamlanmadı")}
+  try{const r=await B.purchase(CFG.PRODUCTS[plan],plan);if(r&&r.ok!==false){grant(plan,r.expiresAt);welcome(plan)}else T("Satın alma tamamlanmadı")}
   catch(e){T("Satın alma başarısız oldu, lütfen tekrar dene")}
   return;
  }
@@ -18859,7 +18836,7 @@ async function purchase(plan){
 async function restore(){
  const B=window.KidomindBilling;
  if(B&&typeof B.restore==="function"){
-  try{const r=await B.restore();if(r&&r.plan){grant(r.plan,r.expiresAt,"store");done("✅ Satın alımların geri yüklendi")}else T("Geri yüklenecek satın alım bulunamadı")}
+  try{const r=await B.restore();if(r&&r.plan){grant(r.plan,r.expiresAt);done("✅ Satın alımların geri yüklendi")}else T("Geri yüklenecek satın alım bulunamadı")}
   catch(e){T("Geri yükleme başarısız oldu")}
   return;
  }
@@ -18938,7 +18915,7 @@ function render(ov){
    +'<ul class="kdp-feat">'+FEAT.map(f=>'<li><i>'+f[0]+'</i><span><b>'+f[1]+'</b><small>'+f[2]+'</small></span></li>').join("")+'</ul>'
    +'<div class="kdp-trust"><span>🚫 Reklamsız</span><span>📴 Çevrimdışı</span><span>🔒 Google Play ile güvenli ödeme</span></div><p class="kdp-fine">Aylık ve yıllık planlar Google Play hesabın üzerinden otomatik yenilenir; istediğin zaman Play Store › Abonelikler bölümünden iptal edebilirsin. Ömür boyu plan tek seferlik ödemedir. Ödeme Google Play tarafından alınır.</p></div>'
    +'<div class="kdp-foot"><button class="kdp-cta" type="button" data-a="buy">👑 '+PLAN_N[sel]+' Premium Al • '+P[sel]+'</button>'
-   +(tl>0?'<p class="kdp-note">🎁 Ücretsiz deneme aktif • '+fmtLeft(tl)+' kaldı</p>':canTrial?'<button class="kdp-trial" type="button" data-a="trial">🎁 3 Gün Ücretsiz Dene<small>'+(window.KidomindBilling&&window.KidomindBilling.startTrial?"Google Play ile • deneme bitince "+PLAN_N[CFG.TRIAL_PLAN].toLowerCase()+" plan "+P[CFG.TRIAL_PLAN]+" olarak yenilenir • istediğin zaman iptal et":"Tüm kilitler 3 gün açılır • bir kez kullanılır")+'</small></button>':'')
+   +(tl>0?'<p class="kdp-note">🎁 Ücretsiz deneme aktif • '+fmtLeft(tl)+' kaldı</p>':canTrial?'<button class="kdp-trial" type="button" data-a="trial">🎁 3 Gün Ücretsiz Dene<small>Tüm kilitler 3 gün açılır • bir kez kullanılır</small></button>':'')
    +'<button class="kdp-link" type="button" data-a="restore">Satın alımları geri yükle</button></div>';
 
  }
@@ -18948,7 +18925,7 @@ function render(ov){
   const a=b.dataset.a;
   if(a==="close")closePaywall();
   else if(a==="buy")gate(ov,()=>purchase(sel));
-   else if(a==="trial")gate(ov,()=>startTrialFlow());
+   else if(a==="trial")gate(ov,()=>{if(startTrial())welcome("trial")});
   else if(a==="restore")restore();
   else if(a==="manage"){const B=window.KidomindBilling;try{if(B&&B.manage)B.manage();else window.open(CFG.MANAGE_URL,"_blank")}catch(e){}}
  }));
@@ -18975,9 +18952,7 @@ window.KidomindPremium={
  status:()=>({premium:isPremium(),plan:S.plan,until:S.until||0,trialStarted:S.trial||0,trialMsLeft:trialLeft(),used:Object.assign({},S.used),miniSeconds:S.mini||0}),
  openPaywall:(r,i)=>openPaywall(r||"strip",i),
  /* Google Play'den doğrulanmış satın alma geldiğinde çağır: grantFromStore({plan:"yearly",expiresAt:ms}) */
- grantFromStore:o=>{if(o&&PLAN_N[o.plan])grant(o.plan,o.expiresAt,"store")},
- /* Google Play kaydında artık sahip olunmayan (iptal/iade/süresi dolan) satın alımı kapatır; deneme ve test premium'a dokunmaz */
- revokeFromStore:()=>{if(S.src==="store"&&S.plan){S.plan=null;S.until=0;S.src=null;save(true);unlockParent();sched();T("Premium aboneliğin sona erdi")}},
+ grantFromStore:o=>{if(o&&PLAN_N[o.plan])grant(o.plan,o.expiresAt)},
  /* Abonelik iptal/bitti ise çağır */
  revoke:()=>{S.plan=null;S.until=0;save(true);sched()},
  /* Test için: tüm sayaçları sıfırla */
@@ -18996,116 +18971,136 @@ function start(){
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",start);else start();
 })();
 </script>
+<script id="kidomind-billing-twa">
+/* ===== KIDOMIND GOOGLE PLAY FATURALANDIRMA (TWA / Digital Goods API) =====
+   Play Store'daki Bubblewrap/PWABuilder (TWA) paketinde çalışır. Tarayıcıda / Capacitor'da hiçbir şey yapmaz.
+   ÜRÜN KİMLİKLERİ — Play Console > "Ürün Kimliği" alanındaki değerlerle BİREBİR aynı olmalı.
+   Her plan için sırayla denenir; Google'ın tanıdığı ilk kimlik kullanılır. */
+(function(){
+"use strict";
+if(window.KidomindBilling||typeof window.getDigitalGoodsService!=="function")return;
+
+const SKUS={
+ monthly:["kidomind_premium_monthly"],
+ yearly:["kidomind_premium_yearly"],
+ lifetime:["premium_lifetime"]
+};
+const PERIOD_MS={monthly:33*864e5,yearly:368*864e5};          /* yenileme + küçük tolerans */
+const ORDER=["lifetime","yearly","monthly"];
+const PM="https://play.google.com/billing";
+const MANAGE_URL="https://play.google.com/store/account/subscriptions";
+let svc=null,svcP=null,resolved={},acked={};
+
+const planOfSku=id=>{for(const pl of ORDER){if(SKUS[pl].indexOf(id)>-1)return pl}return null};
+const grant=(pl)=>{try{window.KidomindPremium&&KidomindPremium.grantFromStore({plan:pl,expiresAt:PERIOD_MS[pl]?Date.now()+PERIOD_MS[pl]:0})}catch(e){}};
+function getSvc(){
+ if(svc)return Promise.resolve(svc);
+ if(!svcP)svcP=window.getDigitalGoodsService(PM).then(s=>(svc=s),e=>{svcP=null;throw e});
+ return svcP;
+}
+/* Bu plan için Google'da tanımlı gerçek ürün kimliğini bul */
+async function skuFor(pl){
+ if(resolved[pl])return resolved[pl];
+ const s=await getSvc();
+ for(const id of SKUS[pl]){
+  try{const d=await s.getDetails([id]);if(d&&d.length){resolved[pl]=id;return id}}catch(e){}
+ }
+ return null;
+}
+async function ackAll(list){
+ const s=await getSvc();
+ for(const p of list){
+  if(!p||!p.purchaseToken||acked[p.purchaseToken])continue;
+  acked[p.purchaseToken]=1;
+  try{await s.acknowledge(p.purchaseToken,"onetime")}catch(e){}   /* zaten onaylıysa hata verir, sorun değil */
+ }
+}
+/* Google'daki aktif satın alımları oku, en yüksek planı döndür */
+async function owned(){
+ const s=await getSvc();
+ const list=(await s.listPurchases())||[];
+ ackAll(list).catch(()=>{});
+ const found={};list.forEach(p=>{const pl=planOfSku(p.itemId);if(pl)found[pl]=1});
+ for(const pl of ORDER)if(found[pl])return pl;
+ return null;
+}
+
+window.KidomindBilling={
+ async purchase(_ignored,plan){
+  const sku=await skuFor(plan);
+  if(!sku)return{ok:false,error:"urun-bulunamadi"};
+  const req=new PaymentRequest([{supportedMethods:PM,data:{sku:sku}}],{total:{label:"Kidomind Premium",amount:{currency:"TRY",value:"0"}}});
+  let resp;
+  try{resp=await req.show()}
+  catch(e){return{ok:false,error:(e&&e.name)||"iptal"}}       /* kullanıcı vazgeçti */
+  try{
+   const token=resp.details&&resp.details.purchaseToken;
+   if(token){acked[token]=1;try{await (await getSvc()).acknowledge(token,"onetime")}catch(e){}}
+   await resp.complete("success");
+  }catch(e){try{await resp.complete("fail")}catch(_){}return{ok:false,error:"onay-hatasi"}}
+  grant(plan);
+  return{ok:true,plan:plan,expiresAt:PERIOD_MS[plan]?Date.now()+PERIOD_MS[plan]:0};
+ },
+ async restore(){
+  const pl=await owned();
+  return pl?{plan:pl,expiresAt:PERIOD_MS[pl]?Date.now()+PERIOD_MS[pl]:0}:{plan:null};
+ },
+ manage(){try{window.open(MANAGE_URL,"_blank")}catch(e){location.href=MANAGE_URL}}
+};
+
+/* Uygulama açılınca: Google'da aktif satın alım varsa premium'u yenile */
+setTimeout(()=>{owned().then(pl=>{if(pl)grant(pl)}).catch(()=>{})},2000);
+})();
+</script>
 <script id="kidomind-billing">
 /* ===== KIDOMIND GOOGLE PLAY FATURALANDIRMA KÖPRÜSÜ =====
    Capacitor + "cordova-plugin-purchase" (CdvPurchase). Tarayıcıda hiçbir şey yapmaz.
-   Play Console yapısı: ABONELİK kimliği = kidomind_premium_monthly; içindeki TEMEL PLANLAR = premium-monthly, premium-yearly-v2 (eski premium-yearly devre dışı);
-   TEK SEFERLİK ürün = premium_lifetime. Fiyatlar Play'den okunur (sabit fiyat yalnızca yedektir). */
+   Ürünler: premium-monthly / premium-yearly (abonelik), premium_lifetime (tek seferlik). */
 (function(){
 "use strict";
 let native=false;
 try{native=!!(window.Capacitor&&Capacitor.isNativePlatform&&Capacitor.isNativePlatform())}catch(e){}
 if(!native||window.KidomindBilling)return;
 
-const SUB="kidomind_premium_monthly",LIFE="premium_lifetime";
-const BASE={monthly:"premium-monthly",yearly:"premium-yearly-v2"};
+const PRODUCTS={"kidomind_premium_monthly":"monthly","kidomind_premium_yearly":"yearly","premium_lifetime":"lifetime"};
+const ORDER=["lifetime","yearly","monthly"];
+const idOf=pl=>Object.keys(PRODUCTS).find(k=>PRODUCTS[k]===pl);
 const MANAGE_URL="https://play.google.com/store/account/subscriptions";
 let C=null,store=null,initP=null;const pending={};
-const GP=()=>C.Platform.GOOGLE_PLAY;
 
 const waitLib=ms=>new Promise((res,rej)=>{const t0=Date.now();(function chk(){
  if(window.CdvPurchase)return res(window.CdvPurchase);
  if(Date.now()-t0>ms)return rej(new Error("purchase plugin yok"));
  setTimeout(chk,300)})()});
-const grant=(pl,exp)=>{try{window.KidomindPremium&&KidomindPremium.grantFromStore({plan:pl,expiresAt:exp})}catch(e){}};
-const hasTrial=o=>{try{return (o.pricingPhases||[]).some(p=>p.paymentMode===C.PaymentMode.FREE_TRIAL)}catch(e){return false}};
-const offersOf=(prod,pl)=>((prod&&prod.offers)||[]).filter(o=>String((o&&o.id)||"").indexOf(BASE[pl])===0);
-const planFromOfferId=s=>{s=String(s||"");return s.indexOf(BASE.yearly)===0?"yearly":s.indexOf(BASE.monthly)===0?"monthly":null};
-
-/* Abonelikte hangi temel plan (aylık/yıllık) aktif? Önce işlem kayıtlarına bak, yoksa son bilinen plan */
-function subPlan(){
- try{for(const t of (store.localTransactions||[]))for(const p of (t.products||[]))if(p.id===SUB){const pl=planFromOfferId(p.offerId);if(pl)return pl}}catch(e){}
- try{const s=window.KidomindPremium&&KidomindPremium.status().plan;if(s==="yearly"||s==="monthly")return s}catch(e){}
- return "monthly";
-}
-function planOfProd(p){
- if(p.id===LIFE)return "lifetime";
- if(p.id!==SUB)return null;
- return planFromOfferId(p.offerId)||(pending[SUB]&&pending[SUB].plan)||subPlan();
-}
+const grant=pl=>{try{window.KidomindPremium&&KidomindPremium.grantFromStore({plan:pl})}catch(e){}};
 function ownedPlan(){
- try{if(store.owned({id:LIFE,platform:GP()}))return "lifetime"}catch(e){}
- try{if(store.owned({id:SUB,platform:GP()}))return subPlan()}catch(e){}
+ for(const pl of ORDER){try{if(store.owned({id:idOf(pl),platform:C.Platform.GOOGLE_PLAY}))return pl}catch(e){}}
  return null;
 }
 function syncOwned(){const pl=ownedPlan();if(pl)grant(pl);return pl}
-
-/* Fiyatları Play'den oku (yerel para birimi, Play'deki güncel fiyat) */
-function updatePrices(){
- try{
-  const cfg=window.KidomindPremium&&KidomindPremium.config;if(!cfg||!cfg.PRICES)return;
-  const sp=store.get(SUB,GP());
-  ["monthly","yearly"].forEach(pl=>{
-   const o=offersOf(sp,pl).find(x=>!hasTrial(x));
-   const ph=o&&(o.pricingPhases||[]).filter(p=>p.paymentMode!==C.PaymentMode.FREE_TRIAL).pop();
-   if(ph&&ph.price)cfg.PRICES[pl]=ph.price;
-  });
-  const lp=store.get(LIFE,GP()),lo=lp&&lp.getOffer&&lp.getOffer(),lph=lo&&lo.pricingPhases&&lo.pricingPhases[0];
-  if(lph&&lph.price)cfg.PRICES.lifetime=lph.price;
- }catch(e){}
-}
-
-async function order(productId,offer,plan){
- if(!offer)return{ok:false,error:"urun-bulunamadi"};
- const done=new Promise(res=>{pending[productId]={res,plan}});
- const err=await offer.order();
- if(err){delete pending[productId];return{ok:false,error:err.message||String(err.code)}}
- const r=await Promise.race([done,new Promise(res=>setTimeout(()=>res(null),90000))]);
- if(!r){delete pending[productId];return{ok:false,error:"zaman-asimi"}}
- return{ok:true,plan:r};
-}
 
 function init(){
  if(initP)return initP;
  initP=waitLib(15000).then(async lib=>{
   C=lib;store=lib.store;
-  const G=GP();
+  const G=C.Platform.GOOGLE_PLAY;
   store.register([
-   {id:SUB,type:C.ProductType.PAID_SUBSCRIPTION,platform:G},
-   {id:LIFE,type:C.ProductType.NON_CONSUMABLE,platform:G}
+   {id:"kidomind_premium_monthly",type:C.ProductType.PAID_SUBSCRIPTION,platform:G},
+   {id:"kidomind_premium_yearly",type:C.ProductType.PAID_SUBSCRIPTION,platform:G},
+   {id:"premium_lifetime",type:C.ProductType.NON_CONSUMABLE,platform:G}
   ]);
-  const vurl=(window.KidomindPremium&&KidomindPremium.config&&KidomindPremium.config.VALIDATOR_URL)||"";
-  const settle=(id,pl)=>{const w=pending[id];if(w){delete pending[id];w.res(pl)}};
-  if(vurl){
-   /* Sunucu doğrulaması açık: önce doğrulat, premium'u yalnızca doğrulanınca ver */
-   store.validator=vurl;
-   store.when().approved(tr=>{try{tr.verify()}catch(e){}});
-   store.when().verified(rc=>{
-    let any=false;
-    try{(rc.collection||[]).forEach(c=>{const pl=planOfProd({id:c.id,offerId:c.offerId});if(!pl)return;any=true;grant(pl,c.expiryDate?+new Date(c.expiryDate):undefined);settle(c.id,pl)})}catch(e){}
-    if(!any)syncOwned();
-    try{rc.finish()}catch(e){}
+  /* Satın alma onaylanınca: premium'u aç, Google'a "onaylandı (acknowledge)" bildir */
+  store.when().approved(tr=>{
+   (tr.products||[]).forEach(p=>{
+    const pl=PRODUCTS[p.id];if(!pl)return;
+    grant(pl);
+    const w=pending[p.id];if(w){delete pending[p.id];w.res(pl)}
    });
-  }else{
-   /* Satın alma onaylanınca: premium'u aç, Google'a "onaylandı (acknowledge)" bildir */
-   store.when().approved(tr=>{
-    (tr.products||[]).forEach(p=>{
-     const pl=planOfProd(p);if(!pl)return;
-     let exp;try{if(tr.expirationDate)exp=+new Date(tr.expirationDate)}catch(e){}
-     grant(pl,exp);settle(p.id,pl);
-    });
-    try{tr.finish()}catch(e){}
-   });
-  }
-  /* İptal/iade/süre bitimi: Play kayıtları hatasız yüklendiyse ve sahip olunan ürün yoksa premium'u kapat */
-  let ready=false,initOK=false;
-  const checkRevoke=()=>{if(!ready||!initOK)return;if(syncOwned())return;try{KidomindPremium.revokeFromStore()}catch(e){}};
-  store.when().receiptsReady(()=>{ready=true;syncOwned();checkRevoke()});
-  store.when().productUpdated(()=>updatePrices());
-  const errs=await store.initialize([G]);
-  initOK=!(Array.isArray(errs)&&errs.length);
-  updatePrices();
-  checkRevoke();
+   try{tr.finish()}catch(e){}
+  });
+  store.when().receiptsReady(()=>{syncOwned()});
+  await store.initialize([G]);
+  syncOwned();
  }).catch(e=>{initP=null;throw e});
  return initP;
 }
@@ -19113,17 +19108,15 @@ function init(){
 window.KidomindBilling={
  async purchase(productId,plan){
   await init();
-  if(plan==="lifetime"){const lp=store.get(LIFE,GP());return order(LIFE,lp&&lp.getOffer&&lp.getOffer(),"lifetime")}
-  /* Normal satın almada ücretsiz deneme fazı içermeyen teklif seçilir */
-  const offer=offersOf(store.get(SUB,GP()),plan).find(o=>!hasTrial(o));
-  return order(SUB,offer,plan);
- },
- async startTrial(productId,plan){
-  await init();
-  /* Google deneme teklifini yalnızca hakkı olan hesaba gösterir; yoksa "deneme-yok" döner */
-  const offer=offersOf(store.get(SUB,GP()),plan).find(hasTrial);
-  if(!offer)return{ok:false,error:"deneme-yok"};
-  return order(SUB,offer,plan);
+  const prod=store.get(productId,C.Platform.GOOGLE_PLAY);
+  const offer=prod&&prod.getOffer&&prod.getOffer();
+  if(!offer)return{ok:false,error:"urun-bulunamadi"};
+  const done=new Promise(res=>{pending[productId]={res}});
+  const err=await offer.order();
+  if(err){delete pending[productId];return{ok:false,error:err.message||String(err.code)}}
+  const r=await Promise.race([done,new Promise(res=>setTimeout(()=>res(null),90000))]);
+  if(!r){delete pending[productId];return{ok:false,error:"zaman-asimi"}}
+  return{ok:true,plan:r};
  },
  async restore(){
   await init();
@@ -19132,7 +19125,7 @@ window.KidomindBilling={
   return pl?{plan:pl}:{plan:null};
  },
  manage(){
-  init().then(()=>store.manageSubscriptions(GP()))
+  init().then(()=>store.manageSubscriptions(C.Platform.GOOGLE_PLAY))
    .catch(()=>{try{window.open(MANAGE_URL,"_blank")}catch(e){}});
  }
 };
