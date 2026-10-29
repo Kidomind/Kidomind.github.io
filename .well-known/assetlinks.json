@@ -1,13 +1,10 @@
-[
-  {
-    "relation": ["delegate_permission/common.handle_all_urls"],
-    "target": {
-      "namespace": "android_app",
-      "package_name": "BURAYA_PACKAGE_ID_YAZ",
-      "sha256_cert_fingerprints": [
-        "BURAYA_PLAY_CONSOLE_SHA256_PARMAK_IZI_1",
-        "BURAYA_PWABUILDER_KEYSTORE_SHA256_PARMAK_IZI_2"
-      ]
-    }
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "com.kidomind.app",
+    "sha256_cert_fingerprints": [
+      "11:D6:87:2E:4B:EB:22:8A:08:82:1A:5E:A0:26:1B:97:A2:13:D6:21:C9:C2:43:DE:39:52:7F:84:C9:89:90:37"
+    ]
   }
-]
+}]
