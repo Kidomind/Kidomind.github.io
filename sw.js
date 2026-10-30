@@ -1,5 +1,5 @@
 /* Kidomind service worker – çevrimdışı çalışma */
-const VERSION = 'kidomind-v5';
+const VERSION = 'kidomind-v6';
 const CORE = VERSION + '-core';
 const AUDIO = VERSION + '-audio';
 const BASE = self.registration.scope;
