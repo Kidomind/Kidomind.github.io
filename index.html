@@ -1252,6 +1252,36 @@ html:root:root:root body #app .kdpf-sw{color:#fff!important;-webkit-text-fill-co
 #splash.kd2 .l.dt:after{box-shadow:0 0 .3em var(--dc)}
 #splash.kd2 .sp-go{background:linear-gradient(135deg,rgba(255,255,255,.12),rgba(255,255,255,.04));box-shadow:0 10px 30px rgba(0,0,0,.45)}
 </style>
+<style id="kidomind-tour">
+#kdtour{position:fixed;inset:0;z-index:100000;display:flex;flex-direction:column;color:#fff;font-family:ui-rounded,"SF Pro Rounded","Nunito",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+background:radial-gradient(ellipse 90% 50% at 50% 12%,#2b2fa8 0,transparent 72%),radial-gradient(ellipse 70% 45% at 90% 95%,#4a1590 0,transparent 70%),linear-gradient(180deg,#060920 0,#0a0f36 55%,#100a2e 100%);transition:opacity .45s,transform .45s;animation:kdtIn .5s both}
+#kdtour.out{opacity:0;transform:scale(1.04);pointer-events:none}
+@keyframes kdtIn{from{opacity:0}to{opacity:1}}
+#kdtour .ktt{display:flex;align-items:center;justify-content:space-between;padding:calc(env(safe-area-inset-top,0px) + 14px) 18px 4px}
+#kdtour .ktd{display:flex;gap:6px}#kdtour .ktd i{width:8px;height:8px;border-radius:9px;background:rgba(255,255,255,.3);transition:.3s}#kdtour .ktd i.on{width:24px;background:#ffb800}
+#kdtour .ktb{justify-content:safe center;flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:6px 18px 10px;display:flex;flex-direction:column;align-items:center}
+#kdtour .ktm{display:flex;align-items:flex-end;gap:8px;width:100%;max-width:440px;margin:0}
+#kdtour .ktf{width:112px;flex:none;cursor:pointer;filter:drop-shadow(0 10px 10px rgba(0,0,0,.4));animation:kdtFl 3s ease-in-out infinite}
+#kdtour .ktf svg{display:block;width:100%;height:auto}
+#kdtour .ktf.hop{animation:kdtHop .7s}
+#kdtour .ktbub{position:relative;flex:1;background:#fff;color:#1d2340;border-radius:18px;padding:12px 14px;font-weight:700;font-size:15px;line-height:1.45;margin-bottom:26px;box-shadow:0 8px 22px rgba(0,0,0,.35);animation:kdtPop .4s both}
+#kdtour .ktbub:before{content:"";position:absolute;left:-8px;bottom:18px;border:8px solid transparent;border-right-color:#fff;border-left:0}
+#kdtour .ktbub b{color:#5b5bf0}
+#kdtour .ktp{width:100%;max-width:440px;margin:10px 0 0;padding:14px;border-radius:22px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);display:grid;gap:8px}
+#kdtour .ktp[hidden]{display:none}
+#kdtour .ktp.g2{grid-template-columns:1fr 1fr}#kdtour .ktp.g1{grid-template-columns:1fr}
+#kdtour .kti{display:flex;align-items:center;gap:10px;padding:10px 11px;border-radius:14px;background:rgba(255,255,255,.1);font-weight:800;font-size:13.5px;line-height:1.25;opacity:0;animation:kdtUp .45s calc(var(--k)*.07s + .15s) forwards}
+#kdtour .kti i{font-style:normal;font-size:24px;flex:none}
+#kdtour .kti small{display:block;font-weight:600;font-size:11.5px;opacity:.75;margin-top:1px}
+#kdtour .ktg{flex:none;margin:6px 18px calc(env(safe-area-inset-bottom,0px) + 18px);max-width:404px;width:calc(100% - 36px);align-self:center;display:flex;align-items:center;justify-content:center;gap:10px;min-height:56px;border:0;border-radius:28px;cursor:pointer;color:#fff;font:inherit;font-size:19px;font-weight:900;background:linear-gradient(135deg,#5b5bf0,#8a5cf6);box-shadow:0 7px 0 #2f2a9a,0 14px 28px rgba(0,0,0,.4);transition:transform .12s,box-shadow .12s}
+#kdtour .ktg:active{transform:translateY(4px);box-shadow:0 3px 0 #2f2a9a,0 8px 18px rgba(0,0,0,.4)}
+@keyframes kdtFl{50%{transform:translateY(-5px)}}
+@keyframes kdtHop{0%,100%{transform:none}30%{transform:translateY(-22px) rotate(-6deg)}60%{transform:translateY(-8px) rotate(6deg)}}
+@keyframes kdtPop{from{opacity:0;transform:scale(.9) translateY(6px)}to{opacity:1;transform:none}}
+@keyframes kdtUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@media(max-height:640px){#kdtour .ktf{width:84px}#kdtour .ktbub{font-size:13.5px;margin-bottom:18px}}
+@media(prefers-reduced-motion:reduce){#kdtour .ktf,#kdtour .kti,#kdtour .ktbub{animation:none;opacity:1}}
+</style>
 </head>
 <body>
 <main id="app"></main>
@@ -13071,18 +13101,81 @@ if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catc
 
 /* Kidomind açılış ekranı */
 (function(){try{var sp=document.getElementById("splash");if(!sp)return;
-var seen=false;try{seen=sessionStorage.getItem("kd-splash")==="1"}catch(e){}
+var seen=false;try{seen=sessionStorage.getItem("kd-splash")==="1";sessionStorage.removeItem("kd-splash")}catch(e){}
 if(seen){sp.remove();return}
 var f=document.getElementById("spf"),sy=["+","−","×","÷","★","?","=","♥","✦","π","A","Z"];
 for(var i=0;i<18;i++){var e=document.createElement("span");e.className="fl";e.textContent=sy[i%sy.length];
 e.style.cssText="left:"+(Math.random()*92)+"%;font-size:"+(28+Math.random()*44)+"px;animation-duration:"+(9+Math.random()*10)+"s;animation-delay:-"+(Math.random()*14)+"s";f.appendChild(e)}
 function kdm(){try{var w=document.querySelector("#splash .sp-w");if(!w)return;var L=w.querySelectorAll(".l");if(!L.length)return;var fs=parseFloat(getComputedStyle(L[0]).fontSize)||64;for(var j=0;j<L.length;j++)L[j].style.setProperty("--x",(L[j].offsetLeft/fs).toFixed(3)+"em")}catch(e){}}kdm();requestAnimationFrame(kdm);window.addEventListener("resize",kdm);if(document.fonts&&document.fonts.ready)document.fonts.ready.then(kdm);
 var t0=Date.now(),done=false;
-function close(){if(done||Date.now()-t0<700)return;done=true;try{sessionStorage.setItem("kd-splash","1")}catch(e){}
+function close(){if(done||Date.now()-t0<700)return;done=true;
 try{if(navigator.vibrate)navigator.vibrate(15)}catch(e){}
 sp.classList.add("out");setTimeout(function(){sp.remove()},500)}
 var go=document.getElementById("spgo");if(go){go.addEventListener("click",close);go.addEventListener("touchend",function(ev){ev.preventDefault();close()},{passive:false})}
 }catch(e){console.warn("splash:",e)}})();
+/* İlk kurulum: Kido tanıtım turu -> "Başla" ekranı (yalnızca ilk kez, atlanamaz) */
+(function(){try{var sp=document.getElementById("splash");
+var K2="kd-tour-seen",s2=false;
+try{s2=localStorage.getItem(K2)==="1"}catch(e){}
+if(s2)return;
+function hideSp(){if(sp)sp.style.display="none"}
+function showSp(){if(sp)sp.style.display=""}
+hideSp();
+
+/* --- Kido (tilki) --- */
+function fox(h){var c="#f97316",b="#fff7ed",F=function(d,f){return '<path d="'+d+'" fill="'+f+'"/>'},
+E=function(x,y,rx,ry,f){return '<ellipse cx="'+x+'" cy="'+y+'" rx="'+rx+'" ry="'+ry+'" fill="'+f+'"/>'},
+C=function(x,y,r,f){return '<circle cx="'+x+'" cy="'+y+'" r="'+r+'" fill="'+f+'"/>'},
+P=function(d,st,wd){return '<path d="'+d+'" stroke="'+st+'" stroke-width="'+wd+'" fill="none" stroke-linecap="round"/>'};
+var tail=F("M84 102c26 2 32-26 16-40-2 16-10 26-24 28z",c)+C(98,66,5,"#fff"),
+ears=F("M28 46L30 12L54 32z",c)+F("M92 46L90 12L66 32z",c)+F("M34 38L35 21L47 32z","#fbcfe8")+F("M86 38L85 21L73 32z","#fbcfe8"),
+eyes=h?P("M40 54q6-10 12 0M68 54q6-10 12 0","#1d2340",3.5):C(46,52,5,"#1d2340")+C(74,52,5,"#1d2340")+C(48,50,1.8,"#fff")+C(76,50,1.8,"#fff"),
+mouth=h?F("M50 69q10 14 20 0z","#be123c"):P("M52 70q8 6 16 0","#1d2340",2.5),
+face=F("M28 58q32 42 64 0q-10 18-32 18q-22 0-32-18z",b);
+return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" aria-hidden="true">'+tail+E(60,98,24,20,c)+E(60,102,13,14,b)+ears+E(60,54,34,30,c)+face+eyes+E(60,64,5,3.6,"#3b2a1a")+mouth+'</svg>'}
+
+/* --- Adım 2: Kido turu --- */
+var STEPS=[
+{h:1,t:"Merhaba, ben <b>Kido</b>! 🦊 KidoMind'ın maskotuyum. Gel, seni ve çocuğunu içeride neler beklediğini göstereyim!",
+ p:null},
+{h:0,t:"Önce <b>dersler</b>! 1. sınıftan 8. sınıfa kadar bütün derslerde sorular, konu çalışmaları ve denemeler var.",g:2,
+ p:[["🧮","Matematik"],["📖","Türkçe"],["🇬🇧","İngilizce"],["🔬","Fen Bilimleri"],["🗺️","Sosyal Bilgiler"],["🕌","Din Kültürü"],["🌱","Hayat Bilgisi"],["📝","Deneme Sınavı"],["🎓","LGS Deneme"],["💻","Bilişim ve Yazılım"]]},
+{h:1,t:"Öğrenirken <b>eğlenmek</b> de şart! Zekâ oyunları, mini oyunlar ve hayal gücünü uçuracak bir atölye hazırladık.",g:1,
+ p:[["🎮","Mini Oyunlar","Eğlenirken öğreten zekâ oyunları"],["🎨","Çizim & Boyama Atölyesi","Hayal gücünü çiz, boya, yarat"],["⚡","Bilgi Yarışmaları","Süreyle yarış, rekorunu kır"]]},
+{h:0,t:"Birlikte <b>hikâyeler</b> okuyalım mı? Her hikâyede güzel bir değer ve hep birlikte öğrendiğimiz bir ders var.",g:1,
+ p:[["🦊","Kido ve Kayıp Yıldız","Arkadaşlık ve yardımlaşma"],["🐰","Lila'nın Cesaret Günü","Korkarken de ilerleyebilmek"],["🚀","Kido'nun Uzay Macerası","Gezegenleri keşfediyoruz"],["♻️","Geri Dönüşüm Hikâyeleri","Doğayı korumayı öğreniyoruz"]]},
+{h:1,t:"Doğru bildikçe <b>jeton</b> kazanırsın! 🪙 Onlarla beni istediğin gibi giydirebilir, yeni maskotlar ve sahneler alabilirsin.",g:2,
+ p:[["🪙","Jeton kazan"],["🎩","Şapka & kostüm"],["🐾","Yeni maskotlar"],["🖼️","Renkli sahneler"]]},
+{h:0,t:"Veliler için de güzel haber: <b>ilerleme</b> hep göz önünde! Eksik konular tekrar karşına çıkar. Hepsi <b>reklamsız</b> ve güvenli.",g:1,
+ p:[["🎯","Zayıf Konularım & Yanlışlarım Defteri","Eksikler akıllıca tekrar ettirilir"],["📊","İlerleme & Sertifikalar","Hedefler, rekorlar, başarı belgeleri"],["👨‍👩‍👧","Ebeveyn Paneli","Gelişimi detaylıca takip edin"],["🛡️","Reklamsız & Ebeveyn Onaylı","Çocuk dostu, güvenli içerik"]]},
+{h:1,t:"Şşşt! Durun, bir saniye... 🤫 Veliler, sizleri de unutmadık! <b>Ömür Boyu</b> satın alma yaptığınızda, Aksu Studio'nun geliştirdiği <b>Moniva – Kişisel Finans ve Bütçe Takip</b> uygulaması size <b>hediyemiz</b> olsun! 🎁",g:1,
+ p:[["🎁","Ömür Boyu alanlara hediye","Siz çocuklarınızın geleceğini düşünürken, biz de sizin ve çocuklarınızın günlük ve aylık bütçesini takip etmenize yardımcı olalım"],["✉️","Bize e-posta ile “Hediye” yazın","aksustudiotr@gmail.com"],["🔑","Size promosyon kodunuzu verelim","Ömür boyu satın alma sonrası ürün promosyon kodunuz iletilir"],["🔒","Bu adres uygulamada da var","Profil › Gizlilik › İletişim bölümünde bulabilirsiniz"]]},
+{h:1,t:"Hazırsan başlayalım! Seninle öğrenmek için sabırsızlanıyorum! 🎉",p:null}
+];
+function runTour(){
+ var o=document.createElement("div");o.id="kdtour";o.setAttribute("role","dialog");o.setAttribute("aria-modal","true");o.setAttribute("aria-label","Kido ile uygulamayı tanıyalım");
+ o.innerHTML='<div class="ktt"><div class="ktd"></div></div><div class="ktb"><div class="ktm"><div class="ktf" role="button" aria-label="Kido"></div><div class="ktbub" aria-live="polite"></div></div><div class="ktp" hidden></div></div><button class="ktg" type="button"><span></span><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>';
+ document.body.appendChild(o);
+ var q=function(c){return o.querySelector(c)},dots=q(".ktd"),ff=q(".ktf"),bub=q(".ktbub"),pn=q(".ktp"),gb=q(".ktg"),gl=gb.firstChild,i=0,fin=false;
+ STEPS.forEach(function(){dots.appendChild(document.createElement("i"))});
+ function set(n){i=n;var S=STEPS[n];
+  [].forEach.call(dots.children,function(d,k){d.className=k===n?"on":""});
+  ff.innerHTML=fox(S.h);ff.classList.remove("hop");void ff.offsetWidth;ff.classList.add("hop");
+  bub.style.animation="none";void bub.offsetWidth;bub.style.animation="";bub.innerHTML=S.t;
+  if(S.p){pn.hidden=false;pn.className="ktp g"+S.g;pn.innerHTML=S.p.map(function(x,k){return '<div class="kti" style="--k:'+k+'"><i>'+x[0]+'</i><span>'+x[1]+(x[2]?'<small>'+x[2]+'</small>':'')+'</span></div>'}).join("")}else{pn.hidden=true;pn.innerHTML=""}
+  gl.textContent=n===STEPS.length-1?"Hadi başlayalım!":"Devam";
+  q(".ktb").scrollTop=0;
+  try{if(navigator.vibrate)navigator.vibrate(8)}catch(e){}}
+ function end(){if(fin)return;fin=true;try{localStorage.setItem(K2,"1")}catch(e){}
+  showSp();o.classList.add("out");setTimeout(function(){o.remove()},480)}
+ gb.addEventListener("click",function(){i<STEPS.length-1?set(i+1):end()});
+ ff.addEventListener("click",function(){ff.innerHTML=fox(1);ff.classList.remove("hop");void ff.offsetWidth;ff.classList.add("hop")});
+ set(0);
+}
+
+runTour();
+}catch(e){console.warn("tour:",e);try{var x=document.getElementById("splash");if(x)x.style.display=""}catch(_){}}})();
+
 
 /* ===== KİDOMİND v6 KABUK: alt menü + Bugün + kategoriler ===== */
 (function(){
