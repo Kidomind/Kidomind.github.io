@@ -1,10 +1,25 @@
-[{
-  "relation": ["delegate_permission/common.handle_all_urls"],
-  "target": {
-    "namespace": "android_app",
-    "package_name": "com.kidomind.app",
-    "sha256_cert_fingerprints": [
-      "11:D6:87:2E:4B:EB:22:8A:08:82:1A:5E:A0:26:1B:97:A2:13:D6:21:C9:C2:43:DE:39:52:7F:84:C9:89:90:37"
-    ]
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.kidomind.app",
+      "sha256_cert_fingerprints": [
+        "11:D6:87:2E:4B:EB:22:8A:08:82:1A:5E:A0:26:1B:97:A2:13:D6:21:C9:C2:43:DE:39:52:7F:84:C9:89:90:37"
+      ]
+    }
+  },
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.bubbloon.app",
+      "sha256_cert_fingerprints": [
+        "77:75:63:A8:13:CA:88:3D:99:65:97:50:33:2B:8B:3F:3A:7C:3C:0A:C2:A2:AF:33:D4:FF:7C:55:AF:C2:AA:0F",
+        "36:44:05:40:3E:95:26:E5:86:B3:BE:2E:8B:2D:F7:14:F3:4E:FB:DE:85:70:F1:17:B5:93:7B:73:03:4C:FC:A8",
+        "32:5B:66:64:88:AC:E2:68:BD:BB:7E:DE:5E:4C:7C:80:E4:DA:C0:B4:38:75:C3:23:FC:60:96:26:06:0E:31:60",
+        "FA:C6:17:45:DC:09:03:78:6F:B9:ED:E6:2A:96:2B:39:9F:73:48:F0:BB:6F:89:9B:83:32:66:75:91:03:3B:9C"
+      ]
+    }
   }
-}]
+]
